@@ -9,7 +9,8 @@
 
 'use strict';
 
-var _ = require('lodash');
+var _ = require('lodash'),
+    UnexpectedSyntaxException = require('./Exception/UnexpectedSyntaxException');
 
 function PHPToAST(parsing, phpGrammarSpec) {
     this.parsing = parsing;
@@ -17,6 +18,8 @@ function PHPToAST(parsing, phpGrammarSpec) {
 }
 
 _.extend(PHPToAST.prototype, {
+    UnexpectedSyntaxException: UnexpectedSyntaxException,
+
     create: function (stderr) {
         var lib = this;
 
