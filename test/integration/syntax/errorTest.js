@@ -13,7 +13,7 @@ var _ = require('lodash'),
     engineTools = require('../tools'),
     nowdoc = require('nowdoc'),
     phpTools = require('../../tools'),
-    UnexpectedSyntaxException = require('../../../src/Exception/UnexpectedSyntaxException');
+    PHPParseError = require('phpcommon').PHPParseError;
 
 describe('PHP Parser syntax error handling integration', function () {
     var parser;
@@ -34,22 +34,22 @@ describe('PHP Parser syntax error handling integration', function () {
         'function call missing end semicolon': {
             code: '<?php open()',
             expectedException: {
-                instanceOf: UnexpectedSyntaxException,
-                match: /^Syntax error, unexpected \$end in \(program\) on line 1$/
+                instanceOf: PHPParseError,
+                match: /^PHP Parse error: syntax error, unexpected \$end in \(program\) on line 1$/
             }
         },
         'echo missing argument or end semicolon': {
             code: '<?php echo',
             expectedException: {
-                instanceOf: UnexpectedSyntaxException,
-                match: /^Syntax error, unexpected \$end in \(program\) on line 1$/
+                instanceOf: PHPParseError,
+                match: /^PHP Parse error: syntax error, unexpected \$end in \(program\) on line 1$/
             }
         },
         'function call missing end semicolon and followed by whitespace': {
             code: '<?php open() ',
             expectedException: {
-                instanceOf: UnexpectedSyntaxException,
-                match: /^Syntax error, unexpected \$end in \(program\) on line 1$/
+                instanceOf: PHPParseError,
+                match: /^PHP Parse error: syntax error, unexpected \$end in \(program\) on line 1$/
             }
         },
         'concatenation expression with superfluous dot preceded by whitespace': {
@@ -63,22 +63,22 @@ describe('PHP Parser syntax error handling integration', function () {
 EOS
 */;}), // jshint ignore:line
             expectedException: {
-                instanceOf: UnexpectedSyntaxException,
-                match: /^Syntax error, unexpected '.' in \(program\) on line 5$/
+                instanceOf: PHPParseError,
+                match: /^PHP Parse error: syntax error, unexpected '.' in \(program\) on line 5$/
             }
         },
         'concatenation with invalid comma before dot operator and followed by whitespace': {
             code: '<?php $a = 1 ,. 2; ',
             expectedException: {
-                instanceOf: UnexpectedSyntaxException,
-                match: /^Syntax error, unexpected ',' in \(program\) on line 1$/
+                instanceOf: PHPParseError,
+                match: /^PHP Parse error: syntax error, unexpected ',' in \(program\) on line 1$/
             }
         },
         'concatenation with invalid comma after dot operator and followed by whitespace': {
             code: '<?php $a = 1 ., 2; ',
             expectedException: {
-                instanceOf: UnexpectedSyntaxException,
-                match: /^Syntax error, unexpected ',' in \(program\) on line 1$/
+                instanceOf: PHPParseError,
+                match: /^PHP Parse error: syntax error, unexpected ',' in \(program\) on line 1$/
             }
         },
         // Ensure the invalid token's line is referred to, not the last valid token's line
@@ -91,8 +91,8 @@ EOS
 EOS
 */;}), // jshint ignore:line
             expectedException: {
-                instanceOf: UnexpectedSyntaxException,
-                match: /^Syntax error, unexpected ',' in \(program\) on line 4$/
+                instanceOf: PHPParseError,
+                match: /^PHP Parse error: syntax error, unexpected ',' in \(program\) on line 4$/
             }
         }
     }, function (scenario, description) {

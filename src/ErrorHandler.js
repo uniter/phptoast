@@ -10,7 +10,7 @@
 'use strict';
 
 var _ = require('lodash'),
-    UnexpectedSyntaxException = require('./Exception/UnexpectedSyntaxException');
+    PHPParseError = require('phpcommon').PHPParseError;
 
 function ErrorHandler(stderr, state) {
     this.state = state;
@@ -30,11 +30,11 @@ _.extend(ErrorHandler.prototype, {
             what = '\'' + text.substr(parseException.getFurthestMatchEnd(), 1) + '\'';
         }
 
-        error = new UnexpectedSyntaxException(
-            handler.state.getPath(),
-            parseException.getLineNumber(),
-            what
-        );
+        error = new PHPParseError(PHPParseError.SYNTAX_UNEXPECTED, {
+            'file': handler.state.getPath(),
+            'line': parseException.getLineNumber(),
+            'what': what
+        });
 
         if (handler.state.isMainProgram() && handler.stderr) {
             handler.stderr.write(error.message);
