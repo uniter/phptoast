@@ -26,7 +26,7 @@
   "dependencies": {
     "lodash": "^3.10.0",
     "parsing": "^1.0.3",
-    "phpcommon": "~1.1"
+    "phpcommon": "~1.2"
   },
   "devDependencies": {
     "chai": "^2.3.0",
