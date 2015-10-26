@@ -13,7 +13,7 @@
  * Elimination of left-recursion: http://web.cs.wpi.edu/~kal/PLT/PLT4.1.2.html
  */
 
-var _ = require('lodash'),
+var _ = require('microdash'),
     uppercaseReplacements = [{
         pattern: /.*/g,
         replacement: function (all) {

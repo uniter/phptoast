@@ -9,7 +9,7 @@
 
 'use strict';
 
-var _ = require('lodash'),
+var _ = require('microdash'),
     expect = require('chai').expect,
     nowdoc = require('nowdoc'),
     tools = require('../../tools');

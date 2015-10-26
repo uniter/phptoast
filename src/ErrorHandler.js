@@ -9,7 +9,7 @@
 
 'use strict';
 
-var _ = require('lodash'),
+var _ = require('microdash'),
     PHPParseError = require('phpcommon').PHPParseError;
 
 function ErrorHandler(stderr, state) {
