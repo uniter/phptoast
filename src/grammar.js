@@ -681,7 +681,7 @@ module.exports = {
             components: ['T_LIST', (/\(/), {name: 'elements', zeroOrMoreOf: {oneOf: [[{oneOf: ['N_VARIABLE', 'N_ARRAY_INDEX']}, {what: (/(,|(?=\)))()/), captureIndex: 2}], 'N_VOID']}}, (/\)/)]
         },
         'N_MAGIC_CONSTANT': {
-            components: {oneOf: ['N_MAGIC_CLASS_CONSTANT', 'N_MAGIC_DIR_CONSTANT', 'N_MAGIC_FILE_CONSTANT', 'N_MAGIC_FUNCTION_CONSTANT', 'N_MAGIC_LINE_CONSTANT', 'N_MAGIC_METHOD_CONSTANT']}
+            components: {oneOf: ['N_MAGIC_CLASS_CONSTANT', 'N_MAGIC_DIR_CONSTANT', 'N_MAGIC_FILE_CONSTANT', 'N_MAGIC_FUNCTION_CONSTANT', 'N_MAGIC_LINE_CONSTANT', 'N_MAGIC_METHOD_CONSTANT', 'N_MAGIC_NAMESPACE_CONSTANT']}
         },
         'N_MAGIC_CLASS_CONSTANT': {
             components: {what: 'T_CLASS_C', replace: uppercaseReplacements, allowMerge: false}
@@ -700,6 +700,9 @@ module.exports = {
         },
         'N_MAGIC_METHOD_CONSTANT': {
             components: {what: 'T_METHOD_C', replace: uppercaseReplacements, allowMerge: false}
+        },
+        'N_MAGIC_NAMESPACE_CONSTANT': {
+            components: {what: 'T_NS_C', replace: uppercaseReplacements, allowMerge: false}
         },
         'N_METHOD_DEFINITION': {
             components: [{name: 'visibility', optionally: {oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}}, 'T_FUNCTION', {name: 'func', what: 'T_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), {name: 'body', what: 'N_STATEMENT'}],
