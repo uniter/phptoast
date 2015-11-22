@@ -68,6 +68,16 @@ var _ = require('microdash'),
             };
         });
     },
+    buildTernaryExpression = function (condition, rest) {
+        return buildTree(condition, rest, function (result, element) {
+            return {
+                name: 'N_TERNARY',
+                condition: result,
+                consequent: element.consequent,
+                alternate: element.alternate
+            };
+        });
+    },
     PHPErrorHandler = require('./ErrorHandler'),
     PHPGrammarState = require('./State');
 
@@ -511,13 +521,13 @@ module.exports = {
         },
         'N_EXPRESSION_LEVEL_5': {
             captureAs: 'N_UNARY_EXPRESSION',
-            components: [{name: 'operator', optionally: (/!/)}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_4'}],
+            components: [{name: 'operator', optionally: (/!/)}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_4']}],
             ifNoMatch: {component: 'operator', capture: 'operand'},
             options: {prefix: true}
         },
         'N_EXPRESSION_LEVEL_6': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_5'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', oneOf: [(/\*/), (/\//), (/%/)]}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_5'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_5'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', oneOf: [(/\*/), (/\//), (/%/)]}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_5']}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_7_A': {
@@ -528,7 +538,7 @@ module.exports = {
         },
         'N_EXPRESSION_LEVEL_7_B': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_7_A'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', oneOf: [(/\+/), (/-/), (/\./)]}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_7_A'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_7_A'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', oneOf: [(/\+/), (/-/), (/\./)]}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_7_A']}]}],
             processor: function (node) {
                 if (!node.right) {
                     return node.left;
@@ -539,62 +549,72 @@ module.exports = {
         },
         'N_EXPRESSION_LEVEL_8': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_7_B'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', oneOf: ['T_SL', 'T_SR']}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_7_B'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_7_B'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', oneOf: ['T_SL', 'T_SR']}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_7_B']}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_9': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_8'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', oneOf: ['T_IS_SMALLER_OR_EQUAL', (/</), 'T_IS_GREATER_OR_EQUAL', (/>/)]}, {name: 'operand', what: 'N_EXPRESSION'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_8'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', oneOf: ['T_IS_SMALLER_OR_EQUAL', (/</), 'T_IS_GREATER_OR_EQUAL', (/>/)]}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_8']}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_10': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_9'}, {name: 'right', wrapInArray: true, optionally: [{name: 'operator', oneOf: ['T_IS_IDENTICAL', 'T_IS_EQUAL', 'T_IS_NOT_IDENTICAL', 'T_IS_NOT_EQUAL']}, {name: 'operand', what: 'N_EXPRESSION'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_9'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', oneOf: ['T_IS_IDENTICAL', 'T_IS_EQUAL', 'T_IS_NOT_IDENTICAL', 'T_IS_NOT_EQUAL']}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_9']}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_11': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_10'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/&&/)}, {name: 'operand', what: 'N_EXPRESSION'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_10'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/&&/)}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_10']}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_12': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_11'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/\^/)}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_11'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_11'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/\^/)}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_11']}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_13': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_12'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/\|/)}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_12'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_12'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/\|/)}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_12']}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_14': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_13'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/&/)}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_13'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_13'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/&/)}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_13']}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_15': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_14'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/\|\|/)}, {name: 'operand', what: 'N_EXPRESSION'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_14'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/\|\|/)}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_14']}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_16': {
             captureAs: 'N_TERNARY',
-            components: [{name: 'condition', what: 'N_EXPRESSION_LEVEL_15'}, {name: 'options', zeroOrMoreOf: [(/\?/), {name: 'consequent', what: 'N_EXPRESSION_LEVEL_15'}, (/:/), {name: 'alternate', what: 'N_EXPRESSION_LEVEL_15'}]}],
-            ifNoMatch: {component: 'options', capture: 'condition'}
+            components: [{name: 'condition', what: 'N_EXPRESSION_LEVEL_15'}, {name: 'rest', zeroOrMoreOf: [(/\?/), {name: 'consequent', what: 'N_EXPRESSION_LEVEL_15'}, (/:/), {name: 'alternate', what: 'N_EXPRESSION_LEVEL_15'}]}],
+            processor: function (node) {
+                if (!node.rest) {
+                    return node.condition;
+                }
+
+                return buildTernaryExpression(node.condition, node.rest);
+            }
         },
-         'N_EXPRESSION_LEVEL_17_A': {
+        'N_ASSIGNMENT_EXPRESSION': {
+            captureAs: 'N_EXPRESSION',
+            components: [
+                {name: 'left', what: 'N_LEFT_HAND_SIDE_EXPRESSION'},
+                {name: 'right', oneOrMoreOf: [{name: 'operator', what: (/[+-]?=/)}, {name: 'operand', what: 'N_EXPRESSION'}]}
+            ]
+        },
+        'N_EXPRESSION_LEVEL_17_A': {
              captureAs: 'N_EXPRESSION',
              components: {
                  // Don't allow binary expressions on the left-hand side of assignments
                  oneOf: [
-                     [
-                         {name: 'left', what: 'N_EXPRESSION_LEVEL_2_B'},
-                         {name: 'right', oneOrMoreOf: [{name: 'operator', what: (/[+-]?=/)}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_17_A'}]}
-                     ],
+                     'N_ASSIGNMENT_EXPRESSION',
                      'N_EXPRESSION_LEVEL_16'
                  ]
              }
-         },
+        },
         'N_EXPRESSION_LEVEL_17_B': {
             captureAs: 'N_PRINT_EXPRESSION',
             components: {oneOf: [
@@ -620,6 +640,7 @@ module.exports = {
         'N_EXPRESSION_LEVEL_21': {
             components: 'N_EXPRESSION_LEVEL_20'
         },
+        'N_LEFT_HAND_SIDE_EXPRESSION': 'N_EXPRESSION_LEVEL_2_B',
         'N_EXPRESSION_STATEMENT': {
             components: [{name: 'expression', what: 'N_EXPRESSION'}, (/;/)]
         },

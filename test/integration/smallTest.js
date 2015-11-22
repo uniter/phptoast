@@ -257,16 +257,14 @@ describe('PHP Parser grammar small program integration', function () {
                             name: 'N_INTEGER',
                             number: '1'
                         },
-                        options: [{
-                            consequent: {
-                                name: 'N_INTEGER',
-                                number: '4'
-                            },
-                            alternate: {
-                                name: 'N_INTEGER',
-                                number: '8'
-                            }
-                        }]
+                        consequent: {
+                            name: 'N_INTEGER',
+                            number: '4'
+                        },
+                        alternate: {
+                            name: 'N_INTEGER',
+                            number: '8'
+                        }
                     }
                 }]
             }
@@ -294,43 +292,41 @@ describe('PHP Parser grammar small program integration', function () {
                                 }
                             }]
                         },
-                        options: [{
-                            consequent: {
-                                name: 'N_EXPRESSION',
-                                left: {
-                                    name: 'N_INTEGER',
-                                    number: '3'
-                                },
-                                right: [{
-                                    operator: '+',
-                                    operand: {
-                                        name: 'N_INTEGER',
-                                        number: '2'
-                                    }
-                                }]
+                        consequent: {
+                            name: 'N_EXPRESSION',
+                            left: {
+                                name: 'N_INTEGER',
+                                number: '3'
                             },
-                            alternate: {
-                                name: 'N_EXPRESSION',
-                                left: {
+                            right: [{
+                                operator: '+',
+                                operand: {
                                     name: 'N_INTEGER',
-                                    number: '7'
-                                },
-                                right: [{
-                                    operator: '+',
-                                    operand: {
-                                        name: 'N_INTEGER',
-                                        number: '5'
-                                    }
-                                }]
-                            }
-                        }]
+                                    number: '2'
+                                }
+                            }]
+                        },
+                        alternate: {
+                            name: 'N_EXPRESSION',
+                            left: {
+                                name: 'N_INTEGER',
+                                number: '7'
+                            },
+                            right: [{
+                                operator: '+',
+                                operand: {
+                                    name: 'N_INTEGER',
+                                    number: '5'
+                                }
+                            }]
+                        }
                     }
                 }]
             }
         },
         // Ternary with nested ternary in condition:
         // - Common gotcha for developers, as in other languages ?: is right-associative whereas in PHP it's left-associative
-        // - Result would be "Banana", but if right-associative it would be "Orange"
+        // - Result would be "Banana", but if right-associative it would be "Apple"
         {
             code: '<?php $arg = "A"; return ($arg === "A") ? "Apple" : ($arg === "B") ? "Banana" : "Orange";',
             expectedAST: {
@@ -356,20 +352,21 @@ describe('PHP Parser grammar small program integration', function () {
                     expression: {
                         name: 'N_TERNARY',
                         condition: {
-                            name: 'N_EXPRESSION',
-                            left: {
-                                name: 'N_VARIABLE',
-                                variable: 'arg'
+                            name: 'N_TERNARY',
+                            condition: {
+                                name: 'N_EXPRESSION',
+                                left: {
+                                    name: 'N_VARIABLE',
+                                    variable: 'arg'
+                                },
+                                right: [{
+                                    operator: '===',
+                                    operand: {
+                                        name: 'N_STRING_LITERAL',
+                                        string: 'A'
+                                    }
+                                }]
                             },
-                            right: [{
-                                operator: '===',
-                                operand: {
-                                    name: 'N_STRING_LITERAL',
-                                    string: 'A'
-                                }
-                            }]
-                        },
-                        options: [{
                             consequent: {
                                 name: 'N_STRING_LITERAL',
                                 string: 'Apple'
@@ -388,16 +385,15 @@ describe('PHP Parser grammar small program integration', function () {
                                     }
                                 }]
                             }
-                        }, {
-                            consequent: {
-                                name: 'N_STRING_LITERAL',
-                                string: 'Banana'
-                            },
-                            alternate: {
-                                name: 'N_STRING_LITERAL',
-                                string: 'Orange'
-                            }
-                        }]
+                        },
+                        consequent: {
+                            name: 'N_STRING_LITERAL',
+                            string: 'Banana'
+                        },
+                        alternate: {
+                            name: 'N_STRING_LITERAL',
+                            string: 'Orange'
+                        }
                     }
                 }]
             }
