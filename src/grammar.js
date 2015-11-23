@@ -260,7 +260,15 @@ module.exports = {
             components: 'N_EXPRESSION_LEVEL_2_A'
         },
         'N_ARRAY_LITERAL': {
+            components: {oneOf: ['N_LONG_ARRAY_LITERAL', 'N_SHORT_ARRAY_LITERAL']}
+        },
+        'N_LONG_ARRAY_LITERAL': {
+            captureAs: 'N_ARRAY_LITERAL',
             components: ['T_ARRAY', (/\(/), {name: 'elements', zeroOrMoreOf: [{oneOf: ['N_KEY_VALUE_PAIR', 'N_EXPRESSION']}, {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/)]
+        },
+        'N_SHORT_ARRAY_LITERAL': {
+            captureAs: 'N_ARRAY_LITERAL',
+            components: [(/\[/), {name: 'elements', zeroOrMoreOf: [{oneOf: ['N_KEY_VALUE_PAIR', 'N_EXPRESSION']}, {what: (/(,|(?=\]))()/), captureIndex: 2}]}, (/\]/)]
         },
         'N_BOOLEAN': {
             components: {name: 'bool', what: (/true|false/i)}

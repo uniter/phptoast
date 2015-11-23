@@ -53,6 +53,72 @@ describe('PHP Parser grammar array literal expression integration', function () 
                     }
                 }]
             }
+        },
+        'short array syntax with one associative element assigned to variable': {
+            code: '$array = ["a" => "b"];',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'array'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_ARRAY_LITERAL',
+                                elements: [{
+                                    name: 'N_KEY_VALUE_PAIR',
+                                    key: {
+                                        name: 'N_STRING_LITERAL',
+                                        string: 'a'
+                                    },
+                                    value: {
+                                        name: 'N_STRING_LITERAL',
+                                        string: 'b'
+                                    }
+                                }]
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
+        'dereferencing element of short array literal': {
+            code: '$value = [21][0];',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'value'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_ARRAY_INDEX',
+                                array: {
+                                    name: 'N_ARRAY_LITERAL',
+                                    elements: [{
+                                        name: 'N_INTEGER',
+                                        number: '21'
+                                    }]
+                                },
+                                indices: [{index: {
+                                    name: 'N_INTEGER',
+                                    number: '0'
+                                }}]
+                            }
+                        }]
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
