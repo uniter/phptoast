@@ -95,6 +95,7 @@ module.exports = {
         // Anything below ASCII 32 except \t (0x09), \n (0x0a) and \r (0x0d)
         'T_BAD_CHARACTER': /(?![\u0009\u000A\u000D])[\u0000-\u001F]/,
 
+        'T_BINARY_CAST': /\(\s*binary\s*\)/i,
         'T_BOOLEAN_AND': /&&/i,
         'T_BOOLEAN_OR': /\|\|/,
         'T_BOOL_CAST': /\(\s*bool(ean)?\s*\)/i,
@@ -517,10 +518,13 @@ module.exports = {
             oneOf: ['N_UNARY_PREFIX_EXPRESSION', 'N_UNARY_SUFFIX_EXPRESSION', 'N_EXPRESSION_LEVEL_2_B']
         },
         'N_EXPRESSION_LEVEL_3_B': {
-            oneOf: ['N_ARRAY_CAST', 'N_BOOLEAN_CAST', 'N_DOUBLE_CAST', 'N_INTEGER_CAST', 'N_OBJECT_CAST', 'N_STRING_CAST', 'N_UNSET_CAST', 'N_EXPRESSION_LEVEL_3_A']
+            oneOf: ['N_ARRAY_CAST', 'N_BINARY_CAST', 'N_BOOLEAN_CAST', 'N_DOUBLE_CAST', 'N_INTEGER_CAST', 'N_OBJECT_CAST', 'N_STRING_CAST', 'N_UNSET_CAST', 'N_EXPRESSION_LEVEL_3_A']
         },
         'N_ARRAY_CAST': {
             components: ['T_ARRAY_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_B'}]
+        },
+        'N_BINARY_CAST': {
+            components: ['T_BINARY_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_B'}]
         },
         'N_BOOLEAN_CAST': {
             components: ['T_BOOL_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_B'}]
