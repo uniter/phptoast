@@ -270,6 +270,18 @@ module.exports = {
             captureAs: 'N_ARRAY_LITERAL',
             components: [(/\[/), {name: 'elements', zeroOrMoreOf: [{oneOf: ['N_KEY_VALUE_PAIR', 'N_EXPRESSION']}, {what: (/(,|(?=\]))()/), captureIndex: 2}]}, (/\]/)]
         },
+        'N_BINARY_LITERAL': {
+            components: [
+                (/b/),
+                {name: 'string', what: 'N_STRING_LITERAL'}
+            ],
+            processor: function (node) {
+                node.name = 'N_BINARY_LITERAL';
+                // Extract the nested string from N_STRING_LITERAL
+                node.string = node.string.string;
+                return node;
+            }
+        },
         'N_BOOLEAN': {
             components: {name: 'bool', what: (/true|false/i)}
         },
@@ -891,7 +903,7 @@ module.exports = {
             components: ['T_SWITCH', (/\(/), {name: 'expression', what: 'N_EXPRESSION'}, (/\)/), (/\{/), {name: 'cases', zeroOrMoreOf: {oneOf: ['N_CASE', 'N_DEFAULT_CASE']}}, (/\}/)]
         },
         'N_TERM': {
-            components: {oneOf: ['N_VARIABLE', 'N_FLOAT', 'N_INTEGER', 'N_BOOLEAN', 'N_STRING_LITERAL', 'N_ARRAY_LITERAL', 'N_LIST', 'N_ISSET', 'N_CLOSURE', 'N_MAGIC_CONSTANT', 'N_REQUIRE_EXPRESSION', 'N_REQUIRE_ONCE_EXPRESSION', 'N_INCLUDE_EXPRESSION', 'N_SELF', 'N_NULL', 'N_NAMESPACED_REFERENCE', 'N_STRING']}
+            components: {oneOf: ['N_VARIABLE', 'N_FLOAT', 'N_INTEGER', 'N_BOOLEAN', 'N_STRING_LITERAL', 'N_BINARY_LITERAL', 'N_ARRAY_LITERAL', 'N_LIST', 'N_ISSET', 'N_CLOSURE', 'N_MAGIC_CONSTANT', 'N_REQUIRE_EXPRESSION', 'N_REQUIRE_ONCE_EXPRESSION', 'N_INCLUDE_EXPRESSION', 'N_SELF', 'N_NULL', 'N_NAMESPACED_REFERENCE', 'N_STRING']}
         },
         'N_THROW_STATEMENT': {
             components: ['T_THROW', {name: 'expression', rule: 'N_EXPRESSION'}, (/;/)]
