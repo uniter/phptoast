@@ -82,6 +82,35 @@ describe('PHP Parser grammar object cast "(object) <value>" operator integration
                     }
                 }]
             }
+        },
+        'assigning cast of cast to another variable': {
+            code: '$myObject = (object)(int)$string;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'myObject'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_OBJECT_CAST',
+                                value: {
+                                    name: 'N_INTEGER_CAST',
+                                    value: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'string'
+                                    }
+                                }
+                            }
+                        }]
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

@@ -508,25 +508,25 @@ module.exports = {
             oneOf: ['N_ARRAY_CAST', 'N_BOOLEAN_CAST', 'N_DOUBLE_CAST', 'N_INTEGER_CAST', 'N_OBJECT_CAST', 'N_STRING_CAST', 'N_UNSET_CAST', 'N_EXPRESSION_LEVEL_3_A']
         },
         'N_ARRAY_CAST': {
-            components: ['T_ARRAY_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_A'}]
+            components: ['T_ARRAY_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_B'}]
         },
         'N_BOOLEAN_CAST': {
-            components: ['T_BOOL_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_A'}]
+            components: ['T_BOOL_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_B'}]
         },
         'N_DOUBLE_CAST': {
-            components: ['T_DOUBLE_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_A'}]
+            components: ['T_DOUBLE_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_B'}]
         },
         'N_INTEGER_CAST': {
-            components: ['T_INT_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_A'}]
+            components: ['T_INT_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_B'}]
         },
         'N_OBJECT_CAST': {
-            components: ['T_OBJECT_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_A'}]
+            components: ['T_OBJECT_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_B'}]
         },
         'N_STRING_CAST': {
-            components: ['T_STRING_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_A'}]
+            components: ['T_STRING_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_B'}]
         },
         'N_UNSET_CAST': {
-            components: ['T_UNSET_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_A'}]
+            components: ['T_UNSET_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_B'}]
         },
         'N_UNARY_PREFIX_EXPRESSION': {
             captureAs: 'N_UNARY_EXPRESSION',

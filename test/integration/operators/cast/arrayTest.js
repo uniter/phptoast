@@ -46,6 +46,35 @@ describe('PHP Parser grammar array cast "(array) <value>" operator integration',
                     }
                 }]
             }
+        },
+        'assigning cast of cast to another variable': {
+            code: '$myArray = (array)(int)$string;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'myArray'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_ARRAY_CAST',
+                                value: {
+                                    name: 'N_INTEGER_CAST',
+                                    value: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'string'
+                                    }
+                                }
+                            }
+                        }]
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

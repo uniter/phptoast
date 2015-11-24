@@ -134,6 +134,35 @@ describe('PHP Parser grammar double cast "(double) <value>" operator integration
                     }
                 }]
             }
+        },
+        'assigning cast of cast to another variable': {
+            code: '$myFloat = (float)(int)$string;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'myFloat'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_DOUBLE_CAST',
+                                value: {
+                                    name: 'N_INTEGER_CAST',
+                                    value: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'string'
+                                    }
+                                }
+                            }
+                        }]
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
