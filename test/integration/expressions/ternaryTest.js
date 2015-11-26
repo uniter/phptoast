@@ -113,6 +113,68 @@ describe('PHP Parser grammar ternary expression integration', function () {
                     }
                 }]
             }
+        },
+        'shorthand ternary': {
+            code: '$myVar = 21 ?: 22;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'myVar'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_TERNARY',
+                                condition: {
+                                    name: 'N_INTEGER',
+                                    number: '21'
+                                },
+                                consequent: null,
+                                alternate: {
+                                    name: 'N_INTEGER',
+                                    number: '22'
+                                }
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
+        'shorthand ternary with erratic whitespace': {
+            code: '$myVar = 21 ?    : 22;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'myVar'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_TERNARY',
+                                condition: {
+                                    name: 'N_INTEGER',
+                                    number: '21'
+                                },
+                                consequent: null,
+                                alternate: {
+                                    name: 'N_INTEGER',
+                                    number: '22'
+                                }
+                            }
+                        }]
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

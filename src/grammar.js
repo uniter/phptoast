@@ -73,7 +73,7 @@ var _ = require('microdash'),
             return {
                 name: 'N_TERNARY',
                 condition: result,
-                consequent: element.consequent,
+                consequent: element.consequent === '' ? null : element.consequent,
                 alternate: element.alternate
             };
         });
@@ -631,7 +631,7 @@ module.exports = {
         },
         'N_EXPRESSION_LEVEL_16': {
             captureAs: 'N_TERNARY',
-            components: [{name: 'condition', what: 'N_EXPRESSION_LEVEL_15'}, {name: 'rest', zeroOrMoreOf: [(/\?/), {name: 'consequent', what: 'N_EXPRESSION_LEVEL_15'}, (/:/), {name: 'alternate', what: 'N_EXPRESSION_LEVEL_15'}]}],
+            components: [{name: 'condition', what: 'N_EXPRESSION_LEVEL_15'}, {name: 'rest', zeroOrMoreOf: [(/\?/), {name: 'consequent', optionally: 'N_EXPRESSION_LEVEL_15'}, (/:/), {name: 'alternate', what: 'N_EXPRESSION_LEVEL_15'}]}],
             processor: function (node) {
                 if (!node.rest) {
                     return node.condition;
