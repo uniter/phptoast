@@ -545,7 +545,7 @@ module.exports = {
             components: ['T_UNSET_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_B'}]
         },
         'N_SUPPRESSED_EXPRESSION': {
-            components: [(/@/), {name: 'expression', rule: 'N_EXPRESSION_LEVEL_3_B'}]
+            components: [(/@/), {name: 'expression', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_3_B']}]
         },
         'N_UNARY_PREFIX_EXPRESSION': {
             captureAs: 'N_UNARY_EXPRESSION',

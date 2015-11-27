@@ -86,6 +86,32 @@ describe('PHP Parser grammar error control operator integration', function () {
                     }
                 }]
             }
+        },
+        'suppressing errors for the target of an assignment': {
+            code: '@$result = $undefVar;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_SUPPRESSED_EXPRESSION',
+                        expression: {
+                            name: 'N_EXPRESSION',
+                            left: {
+                                name: 'N_VARIABLE',
+                                variable: 'result'
+                            },
+                            right: [{
+                                operator: '=',
+                                operand: {
+                                    name: 'N_VARIABLE',
+                                    variable: 'undefVar'
+                                }
+                            }]
+                        }
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
