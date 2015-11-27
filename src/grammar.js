@@ -518,7 +518,7 @@ module.exports = {
             oneOf: ['N_UNARY_PREFIX_EXPRESSION', 'N_UNARY_SUFFIX_EXPRESSION', 'N_EXPRESSION_LEVEL_2_B']
         },
         'N_EXPRESSION_LEVEL_3_B': {
-            oneOf: ['N_ARRAY_CAST', 'N_BINARY_CAST', 'N_BOOLEAN_CAST', 'N_DOUBLE_CAST', 'N_INTEGER_CAST', 'N_OBJECT_CAST', 'N_STRING_CAST', 'N_UNSET_CAST', 'N_EXPRESSION_LEVEL_3_A']
+            oneOf: ['N_ARRAY_CAST', 'N_BINARY_CAST', 'N_BOOLEAN_CAST', 'N_DOUBLE_CAST', 'N_INTEGER_CAST', 'N_OBJECT_CAST', 'N_STRING_CAST', 'N_UNSET_CAST', 'N_SUPPRESSED_EXPRESSION', 'N_EXPRESSION_LEVEL_3_A']
         },
         'N_ARRAY_CAST': {
             components: ['T_ARRAY_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_B'}]
@@ -543,6 +543,9 @@ module.exports = {
         },
         'N_UNSET_CAST': {
             components: ['T_UNSET_CAST', {name: 'value', rule: 'N_EXPRESSION_LEVEL_3_B'}]
+        },
+        'N_SUPPRESSED_EXPRESSION': {
+            components: [(/@/), {name: 'expression', rule: 'N_EXPRESSION_LEVEL_3_B'}]
         },
         'N_UNARY_PREFIX_EXPRESSION': {
             captureAs: 'N_UNARY_EXPRESSION',
