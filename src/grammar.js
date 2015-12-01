@@ -319,6 +319,26 @@ module.exports = {
         'N_EMPTY_STATEMENT': {
             components: (/;/)
         },
+        'N_EXIT': {
+            components: {oneOf: ['N_EXIT_WITH_STATUS', 'N_EXIT_WITH_MESSAGE', 'N_EXIT_BARE']}
+        },
+        'N_EXIT_WITH_STATUS': {
+            captureAs: 'N_EXIT',
+            components: ['T_EXIT', (/\(/), {name: 'status', rule: 'N_INTEGER'}, (/\)/)]
+        },
+        'N_EXIT_WITH_MESSAGE': {
+            captureAs: 'N_EXIT',
+            components: ['T_EXIT', (/\(/), {name: 'message', rule: 'N_EXPRESSION'}, (/\)/)]
+        },
+        'N_EXIT_BARE': {
+            captureAs: 'N_EXIT',
+            components: ['T_EXIT', {optionally: [(/\(/), (/\)/)]}],
+            processor: function () {
+                return {
+                    name: 'N_EXIT'
+                };
+            }
+        },
         'N_EXPRESSION': {
             components: {oneOf: ['N_EXPRESSION_LEVEL_21']}
         },
@@ -910,7 +930,7 @@ module.exports = {
             components: ['T_SWITCH', (/\(/), {name: 'expression', what: 'N_EXPRESSION'}, (/\)/), (/\{/), {name: 'cases', zeroOrMoreOf: {oneOf: ['N_CASE', 'N_DEFAULT_CASE']}}, (/\}/)]
         },
         'N_TERM': {
-            components: {oneOf: ['N_VARIABLE', 'N_FLOAT', 'N_INTEGER', 'N_BOOLEAN', 'N_STRING_LITERAL', 'N_BINARY_LITERAL', 'N_ARRAY_LITERAL', 'N_LIST', 'N_ISSET', 'N_CLOSURE', 'N_MAGIC_CONSTANT', 'N_REQUIRE_EXPRESSION', 'N_REQUIRE_ONCE_EXPRESSION', 'N_INCLUDE_EXPRESSION', 'N_SELF', 'N_NULL', 'N_NAMESPACED_REFERENCE', 'N_STRING']}
+            components: {oneOf: ['N_VARIABLE', 'N_FLOAT', 'N_INTEGER', 'N_BOOLEAN', 'N_STRING_LITERAL', 'N_BINARY_LITERAL', 'N_ARRAY_LITERAL', 'N_LIST', 'N_ISSET', 'N_EXIT', 'N_CLOSURE', 'N_MAGIC_CONSTANT', 'N_REQUIRE_EXPRESSION', 'N_REQUIRE_ONCE_EXPRESSION', 'N_INCLUDE_EXPRESSION', 'N_SELF', 'N_NULL', 'N_NAMESPACED_REFERENCE', 'N_STRING']}
         },
         'N_THROW_STATEMENT': {
             components: ['T_THROW', {name: 'expression', rule: 'N_EXPRESSION'}, (/;/)]
