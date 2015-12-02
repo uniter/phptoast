@@ -7,7 +7,7 @@
     "parse",
     "ast"
   ],
-  "homepage": "http://uniter.github.com/phptoast/",
+  "homepage": "https://github.com/uniter/phptoast",
   "author": "Dan Phillimore <dan@ovms.co> (http://ovms.co)",
   "repository": {
     "type": "git",
