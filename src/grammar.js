@@ -667,7 +667,7 @@ module.exports = {
             captureAs: 'N_EXPRESSION',
             components: [
                 {name: 'left', what: 'N_LEFT_HAND_SIDE_EXPRESSION'},
-                {name: 'right', oneOrMoreOf: [{name: 'operator', what: (/[-+*\/.%&|^]?=/)}, {name: 'operand', what: 'N_EXPRESSION'}]}
+                {name: 'right', oneOrMoreOf: [{name: 'operator', what: (/(?:[-+*\/.%&|^]|<<|>>)?=/)}, {name: 'operand', what: 'N_EXPRESSION'}]}
             ]
         },
         'N_EXPRESSION_LEVEL_17_A': {
