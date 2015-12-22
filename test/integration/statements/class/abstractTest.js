@@ -34,7 +34,7 @@ describe('PHP Parser grammar abstract class statement integration', function () 
             }
         },
         'abstract empty class with comments, erratic whitespace and case': {
-            code: '<?php    aBstRACt        class   MyBase{   }  ',
+            code: '<?php    aBstRACt /* rem */       class /* more comments */  MyBase{   }  ',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{

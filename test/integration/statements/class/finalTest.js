@@ -34,7 +34,7 @@ describe('PHP Parser grammar final class statement integration', function () {
             }
         },
         'final empty class with comments, erratic whitespace and case': {
-            code: '<?php    fInAL        class   MyPerfectClass{   }  ',
+            code: '<?php    fInAL    /* stuff */    class /* more stuff */  MyPerfectClass{   }  ',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
