@@ -797,11 +797,17 @@ module.exports = {
             components: {what: 'T_NS_C', replace: uppercaseReplacements, allowMerge: false}
         },
         'N_METHOD_DEFINITION': {
-            components: [{name: 'visibility', optionally: {oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}}, 'T_FUNCTION', {name: 'func', what: 'T_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), {name: 'body', what: 'N_STATEMENT'}],
+            components: [{name: 'modifier1', optionally: {rule: 'T_FINAL'}}, {name: 'visibility', optionally: {oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}}, {name: 'modifier2', optionally: {rule: 'T_FINAL'}}, 'T_FUNCTION', {name: 'func', what: 'T_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), {name: 'body', what: 'N_STATEMENT'}],
             processor: function (node) {
                 if (!node.visibility) {
                     node.visibility = 'public';
                 }
+                node.modifier = node.modifier1 || node.modifier2;
+                if (!node.modifier) {
+                    delete node.modifier;
+                }
+                delete node.modifier1;
+                delete node.modifier2;
 
                 return node;
             }

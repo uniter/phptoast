@@ -44,6 +44,69 @@ describe('PHP Parser grammar final class statement integration', function () {
                     members: []
                 }]
             }
+        },
+        'final instance method with implicit visibility': {
+            code: '<?php class MyPerfectClass { final function myMethod() {} }',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    className: 'MyPerfectClass',
+                    members: [{
+                        name: 'N_METHOD_DEFINITION',
+                        func: 'myMethod',
+                        modifier: 'final',
+                        visibility: 'public',
+                        args: [],
+                        body: {
+                            name: 'N_COMPOUND_STATEMENT',
+                            statements: []
+                        }
+                    }]
+                }]
+            }
+        },
+        'final instance method with explicit prefixed visibility': {
+            code: '<?php class MyPerfectClass { protected final function myMethod() {} }',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    className: 'MyPerfectClass',
+                    members: [{
+                        name: 'N_METHOD_DEFINITION',
+                        func: 'myMethod',
+                        modifier: 'final',
+                        visibility: 'protected',
+                        args: [],
+                        body: {
+                            name: 'N_COMPOUND_STATEMENT',
+                            statements: []
+                        }
+                    }]
+                }]
+            }
+        },
+        'final instance method with explicit suffixed visibility': {
+            code: '<?php class MyPerfectClass { final protected function myMethod() {} }',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    className: 'MyPerfectClass',
+                    members: [{
+                        name: 'N_METHOD_DEFINITION',
+                        func: 'myMethod',
+                        modifier: 'final',
+                        visibility: 'protected',
+                        args: [],
+                        body: {
+                            name: 'N_COMPOUND_STATEMENT',
+                            statements: []
+                        }
+                    }]
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
