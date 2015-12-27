@@ -107,6 +107,111 @@ describe('PHP Parser grammar final class statement integration', function () {
                     }]
                 }]
             }
+        },
+        'final static method with implicit visibility': {
+            code: '<?php class MyPerfectClass { final static function myMethod() {} }',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    className: 'MyPerfectClass',
+                    members: [{
+                        name: 'N_STATIC_METHOD_DEFINITION',
+                        method: 'myMethod',
+                        modifier: 'final',
+                        visibility: 'public',
+                        args: [],
+                        body: {
+                            name: 'N_COMPOUND_STATEMENT',
+                            statements: []
+                        }
+                    }]
+                }]
+            }
+        },
+        'final static method with explicit prefixed visibility': {
+            code: '<?php class MyPerfectClass { protected final static function myMethod() {} }',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    className: 'MyPerfectClass',
+                    members: [{
+                        name: 'N_STATIC_METHOD_DEFINITION',
+                        method: 'myMethod',
+                        modifier: 'final',
+                        visibility: 'protected',
+                        args: [],
+                        body: {
+                            name: 'N_COMPOUND_STATEMENT',
+                            statements: []
+                        }
+                    }]
+                }]
+            }
+        },
+        'final static method with explicit suffixed visibility': {
+            code: '<?php class MyPerfectClass { final protected static function myMethod() {} }',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    className: 'MyPerfectClass',
+                    members: [{
+                        name: 'N_STATIC_METHOD_DEFINITION',
+                        method: 'myMethod',
+                        modifier: 'final',
+                        visibility: 'protected',
+                        args: [],
+                        body: {
+                            name: 'N_COMPOUND_STATEMENT',
+                            statements: []
+                        }
+                    }]
+                }]
+            }
+        },
+        'final static method with static modifier after final': {
+            code: '<?php class MyPerfectClass { final static protected function myMethod() {} }',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    className: 'MyPerfectClass',
+                    members: [{
+                        name: 'N_STATIC_METHOD_DEFINITION',
+                        method: 'myMethod',
+                        modifier: 'final',
+                        visibility: 'protected',
+                        args: [],
+                        body: {
+                            name: 'N_COMPOUND_STATEMENT',
+                            statements: []
+                        }
+                    }]
+                }]
+            }
+        },
+        'final static method with static modifier before final': {
+            code: '<?php class MyPerfectClass { static final protected function myMethod() {} }',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    className: 'MyPerfectClass',
+                    members: [{
+                        name: 'N_STATIC_METHOD_DEFINITION',
+                        method: 'myMethod',
+                        modifier: 'final',
+                        visibility: 'protected',
+                        args: [],
+                        body: {
+                            name: 'N_COMPOUND_STATEMENT',
+                            statements: []
+                        }
+                    }]
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
