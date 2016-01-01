@@ -17,10 +17,10 @@ function PHPToAST(parsing, phpGrammarSpec) {
 }
 
 _.extend(PHPToAST.prototype, {
-    create: function (stderr) {
+    create: function (stderr, options) {
         var lib = this;
 
-        return lib.parsing.create(lib.phpGrammarSpec, stderr);
+        return lib.parsing.create(lib.phpGrammarSpec, stderr, options);
     }
 });
 

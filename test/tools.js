@@ -12,7 +12,8 @@
 var phpToAST = require('..');
 
 module.exports = {
-    createParser: function () {
-        return phpToAST.create();
+    createParser: function (options) {
+        // `stderr` is always `null` for now
+        return phpToAST.create(null, options);
     }
 };
