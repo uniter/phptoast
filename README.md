@@ -12,7 +12,7 @@ You can modify and extend PHPToAST's built-in grammar with the `options` argumen
 
 For example:
 ```javascript
-var phpParser = require('.').create(null, {
+var phpParser = require('phptoast').create(null, {
     rules: {
         'N_CUSTOM_TRAP_IT': {
             components: [/trap_it/, /@/, {name: 'arg', rule: 'N_EXPRESSION'}, /;/]
