@@ -26,7 +26,7 @@
   "dependencies": {
     "microdash": "~1",
     "parsing": "~1.2",
-    "phpcommon": "~1.3"
+    "phpcommon": "~1"
   },
   "devDependencies": {
     "chai": "^2.3.0",
