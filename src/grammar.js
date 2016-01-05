@@ -595,7 +595,7 @@ module.exports = {
 
                 return buildTree(node.left, node.right, function (result, element) {
                     return {
-                        'name': 'N_INSTANCEOF',
+                        'name': 'N_INSTANCE_OF',
                         'object': result,
                         'class': element.operand
                     };

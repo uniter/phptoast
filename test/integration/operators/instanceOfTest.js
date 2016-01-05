@@ -36,7 +36,7 @@ describe('PHP Parser grammar instanceof operator integration', function () {
                         right: [{
                             operator: '=',
                             operand: {
-                                name: 'N_INSTANCEOF',
+                                name: 'N_INSTANCE_OF',
                                 object: {
                                     name: 'N_OBJECT_PROPERTY',
                                     object: {
@@ -75,9 +75,9 @@ describe('PHP Parser grammar instanceof operator integration', function () {
                         right: [{
                             operator: '=',
                             operand: {
-                                name: 'N_INSTANCEOF',
+                                name: 'N_INSTANCE_OF',
                                 object: {
-                                    name: 'N_INSTANCEOF',
+                                    name: 'N_INSTANCE_OF',
                                     object: {
                                         name: 'N_OBJECT_PROPERTY',
                                         object: {
