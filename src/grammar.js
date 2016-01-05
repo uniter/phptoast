@@ -588,7 +588,19 @@ module.exports = {
         'N_EXPRESSION_LEVEL_4': {
             captureAs: 'N_EXPRESSION',
             components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_3_B'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_INSTANCEOF'}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_3_B'}]}],
-            ifNoMatch: {component: 'right', capture: 'left'}
+            processor: function (node) {
+                if (node.right.length === 0) {
+                    return node.left;
+                }
+
+                return buildTree(node.left, node.right, function (result, element) {
+                    return {
+                        'name': 'N_INSTANCEOF',
+                        'object': result,
+                        'class': element.operand
+                    };
+                });
+            }
         },
         'N_EXPRESSION_LEVEL_5': {
             captureAs: 'N_UNARY_EXPRESSION',
