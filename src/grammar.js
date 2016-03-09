@@ -361,7 +361,7 @@ module.exports = {
             components: {oneOf: [
                 [
                     'T_NEW',
-                    {name: 'className', oneOf: ['N_NAMESPACED_REFERENCE', 'N_EXPRESSION_LEVEL_0']},
+                    {name: 'className', oneOf: ['N_NAMESPACED_REFERENCE', 'N_EXPRESSION']},
                     {optionally: [
                         (/\(/),
                         {name: 'args', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
@@ -370,7 +370,30 @@ module.exports = {
                 ],
                 {name: 'next', what: 'N_EXPRESSION_LEVEL_0'}
             ]},
-            ifNoMatch: {component: 'className', capture: 'next'}
+            ifNoMatch: {component: 'className', capture: 'next'},
+            processor: function (node) {
+                // Handle class lookups where the class name is an object property,
+                // will be parsed as a function or method call
+                if (node.className) {
+                    if (node.className.name === 'N_FUNCTION_CALL') {
+                        node.args = node.className.args;
+                        node.className = node.className.func;
+                    }
+
+                    if (node.className.name === 'N_METHOD_CALL') {
+                        node.args = node.className.calls[0].args;
+                        node.className = {
+                            name: 'N_OBJECT_PROPERTY',
+                            object: node.className.object,
+                            properties: [{
+                                property: node.className.calls[0].func
+                            }]
+                        };
+                    }
+                }
+
+                return node;
+            }
         },
         'N_DO_WHILE_STATEMENT': {
             components: ['T_DO', {name: 'body', what: 'N_STATEMENT'}, 'T_WHILE', (/\(/), {name: 'condition', what: 'N_EXPRESSION'}, (/\)/), (/;/)]

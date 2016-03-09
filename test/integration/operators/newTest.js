@@ -158,7 +158,7 @@ describe('PHP Parser grammar new operator integration', function () {
                 }]
             }
         },
-        'creating class from variable': {
+        'instantiating class from variable': {
             code: '$object = new $className;',
             expectedAST: {
                 name: 'N_PROGRAM',
@@ -178,6 +178,80 @@ describe('PHP Parser grammar new operator integration', function () {
                                     name: 'N_VARIABLE',
                                     variable: 'className'
                                 }
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
+        'instantiating class from object property': {
+            code: '$object = new $myObject->className;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'object'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_NEW_EXPRESSION',
+                                className: {
+                                    name: 'N_OBJECT_PROPERTY',
+                                    object: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'myObject'
+                                    },
+                                    properties: [{
+                                        property: {
+                                            name: 'N_STRING',
+                                            string: 'className'
+                                        }
+                                    }]
+                                }
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
+        'instantiating class from object property with arguments': {
+            code: '$object = new $myObject->className(21);',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'object'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_NEW_EXPRESSION',
+                                className: {
+                                    name: 'N_OBJECT_PROPERTY',
+                                    object: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'myObject'
+                                    },
+                                    properties: [{
+                                        property: {
+                                            name: 'N_STRING',
+                                            string: 'className'
+                                        }
+                                    }]
+                                },
+                                args: [{
+                                    name: 'N_INTEGER',
+                                    number: '21'
+                                }]
                             }
                         }]
                     }
