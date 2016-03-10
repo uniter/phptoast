@@ -257,6 +257,42 @@ describe('PHP Parser grammar new operator integration', function () {
                     }
                 }]
             }
+        },
+        'instantiating class from static name inside addition': {
+            code: '$object = new MyClass + 21;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'object'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_EXPRESSION',
+                                left: {
+                                    name: 'N_NEW_EXPRESSION',
+                                    className: {
+                                        name: 'N_STRING',
+                                        string: 'MyClass'
+                                    }
+                                },
+                                right: [{
+                                    operator: '+',
+                                    operand: {
+                                        name: 'N_INTEGER',
+                                        number: '21'
+                                    }
+                                }]
+                            }
+                        }]
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

@@ -356,12 +356,92 @@ module.exports = {
         'N_EXPRESSION_LEVEL_0': {
             components: [{oneOf: ['N_TERM', [(/\(/), 'N_EXPRESSION', (/\)/)]]}]
         },
+        'N_NEW_EXPRESSION_DYNAMIC_CLASS': {
+            components: [
+                {
+                    name: 'expression',
+                    oneOf: ['N_EXPRESSION_LEVEL_0', 'N_NAMESPACED_REFERENCE']
+                },
+                {
+                    name: 'member',
+                    zeroOrMoreOf: {
+                        oneOf: [
+                            // Array index
+                            {
+                                name: 'array_index',
+                                oneOf: [
+                                    'N_EMPTY_ARRAY_INDEX',
+                                    {
+                                        name: 'indices',
+                                        oneOrMoreOf: [
+                                            (/\[/), {name: 'index', what: 'N_EXPRESSION'}, (/\]/)
+                                        ]
+                                    }
+                                ]
+                            },
+                            // Object property
+                            {
+                                name: 'object_property',
+                                what: {
+                                    name: 'properties',
+                                    oneOrMoreOf: [
+                                        'T_OBJECT_OPERATOR',
+                                        {name: 'property', what: 'N_INSTANCE_MEMBER'}
+                                    ]
+                                }
+                            },
+                            // Static object property
+                            {
+                                name: 'static_property',
+                                what: [
+                                    'T_DOUBLE_COLON',
+                                    {name: 'property', what: 'N_STATIC_MEMBER'}
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            processor: function (node) {
+                var result;
+
+                if (!node || !node.expression) {
+                    return node;
+                }
+
+                result = node.expression;
+
+                _.each(node.member, function (member) {
+                    if (member.array_index) {
+                        result = {
+                            name: 'N_ARRAY_INDEX',
+                            array: result,
+                            indices: member.array_index.indices
+                        };
+                    } else if (member.object_property) {
+                        result = {
+                            name: 'N_OBJECT_PROPERTY',
+                            object: result,
+                            properties: member.object_property.properties
+                        };
+                    } else if (member.static_property) {
+                        result = {
+                            name: 'N_STATIC_PROPERTY',
+                            className: result,
+                            property: member.static_property.property
+                        };
+                    }
+                });
+
+                return result;
+            }
+        },
         'N_EXPRESSION_LEVEL_1_A': {
             captureAs: 'N_NEW_EXPRESSION',
             components: {oneOf: [
                 [
                     'T_NEW',
-                    {name: 'className', oneOf: ['N_NAMESPACED_REFERENCE', 'N_EXPRESSION']},
+                    {name: 'className', rule: 'N_NEW_EXPRESSION_DYNAMIC_CLASS'},
                     {optionally: [
                         (/\(/),
                         {name: 'args', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
@@ -370,30 +450,7 @@ module.exports = {
                 ],
                 {name: 'next', what: 'N_EXPRESSION_LEVEL_0'}
             ]},
-            ifNoMatch: {component: 'className', capture: 'next'},
-            processor: function (node) {
-                // Handle class lookups where the class name is an object property,
-                // will be parsed as a function or method call
-                if (node.className) {
-                    if (node.className.name === 'N_FUNCTION_CALL') {
-                        node.args = node.className.args;
-                        node.className = node.className.func;
-                    }
-
-                    if (node.className.name === 'N_METHOD_CALL') {
-                        node.args = node.className.calls[0].args;
-                        node.className = {
-                            name: 'N_OBJECT_PROPERTY',
-                            object: node.className.object,
-                            properties: [{
-                                property: node.className.calls[0].func
-                            }]
-                        };
-                    }
-                }
-
-                return node;
-            }
+            ifNoMatch: {component: 'className', capture: 'next'}
         },
         'N_DO_WHILE_STATEMENT': {
             components: ['T_DO', {name: 'body', what: 'N_STATEMENT'}, 'T_WHILE', (/\(/), {name: 'condition', what: 'N_EXPRESSION'}, (/\)/), (/;/)]
