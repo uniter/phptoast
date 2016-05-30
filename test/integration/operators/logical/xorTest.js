@@ -13,7 +13,7 @@ var _ = require('microdash'),
     expect = require('chai').expect,
     tools = require('../../../tools');
 
-describe('PHP Parser grammar logical Or "<value> || <value>" operator integration', function () {
+describe('PHP Parser grammar logical Xor "<value> xor <value>" operator integration', function () {
     var parser;
 
     beforeEach(function () {
@@ -21,8 +21,8 @@ describe('PHP Parser grammar logical Or "<value> || <value>" operator integratio
     });
 
     _.each({
-        'assigning Or of variable values to another variable': {
-            code: '$result = $value1 || $value2;',
+        'assigning Xor of variable values to another variable': {
+            code: '$result = $value1 xor $value2;',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
@@ -42,40 +42,7 @@ describe('PHP Parser grammar logical Or "<value> || <value>" operator integratio
                                     variable: 'value1'
                                 },
                                 right: [{
-                                    operator: '||',
-                                    operand: {
-                                        name: 'N_VARIABLE',
-                                        variable: 'value2'
-                                    }
-                                }]
-                            }
-                        }]
-                    }
-                }]
-            }
-        },
-        'assigning word-Or of variable values to another variable': {
-            code: '$result = $value1 or $value2;',
-            expectedAST: {
-                name: 'N_PROGRAM',
-                statements: [{
-                    name: 'N_EXPRESSION_STATEMENT',
-                    expression: {
-                        name: 'N_EXPRESSION',
-                        left: {
-                            name: 'N_VARIABLE',
-                            variable: 'result'
-                        },
-                        right: [{
-                            operator: '=',
-                            operand: {
-                                name: 'N_EXPRESSION',
-                                left: {
-                                    name: 'N_VARIABLE',
-                                    variable: 'value1'
-                                },
-                                right: [{
-                                    operator: 'or',
+                                    operator: 'xor',
                                     operand: {
                                         name: 'N_VARIABLE',
                                         variable: 'value2'
@@ -88,7 +55,7 @@ describe('PHP Parser grammar logical Or "<value> || <value>" operator integratio
             }
         },
         'assigning condition with assignment inside operand to variable': {
-            code: '$result = (first_func() || $pos = second_func());',
+            code: '$result = (first_func() xor $pos = second_func());',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
@@ -112,7 +79,7 @@ describe('PHP Parser grammar logical Or "<value> || <value>" operator integratio
                                     args: []
                                 },
                                 right: [{
-                                    operator: '||',
+                                    operator: 'xor',
                                     operand: {
                                         name: 'N_EXPRESSION',
                                         left: {

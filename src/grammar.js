@@ -795,10 +795,14 @@ module.exports = {
             ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_19': {
-            components: 'N_EXPRESSION_LEVEL_18'
+            captureAs: 'N_EXPRESSION',
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_18'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_XOR'}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_18'}]}],
+            ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_20': {
-            components: 'N_EXPRESSION_LEVEL_19'
+            captureAs: 'N_EXPRESSION',
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_19'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_OR'}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_19'}]}],
+            ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_21': {
             components: 'N_EXPRESSION_LEVEL_20'

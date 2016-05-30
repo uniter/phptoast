@@ -54,6 +54,39 @@ describe('PHP Parser grammar logical And "<value> && <value>" operator integrati
                 }]
             }
         },
+        'assigning word-And of variable values to another variable': {
+            code: '$result = $value1 and $value2;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'result'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_EXPRESSION',
+                                left: {
+                                    name: 'N_VARIABLE',
+                                    variable: 'value1'
+                                },
+                                right: [{
+                                    operator: 'and',
+                                    operand: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'value2'
+                                    }
+                                }]
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
         'assigning condition with assignment inside operand to variable': {
             code: '$result = (first_func() && $pos = second_func());',
             expectedAST: {
