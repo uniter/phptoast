@@ -55,7 +55,7 @@ describe('PHP Parser grammar logical And "<value> && <value>" operator integrati
             }
         },
         'assigning word-And of variable values to another variable': {
-            code: '$result = $value1 and $value2;',
+            code: '$result = $value1 aNd $value2;', // Test cae-insensitivity
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{

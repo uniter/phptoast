@@ -55,7 +55,7 @@ describe('PHP Parser grammar logical Or "<value> || <value>" operator integratio
             }
         },
         'assigning word-Or of variable values to another variable': {
-            code: '$result = $value1 or $value2;',
+            code: '$result = $value1 oR $value2;', // Test cae-insensitivity
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{

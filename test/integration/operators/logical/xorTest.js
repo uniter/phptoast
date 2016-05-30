@@ -22,7 +22,7 @@ describe('PHP Parser grammar logical Xor "<value> xor <value>" operator integrat
 
     _.each({
         'assigning Xor of variable values to another variable': {
-            code: '$result = $value1 xor $value2;',
+            code: '$result = $value1 xOr $value2;', // Test cae-insensitivity
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{

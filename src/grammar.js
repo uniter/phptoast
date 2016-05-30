@@ -14,6 +14,12 @@
  */
 
 var _ = require('microdash'),
+    lowercaseReplacements = [{
+        pattern: /.*/g,
+        replacement: function (all) {
+            return all.toLowerCase();
+        }
+    }],
     uppercaseReplacements = [{
         pattern: /.*/g,
         replacement: function (all) {
@@ -791,17 +797,17 @@ module.exports = {
         },
         'N_EXPRESSION_LEVEL_18': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_17_B'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_AND'}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_17_B'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_17_B'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_AND', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_17_B'}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_19': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_18'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_XOR'}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_18'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_18'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_XOR', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_18'}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_20': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_19'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_OR'}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_19'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_19'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_OR', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_19'}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
         },
         'N_EXPRESSION_LEVEL_21': {
