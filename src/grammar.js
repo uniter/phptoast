@@ -956,7 +956,7 @@ module.exports = {
             components: {oneOf: ['N_NAMESPACE_SCOPED_STATEMENT', 'N_NAMESPACE_STATEMENT']}
         },
         'N_NAMESPACE_SCOPED_STATEMENT': {
-            components: {oneOf: ['N_COMPOUND_STATEMENT', 'N_RETURN_STATEMENT', 'N_INLINE_HTML_STATEMENT', 'N_EMPTY_STATEMENT', 'N_ECHO_STATEMENT', 'N_BREAK_STATEMENT', 'N_CONTINUE_STATEMENT', 'N_UNSET_STATEMENT', 'N_EXPRESSION_STATEMENT', 'N_FUNCTION_STATEMENT', 'N_IF_STATEMENT', 'N_FOREACH_STATEMENT', 'N_FOR_STATEMENT', 'N_WHILE_STATEMENT', 'N_DO_WHILE_STATEMENT', 'N_CLASS_STATEMENT', 'N_INTERFACE_STATEMENT', 'N_SWITCH_STATEMENT', 'N_GLOBAL_STATEMENT', 'N_LABEL_STATEMENT', 'N_GOTO_STATEMENT', 'N_USE_STATEMENT', 'N_THROW_STATEMENT']}
+            components: {oneOf: ['N_COMPOUND_STATEMENT', 'N_RETURN_STATEMENT', 'N_INLINE_HTML_STATEMENT', 'N_EMPTY_STATEMENT', 'N_ECHO_STATEMENT', 'N_BREAK_STATEMENT', 'N_CONTINUE_STATEMENT', 'N_UNSET_STATEMENT', 'N_EXPRESSION_STATEMENT', 'N_FUNCTION_STATEMENT', 'N_IF_STATEMENT', 'N_FOREACH_STATEMENT', 'N_FOR_STATEMENT', 'N_WHILE_STATEMENT', 'N_DO_WHILE_STATEMENT', 'N_CLASS_STATEMENT', 'N_INTERFACE_STATEMENT', 'N_SWITCH_STATEMENT', 'N_GLOBAL_STATEMENT', 'N_LABEL_STATEMENT', 'N_GOTO_STATEMENT', 'N_USE_STATEMENT', 'N_THROW_STATEMENT', 'N_TRY_STATEMENT']}
         },
         'N_REQUIRE_EXPRESSION': {
             components: ['T_REQUIRE', {name: 'path', what: 'N_EXPRESSION'}]
@@ -1067,6 +1067,31 @@ module.exports = {
         },
         'N_THROW_STATEMENT': {
             components: ['T_THROW', {name: 'expression', rule: 'N_EXPRESSION'}, (/;/)]
+        },
+        'N_TRY_STATEMENT': {
+            components: [
+                'T_TRY',
+                {name: 'body', what: 'N_STATEMENT'},
+                {
+                    name: 'catches',
+                    zeroOrMoreOf: [
+                        'T_CATCH',
+                        (/\(/),
+                        {name: 'type', oneOf: ['N_NAMESPACED_REFERENCE', 'N_STRING']},
+                        {name: 'variable', rule: 'N_VARIABLE'},
+                        (/\)/),
+                        {name: 'body', what: 'N_STATEMENT'}
+                    ]
+                },
+                {optionally: {name: 'finalizer', what: ['T_FINALLY', 'N_STATEMENT']}}
+            ],
+            processor: function (node) {
+                if (!node.finalizer) {
+                    node.finalizer = null;
+                }
+
+                return node;
+            }
         },
         'N_UNSET_STATEMENT': {
             components: ['T_UNSET', (/\(/), {name: 'variables', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), (/;/)]
