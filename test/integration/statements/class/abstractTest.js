@@ -11,6 +11,7 @@
 
 var _ = require('microdash'),
     expect = require('chai').expect,
+    nowdoc = require('nowdoc'),
     tools = require('../../../tools');
 
 describe('PHP Parser grammar abstract class statement integration', function () {
@@ -42,6 +43,80 @@ describe('PHP Parser grammar abstract class statement integration', function () 
                     type: 'abstract',
                     className: 'MyBase',
                     members: []
+                }]
+            }
+        },
+        'abstract class with abstract instance method': {
+            code: nowdoc(function () {/*<<<EOS
+<?php
+abstract class AbstractMyClass {
+    abstract protected function myMethod(MyArg $arg1, YourArg $arg2);
+}
+EOS
+*/;}), // jshint ignore:line
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    type: 'abstract',
+                    className: 'AbstractMyClass',
+                    members: [{
+                        name: 'N_ABSTRACT_METHOD_DEFINITION',
+                        func: 'myMethod',
+                        visibility: 'protected',
+                        args: [{
+                            name: 'N_ARGUMENT',
+                            type: 'MyArg',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'arg1'
+                            }
+                        }, {
+                            name: 'N_ARGUMENT',
+                            type: 'YourArg',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'arg2'
+                            }
+                        }]
+                    }]
+                }]
+            }
+        },
+        'abstract class with abstract static method': {
+            code: nowdoc(function () {/*<<<EOS
+<?php
+abstract class AbstractMyClass {
+    abstract protected static function myMethod(MyArg $arg1, YourArg $arg2);
+}
+EOS
+*/;}), // jshint ignore:line
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    type: 'abstract',
+                    className: 'AbstractMyClass',
+                    members: [{
+                        name: 'N_ABSTRACT_STATIC_METHOD_DEFINITION',
+                        method: 'myMethod',
+                        visibility: 'protected',
+                        args: [{
+                            name: 'N_ARGUMENT',
+                            type: 'MyArg',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'arg1'
+                            }
+                        }, {
+                            name: 'N_ARGUMENT',
+                            type: 'YourArg',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'arg2'
+                            }
+                        }]
+                    }]
                 }]
             }
         }

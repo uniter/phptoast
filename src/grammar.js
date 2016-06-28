@@ -252,6 +252,58 @@ module.exports = {
         'T_XOR_EQUAL': /\^=/i,
         'T_YIELD': /yield\b/i,
 
+        'N_ABSTRACT_METHOD_DEFINITION': {
+            components: [
+                {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
+                {optionally: {name: 'modifier', rule: 'T_FINAL'}},
+                {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
+                'T_ABSTRACT',
+                {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
+                {optionally: {name: 'modifier', rule: 'T_FINAL'}},
+                {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
+                'T_FUNCTION',
+                {name: 'func', what: 'T_STRING'},
+                (/\(/),
+                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                (/\)/),
+                (/;/)
+            ],
+            processor: function (node) {
+                if (!node.visibility) {
+                    node.visibility = 'public';
+                }
+
+                return node;
+            }
+        },
+        'N_ABSTRACT_STATIC_METHOD_DEFINITION': {
+            components: [
+                {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
+                {optionally: {name: 'modifier', rule: 'T_FINAL'}},
+                {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
+                'T_ABSTRACT',
+                {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
+                {optionally: {name: 'modifier', rule: 'T_FINAL'}},
+                {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
+                'T_STATIC',
+                {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
+                {optionally: {name: 'modifier', rule: 'T_FINAL'}},
+                {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
+                'T_FUNCTION',
+                {name: 'method', what: 'T_STRING'},
+                (/\(/),
+                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                (/\)/),
+                (/;/)
+            ],
+            processor: function (node) {
+                if (!node.visibility) {
+                    node.visibility = 'public';
+                }
+
+                return node;
+            }
+        },
         'N_ARGUMENT': {
             oneOf: ['N_DECORATED_ARGUMENT', 'N_VARIABLE']
         },
@@ -299,7 +351,7 @@ module.exports = {
             components: ['T_CASE', {name: 'expression', what: 'N_EXPRESSION'}, (/:/), {name: 'body', zeroOrMoreOf: 'N_STATEMENT'}]
         },
         'N_CLASS_STATEMENT': {
-            components: [{optionally: {name: 'type', oneOf: ['T_ABSTRACT', 'T_FINAL']}}, 'T_CLASS', {name: 'className', rule: 'T_STRING'}, {optionally: ['T_EXTENDS', {name: 'extend', oneOf: ['N_NAMESPACE', 'T_STRING']}]}, {optionally: ['T_IMPLEMENTS', {name: 'implement', zeroOrMoreOf: [{oneOf: ['N_NAMESPACE', 'T_STRING']}, {what: (/(,|(?=\{))()/), captureIndex: 2}]}]}, (/\{/), {name: 'members', zeroOrMoreOf: {oneOf: ['N_INSTANCE_PROPERTY_DEFINITION', 'N_STATIC_PROPERTY_DEFINITION', 'N_METHOD_DEFINITION', 'N_STATIC_METHOD_DEFINITION', 'N_CONSTANT_DEFINITION']}}, (/\}/)],
+            components: [{optionally: {name: 'type', oneOf: ['T_ABSTRACT', 'T_FINAL']}}, 'T_CLASS', {name: 'className', rule: 'T_STRING'}, {optionally: ['T_EXTENDS', {name: 'extend', oneOf: ['N_NAMESPACE', 'T_STRING']}]}, {optionally: ['T_IMPLEMENTS', {name: 'implement', zeroOrMoreOf: [{oneOf: ['N_NAMESPACE', 'T_STRING']}, {what: (/(,|(?=\{))()/), captureIndex: 2}]}]}, (/\{/), {name: 'members', zeroOrMoreOf: {oneOf: ['N_INSTANCE_PROPERTY_DEFINITION', 'N_STATIC_PROPERTY_DEFINITION', 'N_METHOD_DEFINITION', 'N_STATIC_METHOD_DEFINITION', 'N_ABSTRACT_METHOD_DEFINITION', 'N_ABSTRACT_STATIC_METHOD_DEFINITION', 'N_CONSTANT_DEFINITION']}}, (/\}/)],
             processor: function (node) {
                 if (node.type) {
                     node.type = node.type.toLowerCase();
@@ -861,7 +913,7 @@ module.exports = {
             components: [{name: 'visibility', oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}, 'T_FUNCTION', {name: 'func', what: 'T_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), (/;/)]
         },
         'N_INTERFACE_STATEMENT': {
-            components: ['T_INTERFACE', {name: 'interfaceName', rule: 'T_STRING'}, {optionally: ['T_EXTENDS', {name: 'extend', oneOf: ['N_NAMESPACE', 'T_STRING']}]}, (/\{/), {name: 'members', zeroOrMoreOf: {oneOf: ['N_INTERFACE_METHOD_DEFINITION', 'N_STATIC_INTERFACE_METHOD_DEFINITION', 'N_CONSTANT_DEFINITION', 'N_INSTANCE_PROPERTY_DEFINITION', 'N_STATIC_PROPERTY_DEFINITION', 'N_METHOD_DEFINITION', 'N_STATIC_METHOD_DEFINITION']}}, (/\}/)]
+            components: ['T_INTERFACE', {name: 'interfaceName', rule: 'T_STRING'}, {optionally: ['T_EXTENDS', {name: 'extend', oneOf: ['N_NAMESPACE', 'T_STRING']}]}, (/\{/), {name: 'members', zeroOrMoreOf: {oneOf: ['N_INTERFACE_METHOD_DEFINITION', 'N_STATIC_INTERFACE_METHOD_DEFINITION', 'N_CONSTANT_DEFINITION', 'N_INSTANCE_PROPERTY_DEFINITION', 'N_STATIC_PROPERTY_DEFINITION', 'N_METHOD_DEFINITION', 'N_STATIC_METHOD_DEFINITION', 'N_ABSTRACT_METHOD_DEFINITION', 'N_ABSTRACT_STATIC_METHOD_DEFINITION']}}, (/\}/)]
         },
         'N_ISSET': {
             components: ['T_ISSET', (/\(/), {name: 'variables', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/)]
@@ -981,7 +1033,8 @@ module.exports = {
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),
                 (/;/)
-            ]            },
+            ]
+        },
         'N_STATIC_MEMBER': {
             components: {oneOf: ['N_STATIC_VARIABLE', 'N_STATIC_VARIABLE_EXPRESSION']}
         },
