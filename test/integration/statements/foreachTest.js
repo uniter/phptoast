@@ -106,9 +106,11 @@ describe('PHP Parser grammar foreach statement integration', function () {
                         variable: 'key'
                     },
                     value: {
-                        name: 'N_VARIABLE',
-                        reference: '&',
-                        variable: 'item'
+                        name: 'N_REFERENCE',
+                        operand: {
+                            name: 'N_VARIABLE',
+                            variable: 'item'
+                        }
                     },
                     body: {
                         name: 'N_COMPOUND_STATEMENT',

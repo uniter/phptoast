@@ -76,9 +76,11 @@ describe('PHP Parser grammar closure expression integration', function () {
                             name: 'N_VARIABLE',
                             variable: 'a'
                         }, {
-                            name: 'N_VARIABLE',
-                            reference: '&',
-                            variable: 'b'
+                            name: 'N_REFERENCE',
+                            operand: {
+                                name: 'N_VARIABLE',
+                                variable: 'b'
+                            }
                         }],
                         body: {
                             name: 'N_COMPOUND_STATEMENT',

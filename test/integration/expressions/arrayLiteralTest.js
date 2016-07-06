@@ -119,6 +119,73 @@ describe('PHP Parser grammar array literal expression integration', function () 
                     }
                 }]
             }
+        },
+        'short array syntax with one indexed element using variable reference': {
+            code: '$array = [&$myVar];',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'array'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_ARRAY_LITERAL',
+                                elements: [{
+                                    name: 'N_REFERENCE',
+                                    operand: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'myVar'
+                                    }
+                                }]
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
+        'short array syntax with one indexed element using instance property reference': {
+            code: '$array = [&$myObj->myProp];',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'array'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_ARRAY_LITERAL',
+                                elements: [{
+                                    name: 'N_REFERENCE',
+                                    operand: {
+                                        name: 'N_OBJECT_PROPERTY',
+                                        object: {
+                                            name: 'N_VARIABLE',
+                                            variable: 'myObj'
+                                        },
+                                        properties: [{
+                                            property: {
+                                                name: 'N_STRING',
+                                                string: 'myProp'
+                                            }
+                                        }]
+                                    }
+                                }]
+                            }
+                        }]
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

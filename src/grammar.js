@@ -305,15 +305,32 @@ module.exports = {
             }
         },
         'N_ARGUMENT': {
-            oneOf: ['N_DECORATED_ARGUMENT', 'N_VARIABLE']
+            oneOf: ['N_DECORATED_ARGUMENT', 'N_ARGUMENT_VARIABLE']
         },
         'N_DECORATED_ARGUMENT': {
             captureAs: 'N_ARGUMENT',
             components: {oneOf: [
-                [{name: 'variable', rule: 'N_VARIABLE'}, (/=/), {name: 'value', rule: 'N_TERM'}],
-                [{name: 'type', oneOf: ['N_NAMESPACE', 'T_STRING']}, {name: 'variable', rule: 'N_VARIABLE'}, (/=/), {name: 'value', rule: 'N_TERM'}],
-                [{name: 'type', oneOf: ['N_NAMESPACE', 'T_STRING']}, {name: 'variable', rule: 'N_VARIABLE'}]
+                [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_TERM'}],
+                [{name: 'type', oneOf: ['N_NAMESPACE', 'T_STRING']}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_TERM'}],
+                [{name: 'type', oneOf: ['N_NAMESPACE', 'T_STRING']}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}]
             ]}
+        },
+        'N_ARGUMENT_VARIABLE': {
+            components: {
+                oneOf: ['N_REFERENCE_VARIABLE', 'N_VARIABLE']
+            }
+        },
+        'N_REFERENCE_VARIABLE': {
+            components: [
+                (/&/),
+                'N_VARIABLE'
+            ],
+            processor: function (node) {
+                return {
+                    name: 'N_REFERENCE',
+                    operand: node
+                };
+            }
         },
         'N_ARRAY_INDEX': {
             components: 'N_EXPRESSION_LEVEL_2_A'
@@ -360,7 +377,7 @@ module.exports = {
             }
         },
         'N_CLOSURE': {
-            components: ['T_FUNCTION', (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), {oneOf: [['T_USE', (/\(/), {name: 'bindings', zeroOrMoreOf: ['N_VARIABLE', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/)], {name: 'bindings', zeroOrMoreOf: {what: (/(?!)/)}}]}, {name: 'body', what: 'N_STATEMENT'}]
+            components: ['T_FUNCTION', (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), {oneOf: [['T_USE', (/\(/), {name: 'bindings', zeroOrMoreOf: ['N_ARGUMENT_VARIABLE', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/)], {name: 'bindings', zeroOrMoreOf: {what: (/(?!)/)}}]}, {name: 'body', what: 'N_STATEMENT'}]
         },
         'N_COMMA_EXPRESSION': {
             components: {optionally: [{name: 'expressions', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=[;\)]))()/), captureIndex: 2}]}, (/(?=[;\)])/)]}
@@ -528,22 +545,21 @@ module.exports = {
             ]},
             ifNoMatch: {component: 'func', capture: 'next'}
         },
-        'N_EXPRESSION_LEVEL_1_D': {
+        'N_EXPRESSION_LEVEL_1_C': {
             captureAs: 'N_UNARY_EXPRESSION',
             components: [{name: 'operator', optionally: 'T_CLONE'}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_1_B'}],
             ifNoMatch: {component: 'operator', capture: 'operand'},
             options: {prefix: true}
         },
-
         'N_EXPRESSION_LEVEL_2_A': {
             captureAs: 'N_CLASS_CONSTANT',
             components: {oneOf: [
                 [
-                    {name: 'className', oneOf: ['N_NAMESPACED_REFERENCE', 'N_EXPRESSION_LEVEL_1_D']},
+                    {name: 'className', oneOf: ['N_NAMESPACED_REFERENCE', 'N_EXPRESSION_LEVEL_1_C']},
                     'T_DOUBLE_COLON',
                     {name: 'constant', what: ['T_STRING', (/(?!\()/)]}
                 ],
-                {name: 'next', what: 'N_EXPRESSION_LEVEL_1_D'}
+                {name: 'next', what: 'N_EXPRESSION_LEVEL_1_C'}
             ]},
             ifNoMatch: {component: 'constant', capture: 'next'}
         },
@@ -678,8 +694,14 @@ module.exports = {
                 return result;
             }
         },
+        'N_EXPRESSION_LEVEL_2_C': {
+            components: {oneOf: ['N_REFERENCE', 'N_EXPRESSION_LEVEL_2_B']}
+        },
+        'N_REFERENCE': {
+            components: [(/&/), {name: 'operand', what: 'N_EXPRESSION_LEVEL_2_B'}]
+        },
         'N_EXPRESSION_LEVEL_3_A': {
-            oneOf: ['N_UNARY_PREFIX_EXPRESSION', 'N_UNARY_SUFFIX_EXPRESSION', 'N_EXPRESSION_LEVEL_2_B']
+            oneOf: ['N_UNARY_PREFIX_EXPRESSION', 'N_UNARY_SUFFIX_EXPRESSION', 'N_EXPRESSION_LEVEL_2_C']
         },
         'N_EXPRESSION_LEVEL_3_B': {
             oneOf: ['N_ARRAY_CAST', 'N_BINARY_CAST', 'N_BOOLEAN_CAST', 'N_DOUBLE_CAST', 'N_INTEGER_CAST', 'N_OBJECT_CAST', 'N_STRING_CAST', 'N_UNSET_CAST', 'N_SUPPRESSED_EXPRESSION', 'N_EXPRESSION_LEVEL_3_A']
@@ -713,13 +735,13 @@ module.exports = {
         },
         'N_UNARY_PREFIX_EXPRESSION': {
             captureAs: 'N_UNARY_EXPRESSION',
-            components: [{name: 'operator', oneOf: ['T_INC', 'T_DEC', (/~/)]}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_2_B'}],
+            components: [{name: 'operator', oneOf: ['T_INC', 'T_DEC', (/~/)]}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_2_C'}],
             ifNoMatch: {component: 'operator', capture: 'operand'},
             options: {prefix: true}
         },
         'N_UNARY_SUFFIX_EXPRESSION': {
             captureAs: 'N_UNARY_EXPRESSION',
-            components: [{name: 'operand', what: 'N_EXPRESSION_LEVEL_2_B'}, {name: 'operator', oneOf: ['T_INC', 'T_DEC']}],
+            components: [{name: 'operand', what: 'N_EXPRESSION_LEVEL_2_C'}, {name: 'operator', oneOf: ['T_INC', 'T_DEC']}],
             ifNoMatch: {component: 'operator', capture: 'operand'},
             options: {prefix: false}
         },
@@ -876,7 +898,7 @@ module.exports = {
             components: ['T_FOR', (/\(/), {name: 'initializer', what: 'N_COMMA_EXPRESSION'}, (/;/), {name: 'condition', what: 'N_COMMA_EXPRESSION'}, (/;/), {name: 'update', what: 'N_COMMA_EXPRESSION'}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
         },
         'N_FOREACH_STATEMENT': {
-            components: ['T_FOREACH', (/\(/), {name: 'array', rule: 'N_EXPRESSION'}, 'T_AS', {optionally: [{name: 'key', oneOf: ['N_ARRAY_INDEX', 'N_VARIABLE']}, 'T_DOUBLE_ARROW']}, {name: 'value', oneOf: ['N_ARRAY_INDEX', 'N_VARIABLE']}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
+            components: ['T_FOREACH', (/\(/), {name: 'array', rule: 'N_EXPRESSION'}, 'T_AS', {optionally: [{name: 'key', oneOf: ['N_ARRAY_INDEX', 'N_ARGUMENT_VARIABLE']}, 'T_DOUBLE_ARROW']}, {name: 'value', oneOf: ['N_ARRAY_INDEX', 'N_ARGUMENT_VARIABLE']}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
         },
         'N_FUNCTION_STATEMENT': {
             components: ['T_FUNCTION', {name: 'func', what: 'T_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
@@ -1154,7 +1176,6 @@ module.exports = {
         },
         'N_VARIABLE': {
             components: [
-                {optionally: {name: 'reference', what: (/&/)}},
                 {oneOf: [
                     {name: 'variable', what: 'T_VARIABLE'},
                     {name: 'variable', what: (/\$\{([a-z0-9_]+)\}/i), captureIndex: 1}
