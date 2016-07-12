@@ -105,8 +105,11 @@ EOS
                         visibility: 'public',
                         func: 'printIt',
                         args: [{
-                            name: 'N_VARIABLE',
-                            variable: 'what'
+                            name: 'N_ARGUMENT',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'what'
+                            }
                         }],
                         body: {
                             name: 'N_COMPOUND_STATEMENT',
@@ -140,8 +143,11 @@ EOS
                         visibility: 'public',
                         func: 'printIt',
                         args: [{
-                            name: 'N_VARIABLE',
-                            variable: 'what'
+                            name: 'N_ARGUMENT',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'what'
+                            }
                         }],
                         body: {
                             name: 'N_ECHO_STATEMENT',
@@ -172,8 +178,11 @@ EOS
                         visibility: 'public',
                         func: 'printIt',
                         args: [{
-                            name: 'N_VARIABLE',
-                            variable: 'msg'
+                            name: 'N_ARGUMENT',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'msg'
+                            }
                         }],
                         body: {
                             name: 'N_ECHO_STATEMENT',

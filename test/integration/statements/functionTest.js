@@ -44,8 +44,11 @@ describe('PHP Parser grammar function definition statement integration', functio
                     name: 'N_FUNCTION_STATEMENT',
                     func: 'doNothing',
                     args: [{
-                        name: 'N_VARIABLE',
-                        variable: 'a'
+                        name: 'N_ARGUMENT',
+                        variable: {
+                            name: 'N_VARIABLE',
+                            variable: 'a'
+                        }
                     }],
                     body: {
                         name: 'N_COMPOUND_STATEMENT',
@@ -62,8 +65,11 @@ describe('PHP Parser grammar function definition statement integration', functio
                     name: 'N_FUNCTION_STATEMENT',
                     func: 'printIt',
                     args: [{
-                        name: 'N_VARIABLE',
-                        variable: 'string'
+                        name: 'N_ARGUMENT',
+                        variable: {
+                            name: 'N_VARIABLE',
+                            variable: 'string'
+                        }
                     }],
                     body: {
                         name: 'N_ECHO_STATEMENT',
@@ -83,11 +89,17 @@ describe('PHP Parser grammar function definition statement integration', functio
                     name: 'N_FUNCTION_STATEMENT',
                     func: 'add',
                     args: [{
-                        name: 'N_VARIABLE',
-                        variable: 'number1'
+                        name: 'N_ARGUMENT',
+                        variable: {
+                            name: 'N_VARIABLE',
+                            variable: 'number1'
+                        }
                     }, {
-                        name: 'N_VARIABLE',
-                        variable: 'number2'
+                        name: 'N_ARGUMENT',
+                        variable: {
+                            name: 'N_VARIABLE',
+                            variable: 'number2'
+                        }
                     }],
                     body: {
                         name: 'N_COMPOUND_STATEMENT',

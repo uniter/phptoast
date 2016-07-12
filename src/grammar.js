@@ -305,12 +305,9 @@ module.exports = {
             }
         },
         'N_ARGUMENT': {
-            oneOf: ['N_DECORATED_ARGUMENT', 'N_ARGUMENT_VARIABLE']
-        },
-        'N_DECORATED_ARGUMENT': {
-            captureAs: 'N_ARGUMENT',
             components: {oneOf: [
                 [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_TERM'}],
+                [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}],
                 [{name: 'type', oneOf: ['N_NAMESPACE', 'T_STRING']}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_TERM'}],
                 [{name: 'type', oneOf: ['N_NAMESPACE', 'T_STRING']}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}]
             ]}

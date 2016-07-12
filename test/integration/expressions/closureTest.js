@@ -99,11 +99,50 @@ describe('PHP Parser grammar closure expression integration', function () {
                     expression: {
                         name: 'N_CLOSURE',
                         args: [{
-                            name: 'N_VARIABLE',
-                            variable: 'a'
+                            name: 'N_ARGUMENT',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'a'
+                            }
                         }, {
-                            name: 'N_VARIABLE',
-                            variable: 'b'
+                            name: 'N_ARGUMENT',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'b'
+                            }
+                        }],
+                        bindings: [],
+                        body: {
+                            name: 'N_COMPOUND_STATEMENT',
+                            statements: []
+                        }
+                    }
+                }]
+            }
+        },
+        'empty closure in void context with two parameters, second passed by reference': {
+            code: 'function ($a, &$b) {};',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_CLOSURE',
+                        args: [{
+                            name: 'N_ARGUMENT',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'a'
+                            }
+                        }, {
+                            name: 'N_ARGUMENT',
+                            variable: {
+                                name: 'N_REFERENCE',
+                                operand: {
+                                    name: 'N_VARIABLE',
+                                    variable: 'b'
+                                }
+                            }
                         }],
                         bindings: [],
                         body: {
@@ -131,8 +170,11 @@ describe('PHP Parser grammar closure expression integration', function () {
                             operand: {
                                 name: 'N_CLOSURE',
                                 args: [{
-                                    name: 'N_VARIABLE',
-                                    variable: 'a'
+                                    name: 'N_ARGUMENT',
+                                    variable: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'a'
+                                    }
                                 }],
                                 bindings: [],
                                 body: {
@@ -165,8 +207,11 @@ describe('PHP Parser grammar closure expression integration', function () {
                             operand: {
                                 name: 'N_CLOSURE',
                                 args: [{
-                                    name: 'N_VARIABLE',
-                                    variable: 'a'
+                                    name: 'N_ARGUMENT',
+                                    variable: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'a'
+                                    }
                                 }],
                                 bindings: [{
                                     name: 'N_VARIABLE',

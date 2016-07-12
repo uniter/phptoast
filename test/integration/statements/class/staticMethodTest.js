@@ -70,8 +70,11 @@ EOS
                         method: 'doNothing',
                         visibility: 'public',
                         args: [{
-                            name: 'N_VARIABLE',
-                            variable: 'a'
+                            name: 'N_ARGUMENT',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'a'
+                            }
                         }],
                         body: {
                             name: 'N_COMPOUND_STATEMENT',
@@ -99,8 +102,11 @@ EOS
                         method: 'printIt',
                         visibility: 'public',
                         args: [{
-                            name: 'N_VARIABLE',
-                            variable: 'string'
+                            name: 'N_ARGUMENT',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'string'
+                            }
                         }],
                         body: {
                             name: 'N_ECHO_STATEMENT',
@@ -134,11 +140,17 @@ EOS
                         method: 'add',
                         visibility: 'public',
                         args: [{
-                            name: 'N_VARIABLE',
-                            variable: 'number1'
+                            name: 'N_ARGUMENT',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'number1'
+                            }
                         }, {
-                            name: 'N_VARIABLE',
-                            variable: 'number2'
+                            name: 'N_ARGUMENT',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'number2'
+                            }
                         }],
                         body: {
                             name: 'N_COMPOUND_STATEMENT',
