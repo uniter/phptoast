@@ -27,7 +27,10 @@ describe('PHP Parser grammar function definition statement default argument valu
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_FUNCTION_STATEMENT',
-                    func: 'doNothing',
+                    func: {
+                        name: 'N_STRING',
+                        string: 'doNothing'
+                    },
                     args: [{
                         name: 'N_ARGUMENT',
                         variable: {
@@ -51,7 +54,10 @@ describe('PHP Parser grammar function definition statement default argument valu
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_FUNCTION_STATEMENT',
-                    func: 'doNothing',
+                    func: {
+                        name: 'N_STRING',
+                        string: 'doNothing'
+                    },
                     args: [{
                         name: 'N_ARGUMENT',
                         type: 'array',

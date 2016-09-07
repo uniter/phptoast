@@ -37,7 +37,10 @@ EOS
                     interfaceName: 'Thing',
                     members: [{
                         name: 'N_METHOD_DEFINITION',
-                        func: 'doNothing',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'doNothing'
+                        },
                         visibility: 'public',
                         args: [],
                         body: {

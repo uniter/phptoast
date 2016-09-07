@@ -37,7 +37,10 @@ EOS
                     interfaceName: 'Thing',
                     members: [{
                         name: 'N_INTERFACE_METHOD_DEFINITION',
-                        func: 'doNothing',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'doNothing'
+                        },
                         visibility: 'public',
                         args: [{
                             name: 'N_ARGUMENT',
@@ -66,7 +69,10 @@ EOS
                     interfaceName: 'Thing',
                     members: [{
                         name: 'N_INTERFACE_METHOD_DEFINITION',
-                        func: 'doNothing',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'doNothing'
+                        },
                         visibility: 'public',
                         args: [{
                             name: 'N_ARGUMENT',
@@ -95,7 +101,10 @@ EOS
                     interfaceName: 'Thing',
                     members: [{
                         name: 'N_INTERFACE_METHOD_DEFINITION',
-                        func: 'doNothing',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'doNothing'
+                        },
                         visibility: 'public',
                         args: [{
                             name: 'N_ARGUMENT',

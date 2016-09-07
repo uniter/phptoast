@@ -39,7 +39,10 @@ EOS
                     className: 'Thing',
                     members: [{
                         name: 'N_STATIC_METHOD_DEFINITION',
-                        method: 'doNothing',
+                        method: {
+                            name: 'N_STRING',
+                            string: 'doNothing'
+                        },
                         visibility: 'public',
                         args: [],
                         body: {
@@ -67,7 +70,10 @@ EOS
                     className: 'Thing',
                     members: [{
                         name: 'N_STATIC_METHOD_DEFINITION',
-                        method: 'doNothing',
+                        method: {
+                            name: 'N_STRING',
+                            string: 'doNothing'
+                        },
                         visibility: 'public',
                         args: [{
                             name: 'N_ARGUMENT',
@@ -99,7 +105,10 @@ EOS
                     className: 'Thing',
                     members: [{
                         name: 'N_STATIC_METHOD_DEFINITION',
-                        method: 'printIt',
+                        method: {
+                            name: 'N_STRING',
+                            string: 'printIt'
+                        },
                         visibility: 'public',
                         args: [{
                             name: 'N_ARGUMENT',
@@ -137,7 +146,10 @@ EOS
                     className: 'Thing',
                     members: [{
                         name: 'N_STATIC_METHOD_DEFINITION',
-                        method: 'add',
+                        method: {
+                            name: 'N_STRING',
+                            string: 'add'
+                        },
                         visibility: 'public',
                         args: [{
                             name: 'N_ARGUMENT',
