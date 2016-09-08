@@ -41,78 +41,78 @@ EOS
                                 'name': 'N_VARIABLE',
                                 'variable': 'myVar',
                                 'offset': {
-                                    'length': 0,
+                                    'length': 6,
                                     'line': 2,
-                                    'column': 18,
-                                    'offset': 23
+                                    'column': 12,
+                                    'offset': 17
                                 }
                             },
                             'consequent': {
                                 'name': 'N_STRING_LITERAL',
                                 'string': 'yes',
                                 'offset': {
-                                    'length': 0,
+                                    'length': 5,
                                     'line': 2,
-                                    'column': 26,
-                                    'offset': 31
+                                    'column': 21,
+                                    'offset': 26
                                 }
                             },
                             'alternate': {
                                 'name': 'N_VARIABLE',
                                 'variable': 'yourVar',
                                 'offset': {
-                                    'length': 0,
+                                    'length': 8,
                                     'line': 3,
-                                    'column': 17,
-                                    'offset': 50
+                                    'column': 9,
+                                    'offset': 42
                                 }
                             },
                             'offset': {
-                                'length': 43,
+                                'length': 33,
                                 'line': 2,
-                                'column': 19,
-                                'offset': 24
+                                'column': 12,
+                                'offset': 17
                             }
                         },
                         'consequent': {
                             'name': 'N_STRING_LITERAL',
                             'string': 'no',
                             'offset': {
-                                'length': 0,
+                                'length': 4,
                                 'line': 3,
-                                'column': 24,
-                                'offset': 57
+                                'column': 20,
+                                'offset': 53
                             }
                         },
                         'alternate': {
                             'name': 'N_STRING_LITERAL',
                             'string': 'maybe',
                             'offset': {
-                                'length': 0,
+                                'length': 7,
                                 'line': 3,
-                                'column': 34,
-                                'offset': 67
+                                'column': 27,
+                                'offset': 60
                             }
                         },
                         'offset': {
-                            'length': 43,
+                            'length': 50,
                             'line': 2,
-                            'column': 19,
-                            'offset': 24
+                            'column': 12,
+                            'offset': 17
                         }
                     },
                     'offset': {
-                        'length': 51,
+                        'length': 58,
                         'line': 2,
-                        'column': 11,
-                        'offset': 16
+                        'column': 5,
+                        'offset': 10
                     }
                 }],
                 'offset': {
-                    'length': 58,
-                    'line': 2,
-                    'column': 5,
-                    'offset': 10
+                    'length': 68,
+                    'line': 1,
+                    'column': 1,
+                    'offset': 0
                 }
             }
         },
@@ -134,69 +134,64 @@ EOS
                                 'name': 'N_VARIABLE',
                                 'variable': 'firstVar',
                                 'offset': {
-                                    // FIXME: Why is length 0 here? And column is wrong too
-                                    'length': 0,
+                                    'length': 9,
                                     'line': 2,
-                                    'column': 21,
-                                    'offset': 26
+                                    'column': 12,
+                                    'offset': 17
                                 }
                             },
-                            'right': [
-                                {
-                                    'operator': '+',
-                                    'operand': {
-                                        'name': 'N_VARIABLE',
-                                        'variable': 'secondVar',
-                                        'offset': {
-                                            'length': 0,
-                                            'line': 2,
-                                            'column': 34,
-                                            'offset': 39
-                                        }
-                                    }
-                                }
-                            ],
-                            'offset': {
-                                'length': 24,
-                                'line': 2,
-                                'column': 22,
-                                'offset': 27
-                            }
-                        },
-                        'right': [
-                            {
+                            'right': [{
                                 'operator': '+',
                                 'operand': {
                                     'name': 'N_VARIABLE',
-                                    'variable': 'thirdVar',
+                                    'variable': 'secondVar',
                                     'offset': {
-                                        'length': 0,
+                                        'length': 10,
                                         'line': 2,
-                                        'column': 46,
-                                        'offset': 51
+                                        'column': 24,
+                                        'offset': 29
                                     }
                                 }
+                            }],
+                            'offset': {
+                                'length': 22,
+                                'line': 2,
+                                'column': 12,
+                                'offset': 17
                             }
-                        ],
+                        },
+                        'right': [{
+                            'operator': '+',
+                            'operand': {
+                                'name': 'N_VARIABLE',
+                                'variable': 'thirdVar',
+                                'offset': {
+                                    'length': 9,
+                                    'line': 2,
+                                    'column': 37,
+                                    'offset': 42
+                                }
+                            }
+                        }],
                         'offset': {
-                            'length': 0,
+                            'length': 34,
                             'line': 2,
-                            'column': 46,
-                            'offset': 51
+                            'column': 12,
+                            'offset': 17
                         }
                     },
                     'offset': {
-                        'length': 35,
+                        'length': 42,
                         'line': 2,
-                        'column': 11,
-                        'offset': 16
+                        'column': 5,
+                        'offset': 10
                     }
                 }],
                 'offset': {
-                    'length': 42,
-                    'line': 2,
-                    'column': 5,
-                    'offset': 10
+                    'length': 52,
+                    'line': 1,
+                    'column': 1,
+                    'offset': 0
                 }
             }
         },
@@ -236,10 +231,10 @@ EOS
                                     }
                                 },
                                 'offset': {
-                                    'length': 6,
+                                    'length': 8,
                                     'line': 2,
-                                    'column': 23,
-                                    'offset': 28
+                                    'column': 21,
+                                    'offset': 26
                                 }
                             }],
                             'offset': {
@@ -254,38 +249,38 @@ EOS
                                 'name': 'N_VARIABLE',
                                 'variable': 'myIndex',
                                 'offset': {
-                                    'length': 0,
+                                    'length': 8,
                                     'line': 2,
-                                    'column': 38,
-                                    'offset': 43
+                                    'column': 30,
+                                    'offset': 35
                                 }
                             },
                             'offset': {
-                                'length': 8,
+                                'length': 10,
                                 'line': 2,
-                                'column': 30,
-                                'offset': 35
+                                'column': 29,
+                                'offset': 34
                             }
                         }],
                         'offset': {
-                            'length': 0,
+                            'length': 27,
                             'line': 2,
-                            'column': 39,
-                            'offset': 44
+                            'column': 12,
+                            'offset': 17
                         }
                     },
                     'offset': {
-                        'length': 28,
+                        'length': 35,
                         'line': 2,
-                        'column': 11,
-                        'offset': 16
+                        'column': 5,
+                        'offset': 10
                     }
                 }],
                 'offset': {
-                    'length': 35,
-                    'line': 2,
-                    'column': 5,
-                    'offset': 10
+                    'length': 45,
+                    'line': 1,
+                    'column': 1,
+                    'offset': 0
                 }
             }
         },

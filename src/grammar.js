@@ -58,7 +58,7 @@ var _ = require('microdash'),
 
         return result;
     },
-    buildBinaryExpression = function (first, rest, offset) {
+    buildBinaryExpression = function (first, rest) {
         // Transform the captured flat list into an AST
         // which will eliminate any ambiguity over precedence.
         return buildTree(first, rest, function (result, element) {
@@ -73,14 +73,19 @@ var _ = require('microdash'),
                 ]
             };
 
-            if (offset) {
-                binaryNode.offset = offset;
+            if (result.offset) {
+                binaryNode.offset = {
+                    length: (element.offset.offset - result.offset.offset) + element.offset.length,
+                    line: result.offset.line,
+                    column: result.offset.column,
+                    offset: result.offset.offset
+                };
             }
 
             return binaryNode;
         });
     },
-    buildTernaryExpression = function (condition, rest, offset) {
+    buildTernaryExpression = function (condition, rest) {
         return buildTree(condition, rest, function (result, element) {
             var ternaryNode = {
                 name: 'N_TERNARY',
@@ -89,8 +94,13 @@ var _ = require('microdash'),
                 alternate: element.alternate
             };
 
-            if (offset) {
-                ternaryNode.offset = offset;
+            if (result.offset) {
+                ternaryNode.offset = {
+                    length: (element.offset.offset - result.offset.offset) + element.offset.length,
+                    line: result.offset.line,
+                    column: result.offset.column,
+                    offset: result.offset.offset
+                };
             }
 
             return ternaryNode;
@@ -804,7 +814,7 @@ module.exports = {
                     return node.left;
                 }
 
-                return buildBinaryExpression(node.left, node.right, node.offset);
+                return buildBinaryExpression(node.left, node.right);
             }
         },
         'N_EXPRESSION_LEVEL_8': {
@@ -855,7 +865,7 @@ module.exports = {
                     return node.condition;
                 }
 
-                return buildTernaryExpression(node.condition, node.rest, node.offset, node.offset);
+                return buildTernaryExpression(node.condition, node.rest);
             }
         },
         'N_ASSIGNMENT_EXPRESSION': {
