@@ -86,25 +86,66 @@ var _ = require('microdash'),
         });
     },
     buildTernaryExpression = function (condition, rest) {
-        return buildTree(condition, rest, function (result, element) {
-            var ternaryNode = {
+        var ternaryNode = {
                 name: 'N_TERNARY',
-                condition: result,
-                consequent: element.consequent === '' ? null : element.consequent,
-                alternate: element.alternate
-            };
+                condition: condition
+            },
+            ternaryNodeStack = [];
 
-            if (result.offset) {
+        function completeTernary(alternateNode) {
+            ternaryNode.alternate = alternateNode;
+
+            if (condition.offset) {
                 ternaryNode.offset = {
-                    length: (element.offset.offset - result.offset.offset) + element.offset.length,
-                    line: result.offset.line,
-                    column: result.offset.column,
-                    offset: result.offset.offset
+                    length: (alternateNode.offset.offset - ternaryNode.condition.offset.offset) +
+                        alternateNode.offset.length,
+                    line: ternaryNode.condition.offset.line,
+                    column: ternaryNode.condition.offset.column,
+                    offset: ternaryNode.condition.offset.offset
                 };
             }
+        }
 
-            return ternaryNode;
+        _.each(rest, function (element) {
+            var nestedTernaryNode;
+
+            if (element.consequent) {
+                if (ternaryNode.consequent && ternaryNode.alternate) {
+                    // Already got a consequent - must be nested - all existing expression is the condition
+                    // of the nested ternary
+                    // - eg. `$myVar = 21 ? 22 : 23 ? 24 : 25;`
+                    nestedTernaryNode = {
+                        name: 'N_TERNARY',
+                        condition: ternaryNode,
+                        consequent: element.consequent
+                    };
+                    ternaryNode = nestedTernaryNode;
+                    ternaryNodeStack.push(ternaryNode);
+                } else if (ternaryNode.consequent && !ternaryNode.alternate) {
+                    // Already got an alternate - must be nested
+                    // - eg. `21 ? 22 ? 23 : 24 : 25`
+                    nestedTernaryNode = {
+                        name: 'N_TERNARY',
+                        condition: ternaryNode.consequent,
+                        consequent: element.consequent
+                    };
+                    ternaryNode.consequent = nestedTernaryNode;
+                    ternaryNodeStack.push(ternaryNode);
+                    ternaryNode = nestedTernaryNode;
+                } else {
+                    ternaryNode.consequent = element.consequent;
+                    ternaryNodeStack.push(ternaryNode);
+                }
+            } else if (element.alternate) {
+                completeTernary(element.alternate);
+                ternaryNode = ternaryNodeStack.pop();
+            } else if (element.shorthand) {
+                ternaryNode.consequent = null;
+                completeTernary(element.shorthand);
+            }
         });
+
+        return ternaryNode;
     },
     PHPErrorHandler = require('./ErrorHandler'),
     PHPGrammarState = require('./State');
@@ -859,13 +900,36 @@ module.exports = {
         },
         'N_EXPRESSION_LEVEL_16': {
             captureAs: 'N_TERNARY',
-            components: [{name: 'condition', what: 'N_EXPRESSION_LEVEL_15'}, {name: 'rest', zeroOrMoreOf: [(/\?/), {name: 'consequent', optionally: 'N_EXPRESSION_LEVEL_15'}, (/:/), {name: 'alternate', what: 'N_EXPRESSION_LEVEL_15'}]}],
+            components: [
+                {name: 'condition', what: 'N_EXPRESSION_LEVEL_15'},
+                {
+                    optionally: [
+                        {
+                            name: 'firstOperand',
+                            oneOf: [
+                                [(/\?/), {name: 'consequent', rule: 'N_EXPRESSION_LEVEL_15'}],
+                                [/\?\s*\:/, {name: 'shorthand', rule: 'N_EXPRESSION_LEVEL_15'}] // Shorthand ternary
+                            ]
+                        },
+                        {
+                            name: 'restOfOperands',
+                            zeroOrMoreOf: {
+                                oneOf: [
+                                    [(/\?/), {name: 'consequent', rule: 'N_EXPRESSION_LEVEL_15'}],
+                                    [(/:/), {name: 'alternate', rule: 'N_EXPRESSION_LEVEL_15'}],
+                                    [/\?\s*\:/, {name: 'shorthand', rule: 'N_EXPRESSION_LEVEL_15'}] // Shorthand ternary
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ],
             processor: function (node) {
-                if (!node.rest) {
+                if (!node.firstOperand) {
                     return node.condition;
                 }
 
-                return buildTernaryExpression(node.condition, node.rest);
+                return buildTernaryExpression(node.condition, [node.firstOperand].concat(node.restOfOperands));
             }
         },
         'N_ASSIGNMENT_EXPRESSION': {

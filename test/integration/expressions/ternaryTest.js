@@ -45,7 +45,7 @@ describe('PHP Parser grammar ternary expression integration', function () {
                 }]
             }
         },
-        'nested ternary with integer operands in void context': {
+        'nested ternary inside alternate with integer operands in void context': {
             code: '21 ? 22 : 23 ? 24 : 25;',
             expectedAST: {
                 name: 'N_PROGRAM',
@@ -71,6 +71,41 @@ describe('PHP Parser grammar ternary expression integration', function () {
                         consequent: {
                             name: 'N_INTEGER',
                             number: '24'
+                        },
+                        alternate: {
+                            name: 'N_INTEGER',
+                            number: '25'
+                        }
+                    }
+                }]
+            }
+        },
+        'nested ternary inside consequent with integer operands in void context': {
+            code: '21 ? 22 ? 23 : 24 : 25;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_TERNARY',
+                        condition: {
+                            name: 'N_INTEGER',
+                            number: '21'
+                        },
+                        consequent: {
+                            name: 'N_TERNARY',
+                            condition: {
+                                name: 'N_INTEGER',
+                                number: '22'
+                            },
+                            consequent: {
+                                name: 'N_INTEGER',
+                                number: '23'
+                            },
+                            alternate: {
+                                name: 'N_INTEGER',
+                                number: '24'
+                            }
                         },
                         alternate: {
                             name: 'N_INTEGER',
