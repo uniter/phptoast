@@ -103,7 +103,10 @@ EOS
                     members: [{
                         name: 'N_METHOD_DEFINITION',
                         visibility: 'public',
-                        func: 'printIt',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'printIt'
+                        },
                         args: [{
                             name: 'N_ARGUMENT',
                             variable: {
@@ -141,7 +144,10 @@ EOS
                     members: [{
                         name: 'N_METHOD_DEFINITION',
                         visibility: 'public',
-                        func: 'printIt',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'printIt'
+                        },
                         args: [{
                             name: 'N_ARGUMENT',
                             variable: {
@@ -176,7 +182,10 @@ EOS
                     members: [{
                         name: 'N_METHOD_DEFINITION',
                         visibility: 'public',
-                        func: 'printIt',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'printIt'
+                        },
                         args: [{
                             name: 'N_ARGUMENT',
                             variable: {

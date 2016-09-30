@@ -30,7 +30,9 @@ describe('PHP Parser grammar __LINE__ magic constant expression integration', fu
                     expression: {
                         name: 'N_MAGIC_LINE_CONSTANT',
                         offset: {
+                            length: 8,
                             line: 1,
+                            column: 6 + 6,
                             offset: 11
                         }
                     }
@@ -46,7 +48,9 @@ describe('PHP Parser grammar __LINE__ magic constant expression integration', fu
                     expression: {
                         name: 'N_MAGIC_LINE_CONSTANT',
                         offset: {
+                            length: 8,
                             line: 1,
+                            column: 6 + 6,
                             offset: 11
                         }
                     }
@@ -70,7 +74,9 @@ describe('PHP Parser grammar __LINE__ magic constant expression integration', fu
                             operand: {
                                 name: 'N_MAGIC_LINE_CONSTANT',
                                 offset: {
+                                    length: 8,
                                     line: 1,
+                                    column: 6 + 9,
                                     offset: 14
                                 }
                             }

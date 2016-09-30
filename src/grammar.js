@@ -62,7 +62,7 @@ var _ = require('microdash'),
         // Transform the captured flat list into an AST
         // which will eliminate any ambiguity over precedence.
         return buildTree(first, rest, function (result, element) {
-            return {
+            var binaryNode = {
                 name: 'N_EXPRESSION',
                 left: result,
                 right: [
@@ -72,17 +72,80 @@ var _ = require('microdash'),
                     }
                 ]
             };
+
+            if (result.offset) {
+                binaryNode.offset = {
+                    length: (element.offset.offset - result.offset.offset) + element.offset.length,
+                    line: result.offset.line,
+                    column: result.offset.column,
+                    offset: result.offset.offset
+                };
+            }
+
+            return binaryNode;
         });
     },
     buildTernaryExpression = function (condition, rest) {
-        return buildTree(condition, rest, function (result, element) {
-            return {
+        var ternaryNode = {
                 name: 'N_TERNARY',
-                condition: result,
-                consequent: element.consequent === '' ? null : element.consequent,
-                alternate: element.alternate
-            };
+                condition: condition
+            },
+            ternaryNodeStack = [];
+
+        function completeTernary(alternateNode) {
+            ternaryNode.alternate = alternateNode;
+
+            if (condition.offset) {
+                ternaryNode.offset = {
+                    length: (alternateNode.offset.offset - ternaryNode.condition.offset.offset) +
+                        alternateNode.offset.length,
+                    line: ternaryNode.condition.offset.line,
+                    column: ternaryNode.condition.offset.column,
+                    offset: ternaryNode.condition.offset.offset
+                };
+            }
+        }
+
+        _.each(rest, function (element) {
+            var nestedTernaryNode;
+
+            if (element.consequent) {
+                if (ternaryNode.consequent && ternaryNode.alternate) {
+                    // Already got a consequent - must be nested - all existing expression is the condition
+                    // of the nested ternary
+                    // - eg. `$myVar = 21 ? 22 : 23 ? 24 : 25;`
+                    nestedTernaryNode = {
+                        name: 'N_TERNARY',
+                        condition: ternaryNode,
+                        consequent: element.consequent
+                    };
+                    ternaryNode = nestedTernaryNode;
+                    ternaryNodeStack.push(ternaryNode);
+                } else if (ternaryNode.consequent && !ternaryNode.alternate) {
+                    // Already got an alternate - must be nested
+                    // - eg. `21 ? 22 ? 23 : 24 : 25`
+                    nestedTernaryNode = {
+                        name: 'N_TERNARY',
+                        condition: ternaryNode.consequent,
+                        consequent: element.consequent
+                    };
+                    ternaryNode.consequent = nestedTernaryNode;
+                    ternaryNodeStack.push(ternaryNode);
+                    ternaryNode = nestedTernaryNode;
+                } else {
+                    ternaryNode.consequent = element.consequent;
+                    ternaryNodeStack.push(ternaryNode);
+                }
+            } else if (element.alternate) {
+                completeTernary(element.alternate);
+                ternaryNode = ternaryNodeStack.pop();
+            } else if (element.shorthand) {
+                ternaryNode.consequent = null;
+                completeTernary(element.shorthand);
+            }
         });
+
+        return ternaryNode;
     },
     PHPErrorHandler = require('./ErrorHandler'),
     PHPGrammarState = require('./State');
@@ -91,6 +154,7 @@ module.exports = {
     ErrorHandler: PHPErrorHandler,
     State: PHPGrammarState,
     ignore: 'N_IGNORE',
+    offsets: 'offset',
     rules: {
         'T_ABSTRACT': /abstract\b/i,
         'T_AND_EQUAL': /&=/i,
@@ -262,7 +326,7 @@ module.exports = {
                 {optionally: {name: 'modifier', rule: 'T_FINAL'}},
                 {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
                 'T_FUNCTION',
-                {name: 'func', what: 'T_STRING'},
+                {name: 'func', what: 'N_STRING'},
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),
@@ -290,7 +354,7 @@ module.exports = {
                 {optionally: {name: 'modifier', rule: 'T_FINAL'}},
                 {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
                 'T_FUNCTION',
-                {name: 'method', what: 'T_STRING'},
+                {name: 'method', what: 'N_STRING'},
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),
@@ -503,6 +567,10 @@ module.exports = {
                             property: member.static_property.property
                         };
                     }
+
+                    if (member.offset) {
+                        result.offset = member.offset;
+                    }
                 });
 
                 return result;
@@ -686,6 +754,10 @@ module.exports = {
                             property: member.static_property.property
                         };
                     }
+
+                    if (member.offset) {
+                        result.offset = member.offset;
+                    }
                 });
 
                 return result;
@@ -829,13 +901,36 @@ module.exports = {
         },
         'N_EXPRESSION_LEVEL_16': {
             captureAs: 'N_TERNARY',
-            components: [{name: 'condition', what: 'N_EXPRESSION_LEVEL_15'}, {name: 'rest', zeroOrMoreOf: [(/\?/), {name: 'consequent', optionally: 'N_EXPRESSION_LEVEL_15'}, (/:/), {name: 'alternate', what: 'N_EXPRESSION_LEVEL_15'}]}],
+            components: [
+                {name: 'condition', what: 'N_EXPRESSION_LEVEL_15'},
+                {
+                    optionally: [
+                        {
+                            name: 'firstOperand',
+                            oneOf: [
+                                [(/\?/), {name: 'consequent', rule: 'N_EXPRESSION_LEVEL_15'}],
+                                [/\?\s*\:/, {name: 'shorthand', rule: 'N_EXPRESSION_LEVEL_15'}] // Shorthand ternary
+                            ]
+                        },
+                        {
+                            name: 'restOfOperands',
+                            zeroOrMoreOf: {
+                                oneOf: [
+                                    [(/\?/), {name: 'consequent', rule: 'N_EXPRESSION_LEVEL_15'}],
+                                    [(/:/), {name: 'alternate', rule: 'N_EXPRESSION_LEVEL_15'}],
+                                    [/\?\s*\:/, {name: 'shorthand', rule: 'N_EXPRESSION_LEVEL_15'}] // Shorthand ternary
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ],
             processor: function (node) {
-                if (!node.rest) {
+                if (!node.firstOperand) {
                     return node.condition;
                 }
 
-                return buildTernaryExpression(node.condition, node.rest);
+                return buildTernaryExpression(node.condition, [node.firstOperand].concat(node.restOfOperands));
             }
         },
         'N_ASSIGNMENT_EXPRESSION': {
@@ -898,7 +993,7 @@ module.exports = {
             components: ['T_FOREACH', (/\(/), {name: 'array', rule: 'N_EXPRESSION'}, 'T_AS', {optionally: [{name: 'key', oneOf: ['N_ARRAY_INDEX', 'N_ARGUMENT_VARIABLE']}, 'T_DOUBLE_ARROW']}, {name: 'value', oneOf: ['N_ARRAY_INDEX', 'N_ARGUMENT_VARIABLE']}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
         },
         'N_FUNCTION_STATEMENT': {
-            components: ['T_FUNCTION', {name: 'func', what: 'T_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
+            components: ['T_FUNCTION', {name: 'func', what: 'N_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
         },
         'N_GLOBAL_STATEMENT': {
             components: ['T_GLOBAL', {name: 'variables', oneOrMoreOf: ['N_VARIABLE', (/,|(?=;)/)]}, (/;/)]
@@ -929,7 +1024,7 @@ module.exports = {
             components: {name: 'number', what: 'T_LNUMBER'}
         },
         'N_INTERFACE_METHOD_DEFINITION': {
-            components: [{name: 'visibility', oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}, 'T_FUNCTION', {name: 'func', what: 'T_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), (/;/)]
+            components: [{name: 'visibility', oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}, 'T_FUNCTION', {name: 'func', what: 'N_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), (/;/)]
         },
         'N_INTERFACE_STATEMENT': {
             components: ['T_INTERFACE', {name: 'interfaceName', rule: 'T_STRING'}, {optionally: ['T_EXTENDS', {name: 'extend', oneOf: ['N_NAMESPACE', 'T_STRING']}]}, (/\{/), {name: 'members', zeroOrMoreOf: {oneOf: ['N_INTERFACE_METHOD_DEFINITION', 'N_STATIC_INTERFACE_METHOD_DEFINITION', 'N_CONSTANT_DEFINITION', 'N_INSTANCE_PROPERTY_DEFINITION', 'N_STATIC_PROPERTY_DEFINITION', 'N_METHOD_DEFINITION', 'N_STATIC_METHOD_DEFINITION', 'N_ABSTRACT_METHOD_DEFINITION', 'N_ABSTRACT_STATIC_METHOD_DEFINITION']}}, (/\}/)]
@@ -981,7 +1076,7 @@ module.exports = {
                 {optionally: {name: 'modifier', rule: 'T_FINAL'}},
                 {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
                 'T_FUNCTION',
-                {name: 'func', what: 'T_STRING'},
+                {name: 'func', what: 'N_STRING'},
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),
@@ -1047,7 +1142,7 @@ module.exports = {
                     'T_STATIC'
                 ]},
                 'T_FUNCTION',
-                {name: 'method', what: 'T_STRING'},
+                {name: 'method', what: 'N_STRING'},
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),
@@ -1067,7 +1162,7 @@ module.exports = {
                 {optionally: {name: 'modifier', rule: 'T_FINAL'}},
                 {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
                 'T_FUNCTION',
-                {name: 'method', what: 'T_STRING'},
+                {name: 'method', what: 'N_STRING'},
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),

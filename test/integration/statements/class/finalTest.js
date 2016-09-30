@@ -54,7 +54,10 @@ describe('PHP Parser grammar final class statement integration', function () {
                     className: 'MyPerfectClass',
                     members: [{
                         name: 'N_METHOD_DEFINITION',
-                        func: 'myMethod',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
                         modifier: 'final',
                         visibility: 'public',
                         args: [],
@@ -75,7 +78,10 @@ describe('PHP Parser grammar final class statement integration', function () {
                     className: 'MyPerfectClass',
                     members: [{
                         name: 'N_METHOD_DEFINITION',
-                        func: 'myMethod',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
                         modifier: 'final',
                         visibility: 'protected',
                         args: [],
@@ -96,7 +102,10 @@ describe('PHP Parser grammar final class statement integration', function () {
                     className: 'MyPerfectClass',
                     members: [{
                         name: 'N_METHOD_DEFINITION',
-                        func: 'myMethod',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
                         modifier: 'final',
                         visibility: 'protected',
                         args: [],
@@ -117,7 +126,10 @@ describe('PHP Parser grammar final class statement integration', function () {
                     className: 'MyPerfectClass',
                     members: [{
                         name: 'N_STATIC_METHOD_DEFINITION',
-                        method: 'myMethod',
+                        method: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
                         modifier: 'final',
                         visibility: 'public',
                         args: [],
@@ -138,7 +150,10 @@ describe('PHP Parser grammar final class statement integration', function () {
                     className: 'MyPerfectClass',
                     members: [{
                         name: 'N_STATIC_METHOD_DEFINITION',
-                        method: 'myMethod',
+                        method: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
                         modifier: 'final',
                         visibility: 'protected',
                         args: [],
@@ -159,7 +174,10 @@ describe('PHP Parser grammar final class statement integration', function () {
                     className: 'MyPerfectClass',
                     members: [{
                         name: 'N_STATIC_METHOD_DEFINITION',
-                        method: 'myMethod',
+                        method: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
                         modifier: 'final',
                         visibility: 'protected',
                         args: [],
@@ -180,7 +198,10 @@ describe('PHP Parser grammar final class statement integration', function () {
                     className: 'MyPerfectClass',
                     members: [{
                         name: 'N_STATIC_METHOD_DEFINITION',
-                        method: 'myMethod',
+                        method: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
                         modifier: 'final',
                         visibility: 'protected',
                         args: [],
@@ -201,7 +222,10 @@ describe('PHP Parser grammar final class statement integration', function () {
                     className: 'MyPerfectClass',
                     members: [{
                         name: 'N_STATIC_METHOD_DEFINITION',
-                        method: 'myMethod',
+                        method: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
                         modifier: 'final',
                         visibility: 'protected',
                         args: [],

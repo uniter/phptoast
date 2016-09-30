@@ -27,7 +27,10 @@ describe('PHP Parser grammar function definition statement integration', functio
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_FUNCTION_STATEMENT',
-                    func: 'gogo',
+                    func: {
+                        name: 'N_STRING',
+                        string: 'gogo'
+                    },
                     args: [],
                     body: {
                         name: 'N_COMPOUND_STATEMENT',
@@ -42,7 +45,10 @@ describe('PHP Parser grammar function definition statement integration', functio
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_FUNCTION_STATEMENT',
-                    func: 'doNothing',
+                    func: {
+                        name: 'N_STRING',
+                        string: 'doNothing'
+                    },
                     args: [{
                         name: 'N_ARGUMENT',
                         variable: {
@@ -63,7 +69,10 @@ describe('PHP Parser grammar function definition statement integration', functio
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_FUNCTION_STATEMENT',
-                    func: 'printIt',
+                    func: {
+                        name: 'N_STRING',
+                        string: 'printIt'
+                    },
                     args: [{
                         name: 'N_ARGUMENT',
                         variable: {
@@ -87,7 +96,10 @@ describe('PHP Parser grammar function definition statement integration', functio
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_FUNCTION_STATEMENT',
-                    func: 'add',
+                    func: {
+                        name: 'N_STRING',
+                        string: 'add'
+                    },
                     args: [{
                         name: 'N_ARGUMENT',
                         variable: {

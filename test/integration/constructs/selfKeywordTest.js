@@ -28,7 +28,10 @@ describe('PHP Parser grammar "self" keyword construct integration', function () 
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_FUNCTION_STATEMENT',
-                    func: 'self',
+                    func: {
+                        name: 'N_STRING',
+                        string: 'self'
+                    },
                     args: [],
                     body: {
                         name: 'N_COMPOUND_STATEMENT',

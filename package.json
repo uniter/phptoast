@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "microdash": "~1",
-    "parsing": "~1.2",
+    "parsing": "~1.4",
     "phpcommon": "~1"
   },
   "devDependencies": {
