@@ -9,24 +9,35 @@
 
 'use strict';
 
-var _ = require('microdash'),
-    CAPTURE_ALL_OFFSETS = 'captureAllOffsets',
-    CAPTURE_ALL_OFFSETS_AS = 'captureAllOffsetsAs';
+var _ = require('microdash');
 
+/**
+ * @param {Parsing} parsing
+ * @param {object} phpGrammarSpec
+ * @constructor
+ */
 function PHPToAST(parsing, phpGrammarSpec) {
+    /**
+     * @type {Parsing}
+     */
     this.parsing = parsing;
+    /**
+     * @type {Object}
+     */
     this.phpGrammarSpec = phpGrammarSpec;
 }
 
 _.extend(PHPToAST.prototype, {
+    /**
+     * Creates a new PHP parser
+     *
+     * @param {Stream} stderr
+     * @param {object} options
+     * @returns {object}
+     */
     create: function (stderr, options) {
         var lib = this,
             parsingOptions = _.extend({}, options || {});
-
-        if (parsingOptions[CAPTURE_ALL_OFFSETS]) {
-            parsingOptions[CAPTURE_ALL_OFFSETS_AS] = 'offset';
-            delete parsingOptions[CAPTURE_ALL_OFFSETS];
-        }
 
         return lib.parsing.create(lib.phpGrammarSpec, stderr, parsingOptions);
     }

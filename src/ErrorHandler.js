@@ -12,12 +12,29 @@
 var _ = require('microdash'),
     PHPParseError = require('phpcommon').PHPParseError;
 
+/**
+ * @param {Stream} stderr Stream to write error messages to
+ * @param {State} state PHP parser state
+ * @constructor
+ */
 function ErrorHandler(stderr, state) {
+    /**
+     * @type {State}
+     */
     this.state = state;
+    /**
+     * @type {Stream}
+     */
     this.stderr = stderr;
 }
 
 _.extend(ErrorHandler.prototype, {
+    /**
+     * Throws a PHPParseError from the provided parser error from Parsing
+     *
+     * @param {Exception} parseException
+     * @throws {PHPParseError}
+     */
     handle: function (parseException) {
         var handler = this,
             text = parseException.getText(),

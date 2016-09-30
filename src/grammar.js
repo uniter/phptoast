@@ -154,6 +154,7 @@ module.exports = {
     ErrorHandler: PHPErrorHandler,
     State: PHPGrammarState,
     ignore: 'N_IGNORE',
+    offsets: 'offset',
     rules: {
         'T_ABSTRACT': /abstract\b/i,
         'T_AND_EQUAL': /&=/i,
