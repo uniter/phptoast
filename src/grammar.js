@@ -330,7 +330,7 @@ module.exports = {
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),
-                (/;/)
+                'N_END_STATEMENT'
             ],
             processor: function (node) {
                 if (!node.visibility) {
@@ -358,7 +358,7 @@ module.exports = {
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),
-                (/;/)
+                'N_END_STATEMENT'
             ],
             processor: function (node) {
                 if (!node.visibility) {
@@ -423,7 +423,7 @@ module.exports = {
             components: {name: 'bool', what: (/true|false/i)}
         },
         'N_BREAK_STATEMENT': {
-            components: ['T_BREAK', {name: 'levels', oneOf: ['N_INTEGER', 'N_JUMP_ONE_LEVEL']}, (/;/)]
+            components: ['T_BREAK', {name: 'levels', oneOf: ['N_INTEGER', 'N_JUMP_ONE_LEVEL']}, 'N_END_STATEMENT']
         },
         'N_CASE': {
             components: ['T_CASE', {name: 'expression', what: 'N_EXPRESSION'}, (/:/), {name: 'body', zeroOrMoreOf: 'N_STATEMENT'}]
@@ -447,19 +447,27 @@ module.exports = {
             components: [(/\{/), {name: 'statements', zeroOrMoreOf: 'N_STATEMENT'}, (/\}/)]
         },
         'N_CONSTANT_DEFINITION': {
-            components: ['T_CONST', {name: 'constant', what: 'T_STRING'}, (/=/), {name: 'value', oneOf: ['N_CLASS_CONSTANT', 'N_TERM']}, (/;/)]
+            components: ['T_CONST', {name: 'constant', what: 'T_STRING'}, (/=/), {name: 'value', oneOf: ['N_CLASS_CONSTANT', 'N_TERM']}, 'N_END_STATEMENT']
         },
         'N_CONTINUE_STATEMENT': {
-            components: ['T_CONTINUE', {name: 'levels', oneOf: ['N_INTEGER', 'N_JUMP_ONE_LEVEL']}, (/;/)]
+            components: ['T_CONTINUE', {name: 'levels', oneOf: ['N_INTEGER', 'N_JUMP_ONE_LEVEL']}, 'N_END_STATEMENT']
         },
         'N_DEFAULT_CASE': {
             components: ['T_DEFAULT', (/:/), {name: 'body', zeroOrMoreOf: 'N_STATEMENT'}]
         },
         'N_ECHO_STATEMENT': {
-            components: ['T_ECHO', {name: 'expression', what: 'N_EXPRESSION'}, (/;/)]
+            components: ['T_ECHO', {name: 'expressions', oneOrMoreOf: ['N_EXPRESSION', {what: (/,|(?=;|[?%]>\n?)/)}]}, 'N_END_STATEMENT']
         },
         'N_EMPTY_STATEMENT': {
             components: (/;/)
+        },
+        'N_END_STATEMENT': {
+            components: {
+                oneOf: [
+                    (/;/), // Standard semi-colon statement terminator
+                    (/(?=[?%]>\n?)/) // Statements may be terminated by a closing PHP tag
+                ]
+            }
         },
         'N_EXIT': {
             components: {oneOf: ['N_EXIT_WITH_STATUS', 'N_EXIT_WITH_MESSAGE', 'N_EXIT_BARE']}
@@ -593,7 +601,7 @@ module.exports = {
             ifNoMatch: {component: 'className', capture: 'next'}
         },
         'N_DO_WHILE_STATEMENT': {
-            components: ['T_DO', {name: 'body', what: 'N_STATEMENT'}, 'T_WHILE', (/\(/), {name: 'condition', what: 'N_EXPRESSION'}, (/\)/), (/;/)]
+            components: ['T_DO', {name: 'body', what: 'N_STATEMENT'}, 'T_WHILE', (/\(/), {name: 'condition', what: 'N_EXPRESSION'}, (/\)/), 'N_END_STATEMENT']
         },
         'N_EXPRESSION_LEVEL_1_B': {
             captureAs: 'N_FUNCTION_CALL',
@@ -981,7 +989,7 @@ module.exports = {
         },
         'N_LEFT_HAND_SIDE_EXPRESSION': 'N_EXPRESSION_LEVEL_2_B',
         'N_EXPRESSION_STATEMENT': {
-            components: [{name: 'expression', what: 'N_EXPRESSION'}, (/;/)]
+            components: [{name: 'expression', what: 'N_EXPRESSION'}, 'N_END_STATEMENT']
         },
         'N_FLOAT': {
             components: {name: 'number', what: 'T_DNUMBER'}
@@ -996,10 +1004,10 @@ module.exports = {
             components: ['T_FUNCTION', {name: 'func', what: 'N_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
         },
         'N_GLOBAL_STATEMENT': {
-            components: ['T_GLOBAL', {name: 'variables', oneOrMoreOf: ['N_VARIABLE', (/,|(?=;)/)]}, (/;/)]
+            components: ['T_GLOBAL', {name: 'variables', oneOrMoreOf: ['N_VARIABLE', (/,|(?=;|[?%]>\n?)/)]}, 'N_END_STATEMENT']
         },
         'N_GOTO_STATEMENT': {
-            components: ['T_GOTO', {name: 'label', what: 'T_STRING'}, (/;/)]
+            components: ['T_GOTO', {name: 'label', what: 'T_STRING'}, 'N_END_STATEMENT']
         },
         'N_IF_STATEMENT': {
             components: ['T_IF', (/\(/), {name: 'condition', what: 'N_EXPRESSION'}, (/\)/), {name: 'consequentStatement', what: 'N_STATEMENT'}, {optionally: [(/else(\b|(?=if\b))/), {name: 'alternateStatement', what: 'N_STATEMENT'}]}]
@@ -1018,13 +1026,13 @@ module.exports = {
             components: {oneOf: ['N_STRING', 'N_VARIABLE', [(/\{/), 'N_EXPRESSION', (/\}/)]]}
         },
         'N_INSTANCE_PROPERTY_DEFINITION': {
-            components: [{name: 'visibility', oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}, {name: 'variable', what: 'N_VARIABLE'}, {optionally: [(/=/), {name: 'value', what: 'N_TERM'}]}, (/;/)]
+            components: [{name: 'visibility', oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}, {name: 'variable', what: 'N_VARIABLE'}, {optionally: [(/=/), {name: 'value', what: 'N_TERM'}]}, 'N_END_STATEMENT']
         },
         'N_INTEGER': {
             components: {name: 'number', what: 'T_LNUMBER'}
         },
         'N_INTERFACE_METHOD_DEFINITION': {
-            components: [{name: 'visibility', oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}, 'T_FUNCTION', {name: 'func', what: 'N_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), (/;/)]
+            components: [{name: 'visibility', oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}, 'T_FUNCTION', {name: 'func', what: 'N_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), 'N_END_STATEMENT']
         },
         'N_INTERFACE_STATEMENT': {
             components: ['T_INTERFACE', {name: 'interfaceName', rule: 'T_STRING'}, {optionally: ['T_EXTENDS', {name: 'extend', oneOf: ['N_NAMESPACE', 'T_STRING']}]}, (/\{/), {name: 'members', zeroOrMoreOf: {oneOf: ['N_INTERFACE_METHOD_DEFINITION', 'N_STATIC_INTERFACE_METHOD_DEFINITION', 'N_CONSTANT_DEFINITION', 'N_INSTANCE_PROPERTY_DEFINITION', 'N_STATIC_PROPERTY_DEFINITION', 'N_METHOD_DEFINITION', 'N_STATIC_METHOD_DEFINITION', 'N_ABSTRACT_METHOD_DEFINITION', 'N_ABSTRACT_STATIC_METHOD_DEFINITION']}}, (/\}/)]
@@ -1116,7 +1124,7 @@ module.exports = {
             components: [{optionally: 'T_OPEN_TAG'}, {name: 'statements', zeroOrMoreOf: 'N_STATEMENT'}, {oneOf: ['T_CLOSE_TAG', {what: '<EOF>'}]}]
         },
         'N_RETURN_STATEMENT': {
-            components: ['T_RETURN', {name: 'expression', optionally: 'N_EXPRESSION'}, (/;/)]
+            components: ['T_RETURN', {name: 'expression', optionally: 'N_EXPRESSION'}, 'N_END_STATEMENT']
         },
         'N_STATEMENT': {
             components: {oneOf: ['N_NAMESPACE_SCOPED_STATEMENT', 'N_NAMESPACE_STATEMENT']}
@@ -1146,7 +1154,7 @@ module.exports = {
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),
-                (/;/)
+                'N_END_STATEMENT'
             ]
         },
         'N_STATIC_MEMBER': {
@@ -1193,7 +1201,7 @@ module.exports = {
                     ['T_STATIC', {name: 'visibility', rule: 'N_VISIBILITY'}],
                     'T_STATIC'
                 ]},
-                {name: 'variable', what: 'N_VARIABLE'}, {optionally: [(/=/), {name: 'value', what: 'N_TERM'}]}, (/;/)
+                {name: 'variable', what: 'N_VARIABLE'}, {optionally: [(/=/), {name: 'value', what: 'N_TERM'}]}, 'N_END_STATEMENT'
             ]
         },
         'N_STRING': {
@@ -1233,7 +1241,7 @@ module.exports = {
             components: {oneOf: ['N_VARIABLE', 'N_FLOAT', 'N_INTEGER', 'N_BOOLEAN', 'N_STRING_LITERAL', 'N_BINARY_LITERAL', 'N_ARRAY_LITERAL', 'N_LIST', 'N_ISSET', 'N_EXIT', 'N_CLOSURE', 'N_MAGIC_CONSTANT', 'N_REQUIRE_EXPRESSION', 'N_REQUIRE_ONCE_EXPRESSION', 'N_INCLUDE_EXPRESSION', 'N_INCLUDE_ONCE_EXPRESSION', 'N_SELF', 'N_NULL', 'N_NAMESPACED_REFERENCE', 'N_STRING']}
         },
         'N_THROW_STATEMENT': {
-            components: ['T_THROW', {name: 'expression', rule: 'N_EXPRESSION'}, (/;/)]
+            components: ['T_THROW', {name: 'expression', rule: 'N_EXPRESSION'}, 'N_END_STATEMENT']
         },
         'N_TRY_STATEMENT': {
             components: [
@@ -1261,10 +1269,10 @@ module.exports = {
             }
         },
         'N_UNSET_STATEMENT': {
-            components: ['T_UNSET', (/\(/), {name: 'variables', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), (/;/)]
+            components: ['T_UNSET', (/\(/), {name: 'variables', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), 'N_END_STATEMENT']
         },
         'N_USE_STATEMENT': {
-            components: ['T_USE', {name: 'uses', oneOrMoreOf: [{name: 'source', oneOf: ['N_NAMESPACE', 'T_STRING']}, {optionally: ['T_AS', {name: 'alias', what: 'T_STRING'}]}]}, (/;/)]
+            components: ['T_USE', {name: 'uses', oneOrMoreOf: [{name: 'source', oneOf: ['N_NAMESPACE', 'T_STRING']}, {optionally: ['T_AS', {name: 'alias', what: 'T_STRING'}]}]}, 'N_END_STATEMENT']
         },
         'N_VARIABLE': {
             components: [

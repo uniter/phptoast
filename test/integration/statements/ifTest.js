@@ -114,10 +114,10 @@ describe('PHP Parser grammar if statement integration', function () {
                     },
                     consequentStatement: {
                         name: 'N_ECHO_STATEMENT',
-                        expression: {
+                        expressions: [{
                             name: 'N_INTEGER',
                             number: '1'
-                        }
+                        }]
                     }
                 }]
             }

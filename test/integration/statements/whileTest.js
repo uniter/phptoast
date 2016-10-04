@@ -47,10 +47,10 @@ describe('PHP Parser grammar while statement integration', function () {
                     },
                     statements: [{
                         name: 'N_ECHO_STATEMENT',
-                        expression: {
+                        expressions: [{
                             name: 'N_INTEGER',
                             number: '4'
-                        }
+                        }]
                     }]
                 }]
             }

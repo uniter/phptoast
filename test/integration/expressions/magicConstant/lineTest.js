@@ -27,7 +27,7 @@ describe('PHP Parser grammar __LINE__ magic constant expression integration', fu
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_ECHO_STATEMENT',
-                    expression: {
+                    expressions: [{
                         name: 'N_MAGIC_LINE_CONSTANT',
                         offset: {
                             length: 8,
@@ -35,7 +35,7 @@ describe('PHP Parser grammar __LINE__ magic constant expression integration', fu
                             column: 6 + 6,
                             offset: 11
                         }
-                    }
+                    }]
                 }]
             }
         },
@@ -45,7 +45,7 @@ describe('PHP Parser grammar __LINE__ magic constant expression integration', fu
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_ECHO_STATEMENT',
-                    expression: {
+                    expressions: [{
                         name: 'N_MAGIC_LINE_CONSTANT',
                         offset: {
                             length: 8,
@@ -53,7 +53,7 @@ describe('PHP Parser grammar __LINE__ magic constant expression integration', fu
                             column: 6 + 6,
                             offset: 11
                         }
-                    }
+                    }]
                 }]
             }
         },

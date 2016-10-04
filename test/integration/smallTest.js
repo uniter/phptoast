@@ -92,6 +92,51 @@ describe('PHP Parser grammar small program integration', function () {
             }
         },
         {
+            code: '<html><?php echo "No requirement for semi-colon here" ?></html>',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_INLINE_HTML_STATEMENT',
+                    html: '<html>'
+                }, {
+                    name: 'N_ECHO_STATEMENT',
+                    expressions: [{
+                        name: 'N_STRING_LITERAL',
+                        string: 'No requirement for semi-colon here'
+                    }]
+                }, {
+                    name: 'N_INLINE_HTML_STATEMENT',
+                    html: '</html>'
+                }]
+            }
+        },
+        {
+            code: '<html><?php go("No requirement for semi-colon here") ?></html>',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_INLINE_HTML_STATEMENT',
+                    html: '<html>'
+                }, {
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_FUNCTION_CALL',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'go'
+                        },
+                        args: [{
+                            name: 'N_STRING_LITERAL',
+                            string: 'No requirement for semi-colon here'
+                        }]
+                    }
+                }, {
+                    name: 'N_INLINE_HTML_STATEMENT',
+                    html: '</html>'
+                }]
+            }
+        },
+        {
             code: '<?php $a = 7;',
             expectedAST: {
                 name: 'N_PROGRAM',

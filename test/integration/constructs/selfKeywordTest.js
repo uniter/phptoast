@@ -60,7 +60,7 @@ EOS
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_ECHO_STATEMENT',
-                    expression: {
+                    expressions: [{
                         name: 'N_STATIC_PROPERTY',
                         className: {
                             name: 'N_SELF'
@@ -69,7 +69,7 @@ EOS
                             name: 'N_STRING',
                             string: 'something'
                         }
-                    }
+                    }]
                 }]
             }
         },
@@ -83,7 +83,7 @@ EOS
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_ECHO_STATEMENT',
-                    expression: {
+                    expressions: [{
                         name: 'N_STATIC_PROPERTY',
                         className: {
                             name: 'N_SELF'
@@ -92,7 +92,7 @@ EOS
                             name: 'N_STRING',
                             string: 'something'
                         }
-                    }
+                    }]
                 }]
             }
         }

@@ -118,10 +118,10 @@ EOS
                             name: 'N_COMPOUND_STATEMENT',
                             statements: [{
                                 name: 'N_ECHO_STATEMENT',
-                                expression: {
+                                expressions: [{
                                     name: 'N_VARIABLE',
                                     variable: 'what'
-                                }
+                                }]
                             }]
                         }
                     }]
@@ -157,10 +157,10 @@ EOS
                         }],
                         body: {
                             name: 'N_ECHO_STATEMENT',
-                            expression: {
+                            expressions: [{
                                 name: 'N_VARIABLE',
                                 variable: 'what'
-                            }
+                            }]
                         }
                     }]
                 }]
@@ -195,10 +195,10 @@ EOS
                         }],
                         body: {
                             name: 'N_ECHO_STATEMENT',
-                            expression: {
+                            expressions: [{
                                 name: 'N_VARIABLE',
                                 variable: 'msg'
-                            }
+                            }]
                         }
                     }]
                 }]

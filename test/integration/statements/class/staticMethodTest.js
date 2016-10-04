@@ -119,10 +119,10 @@ EOS
                         }],
                         body: {
                             name: 'N_ECHO_STATEMENT',
-                            expression: {
+                            expressions: [{
                                 name: 'N_VARIABLE',
                                 variable: 'string'
-                            }
+                            }]
                         }
                     }]
                 }]

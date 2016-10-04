@@ -27,9 +27,9 @@ describe('PHP Parser grammar __NAMESPACE__ magic constant expression integration
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_ECHO_STATEMENT',
-                    expression: {
+                    expressions: [{
                         name: 'N_MAGIC_NAMESPACE_CONSTANT'
-                    }
+                    }]
                 }]
             }
         },
@@ -39,9 +39,9 @@ describe('PHP Parser grammar __NAMESPACE__ magic constant expression integration
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_ECHO_STATEMENT',
-                    expression: {
+                    expressions: [{
                         name: 'N_MAGIC_NAMESPACE_CONSTANT'
-                    }
+                    }]
                 }]
             }
         },

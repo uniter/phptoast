@@ -52,10 +52,10 @@ describe('PHP Parser grammar do...while statement integration', function () {
                         name: 'N_COMPOUND_STATEMENT',
                         statements: [{
                             name: 'N_ECHO_STATEMENT',
-                            expression: {
+                            expressions: [{
                                 name: 'N_INTEGER',
                                 number: '4'
-                            }
+                            }]
                         }]
                     }
                 }]
@@ -73,10 +73,10 @@ describe('PHP Parser grammar do...while statement integration', function () {
                     },
                     body: {
                         name: 'N_ECHO_STATEMENT',
-                        expression: {
+                        expressions: [{
                             name: 'N_INTEGER',
                             number: '4'
-                        }
+                        }]
                     }
                 }]
             }

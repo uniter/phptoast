@@ -27,9 +27,9 @@ describe('PHP Parser grammar __FILE__ magic constant expression integration', fu
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_ECHO_STATEMENT',
-                    expression: {
+                    expressions: [{
                         name: 'N_MAGIC_FILE_CONSTANT'
-                    }
+                    }]
                 }]
             }
         },
@@ -39,9 +39,9 @@ describe('PHP Parser grammar __FILE__ magic constant expression integration', fu
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_ECHO_STATEMENT',
-                    expression: {
+                    expressions: [{
                         name: 'N_MAGIC_FILE_CONSTANT'
-                    }
+                    }]
                 }]
             }
         },

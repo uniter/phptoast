@@ -27,9 +27,9 @@ describe('PHP Parser grammar __CLASS__ magic constant expression integration', f
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_ECHO_STATEMENT',
-                    expression: {
+                    expressions: [{
                         name: 'N_MAGIC_CLASS_CONSTANT'
-                    }
+                    }]
                 }]
             }
         },
@@ -39,9 +39,9 @@ describe('PHP Parser grammar __CLASS__ magic constant expression integration', f
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_ECHO_STATEMENT',
-                    expression: {
+                    expressions: [{
                         name: 'N_MAGIC_CLASS_CONSTANT'
-                    }
+                    }]
                 }]
             }
         },

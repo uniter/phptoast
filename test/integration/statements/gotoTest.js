@@ -43,19 +43,19 @@ describe('PHP Parser grammar goto statement integration', function () {
                     label: 'secondEcho',
                 }, {
                     name: 'N_ECHO_STATEMENT',
-                    expression: {
+                    expressions: [{
                         name: 'N_STRING_LITERAL',
                         string: 'first'
-                    }
+                    }]
                 }, {
                     name: 'N_LABEL_STATEMENT',
                     label: 'secondEcho'
                 }, {
                     name: 'N_ECHO_STATEMENT',
-                    expression: {
+                    expressions: [{
                         name: 'N_STRING_LITERAL',
                         string: 'second'
-                    }
+                    }]
                 }]
             }
         },
@@ -68,10 +68,10 @@ describe('PHP Parser grammar goto statement integration', function () {
                     label: 'repeat'
                 }, {
                     name: 'N_ECHO_STATEMENT',
-                    expression: {
+                    expressions: [{
                         name: 'N_INTEGER',
                         number: '1'
-                    }
+                    }]
                 }, {
                     name: 'N_GOTO_STATEMENT',
                     label: 'repeat',

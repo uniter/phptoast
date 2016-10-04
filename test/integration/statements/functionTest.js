@@ -82,10 +82,10 @@ describe('PHP Parser grammar function definition statement integration', functio
                     }],
                     body: {
                         name: 'N_ECHO_STATEMENT',
-                        expression: {
+                        expressions: [{
                             name: 'N_VARIABLE',
                             variable: 'string'
-                        }
+                        }]
                     }
                 }]
             }

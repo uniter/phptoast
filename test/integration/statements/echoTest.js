@@ -1,7 +1,7 @@
 /*
  * PHP-To-AST - PHP parser
  * Copyright (c) Dan Phillimore (asmblah)
- * http://uniter.github.com/phptoast/
+ * https://uniter.github.com/phptoast/
  *
  * Released under the MIT license
  * https://github.com/uniter/phptoast/raw/master/MIT-LICENSE.txt
@@ -11,9 +11,9 @@
 
 var _ = require('microdash'),
     expect = require('chai').expect,
-    tools = require('../../../tools');
+    tools = require('../../tools');
 
-describe('PHP Parser grammar __DIR__ magic constant expression integration', function () {
+describe('PHP Parser grammar echo statement integration', function () {
     var parser;
 
     beforeEach(function () {
@@ -21,49 +21,32 @@ describe('PHP Parser grammar __DIR__ magic constant expression integration', fun
     });
 
     _.each({
-        'simple echo of current file\'s directory using correct case': {
-            code: 'echo __DIR__;',
+        'echo with a single variable expression': {
+            code: 'echo $myVar;',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_ECHO_STATEMENT',
                     expressions: [{
-                        name: 'N_MAGIC_DIR_CONSTANT'
+                        name: 'N_VARIABLE',
+                        variable: 'myVar'
                     }]
                 }]
             }
         },
-        'simple echo of current file\'s directory using weird case': {
-            code: 'echo __Dir__;',
+        'echo with multiple expressions': {
+            code: 'echo $firstVar, $secondVar;',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
                     name: 'N_ECHO_STATEMENT',
                     expressions: [{
-                        name: 'N_MAGIC_DIR_CONSTANT'
+                        name: 'N_VARIABLE',
+                        variable: 'firstVar'
+                    }, {
+                        name: 'N_VARIABLE',
+                        variable: 'secondVar'
                     }]
-                }]
-            }
-        },
-        'assignment of current file\'s directory to variable using correct case': {
-            code: '$dir = __DIR__;',
-            expectedAST: {
-                name: 'N_PROGRAM',
-                statements: [{
-                    name: 'N_EXPRESSION_STATEMENT',
-                    expression: {
-                        name: 'N_EXPRESSION',
-                        left: {
-                            name: 'N_VARIABLE',
-                            variable: 'dir'
-                        },
-                        right: [{
-                            operator: '=',
-                            operand: {
-                                name: 'N_MAGIC_DIR_CONSTANT'
-                            }
-                        }]
-                    }
                 }]
             }
         }

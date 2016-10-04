@@ -179,10 +179,10 @@ describe('PHP Parser grammar closure expression integration', function () {
                                 bindings: [],
                                 body: {
                                     name: 'N_ECHO_STATEMENT',
-                                    expression: {
+                                    expressions: [{
                                         name: 'N_INTEGER',
                                         number: '1'
-                                    }
+                                    }]
                                 }
                             }
                         }]
@@ -219,10 +219,10 @@ describe('PHP Parser grammar closure expression integration', function () {
                                 }],
                                 body: {
                                     name: 'N_ECHO_STATEMENT',
-                                    expression: {
+                                    expressions: [{
                                         name: 'N_INTEGER',
                                         number: '1'
-                                    }
+                                    }]
                                 }
                             }
                         }]
