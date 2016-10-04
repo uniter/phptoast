@@ -13,7 +13,7 @@ var _ = require('microdash'),
     expect = require('chai').expect,
     tools = require('../../../tools');
 
-describe('PHP Parser grammar modulo "%" operator integration', function () {
+describe('PHP Parser grammar multiplication "*" operator integration', function () {
     var parser;
 
     beforeEach(function () {
@@ -21,8 +21,8 @@ describe('PHP Parser grammar modulo "%" operator integration', function () {
     });
 
     _.each({
-        'calculating modulus of 21 and 10': {
-            code: 'return 21 % 10;',
+        'multiplying an integer by a variable': {
+            code: 'return 20 * $myMultiplier;',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
@@ -31,21 +31,21 @@ describe('PHP Parser grammar modulo "%" operator integration', function () {
                         name: 'N_EXPRESSION',
                         left: {
                             name: 'N_INTEGER',
-                            number: '21'
+                            number: '20'
                         },
                         right: [{
-                            operator: '%',
+                            operator: '*',
                             operand: {
-                                name: 'N_INTEGER',
-                                number: '10'
+                                name: 'N_VARIABLE',
+                                variable: 'myMultiplier'
                             }
                         }]
                     }
                 }]
             }
         },
-        'calculating modulus of 100, 27 and a variable': {
-            code: 'return 100 % 27 % $myVar;',
+        'multiplying an integer by two variables': {
+            code: 'return 20 * $firstMultiplier * $secondMultiplier;',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
@@ -56,21 +56,21 @@ describe('PHP Parser grammar modulo "%" operator integration', function () {
                             name: 'N_EXPRESSION',
                             left: {
                                 name: 'N_INTEGER',
-                                number: '100'
+                                number: '20'
                             },
                             right: [{
-                                operator: '%',
+                                operator: '*',
                                 operand: {
-                                    name: 'N_INTEGER',
-                                    number: '27'
+                                    name: 'N_VARIABLE',
+                                    variable: 'firstMultiplier'
                                 }
                             }]
                         },
                         right: [{
-                            operator: '%',
+                            operator: '*',
                             operand: {
                                 name: 'N_VARIABLE',
-                                variable: 'myVar'
+                                variable: 'secondMultiplier'
                             }
                         }]
                     }

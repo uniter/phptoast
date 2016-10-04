@@ -848,7 +848,13 @@ module.exports = {
         'N_EXPRESSION_LEVEL_6': {
             captureAs: 'N_EXPRESSION',
             components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_5'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', oneOf: [(/\*/), (/\//), (/%/)]}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_5']}]}],
-            ifNoMatch: {component: 'right', capture: 'left'}
+            processor: function (node) {
+                if (node.right.length === 0) {
+                    return node.left;
+                }
+
+                return buildBinaryExpression(node.left, node.right);
+            }
         },
         'N_EXPRESSION_LEVEL_7_A': {
             captureAs: 'N_UNARY_EXPRESSION',

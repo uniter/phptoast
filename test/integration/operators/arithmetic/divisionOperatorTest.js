@@ -13,7 +13,7 @@ var _ = require('microdash'),
     expect = require('chai').expect,
     tools = require('../../../tools');
 
-describe('PHP Parser grammar modulo "%" operator integration', function () {
+describe('PHP Parser grammar division "/" operator integration', function () {
     var parser;
 
     beforeEach(function () {
@@ -21,8 +21,8 @@ describe('PHP Parser grammar modulo "%" operator integration', function () {
     });
 
     _.each({
-        'calculating modulus of 21 and 10': {
-            code: 'return 21 % 10;',
+        'dividing an integer by a variable': {
+            code: 'return 20 / $myDivisor;',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
@@ -31,21 +31,21 @@ describe('PHP Parser grammar modulo "%" operator integration', function () {
                         name: 'N_EXPRESSION',
                         left: {
                             name: 'N_INTEGER',
-                            number: '21'
+                            number: '20'
                         },
                         right: [{
-                            operator: '%',
+                            operator: '/',
                             operand: {
-                                name: 'N_INTEGER',
-                                number: '10'
+                                name: 'N_VARIABLE',
+                                variable: 'myDivisor'
                             }
                         }]
                     }
                 }]
             }
         },
-        'calculating modulus of 100, 27 and a variable': {
-            code: 'return 100 % 27 % $myVar;',
+        'dividing an integer by two variables': {
+            code: 'return 20 / $firstDivisor / $secondDivisor;',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
@@ -56,21 +56,21 @@ describe('PHP Parser grammar modulo "%" operator integration', function () {
                             name: 'N_EXPRESSION',
                             left: {
                                 name: 'N_INTEGER',
-                                number: '100'
+                                number: '20'
                             },
                             right: [{
-                                operator: '%',
+                                operator: '/',
                                 operand: {
-                                    name: 'N_INTEGER',
-                                    number: '27'
+                                    name: 'N_VARIABLE',
+                                    variable: 'firstDivisor'
                                 }
                             }]
                         },
                         right: [{
-                            operator: '%',
+                            operator: '/',
                             operand: {
                                 name: 'N_VARIABLE',
-                                variable: 'myVar'
+                                variable: 'secondDivisor'
                             }
                         }]
                     }
