@@ -43,9 +43,10 @@ var _ = require('microdash'),
         }
     }],
     singleQuotedStringEscapeReplacements = [{
-        // Escaped backslash should result in just one backslash
-        pattern: /\\\\/g,
-        replacement: '\\'
+        // Escaped backslash or escaped single quote should result in just the escaped character
+        // All other characters cannot be escaped, the backslash will be left untouched
+        pattern: /\\([\\'])/g,
+        replacement: '$1'
     }],
     buildTree = function (first, rest, buildNode) {
         var i,
@@ -182,7 +183,7 @@ module.exports = {
         'T_CONST': /const\b/i,
         'T_CONSTANT_ENCAPSED_STRING': {oneOf: [
             // Single-quoted
-            {what: /'((?:[^']|\\')*)'/, captureIndex: 1, replace: singleQuotedStringEscapeReplacements},
+            {what: /'((?:[^\\']|\\[\s\S])*)'/, captureIndex: 1, replace: singleQuotedStringEscapeReplacements},
             // Double-quoted
             {what: /"((?:(?!\$\{?[\$a-z0-9_]+)(?:[^\\"]|\\[\s\S]))*)"/, captureIndex: 1, replace: stringEscapeReplacements}
         ]},
