@@ -823,6 +823,9 @@ module.exports = {
             ifNoMatch: {component: 'operator', capture: 'operand'},
             options: {prefix: false}
         },
+        'N_EMPTY': {
+            components: ['T_EMPTY', (/\(/), {name: 'variable', rule: 'N_EXPRESSION'}, (/\)/)]
+        },
         'N_EXPRESSION_LEVEL_4': {
             captureAs: 'N_EXPRESSION',
             components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_3_B'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_INSTANCEOF'}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_3_B'}]}],
@@ -1245,7 +1248,29 @@ module.exports = {
             components: ['T_SWITCH', (/\(/), {name: 'expression', what: 'N_EXPRESSION'}, (/\)/), (/\{/), {name: 'cases', zeroOrMoreOf: {oneOf: ['N_CASE', 'N_DEFAULT_CASE']}}, (/\}/)]
         },
         'N_TERM': {
-            components: {oneOf: ['N_VARIABLE', 'N_FLOAT', 'N_INTEGER', 'N_BOOLEAN', 'N_STRING_LITERAL', 'N_BINARY_LITERAL', 'N_ARRAY_LITERAL', 'N_LIST', 'N_ISSET', 'N_EXIT', 'N_CLOSURE', 'N_MAGIC_CONSTANT', 'N_REQUIRE_EXPRESSION', 'N_REQUIRE_ONCE_EXPRESSION', 'N_INCLUDE_EXPRESSION', 'N_INCLUDE_ONCE_EXPRESSION', 'N_SELF', 'N_NULL', 'N_NAMESPACED_REFERENCE', 'N_STRING']}
+            components: {oneOf: [
+                'N_VARIABLE',
+                'N_FLOAT',
+                'N_INTEGER',
+                'N_BOOLEAN',
+                'N_STRING_LITERAL',
+                'N_BINARY_LITERAL',
+                'N_ARRAY_LITERAL',
+                'N_LIST',
+                'N_ISSET',
+                'N_EMPTY',
+                'N_EXIT',
+                'N_CLOSURE',
+                'N_MAGIC_CONSTANT',
+                'N_REQUIRE_EXPRESSION',
+                'N_REQUIRE_ONCE_EXPRESSION',
+                'N_INCLUDE_EXPRESSION',
+                'N_INCLUDE_ONCE_EXPRESSION',
+                'N_SELF',
+                'N_NULL',
+                'N_NAMESPACED_REFERENCE',
+                'N_STRING'
+            ]}
         },
         'N_THROW_STATEMENT': {
             components: ['T_THROW', {name: 'expression', rule: 'N_EXPRESSION'}, 'N_END_STATEMENT']
