@@ -1152,6 +1152,10 @@ module.exports = {
             allowMerge: false,
             what: /self\b(?=\s*::)/
         },
+        'N_STATIC': {
+            allowMerge: false,
+            what: /static\b(?=\s*::)/
+        },
         'N_STATIC_INTERFACE_METHOD_DEFINITION': {
             components: [
                 {oneOf: [
@@ -1267,6 +1271,7 @@ module.exports = {
                 'N_INCLUDE_EXPRESSION',
                 'N_INCLUDE_ONCE_EXPRESSION',
                 'N_SELF',
+                'N_STATIC',
                 'N_NULL',
                 'N_NAMESPACED_REFERENCE',
                 'N_STRING'
