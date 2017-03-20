@@ -67,6 +67,42 @@ describe('PHP Parser grammar object access operator "->" instance method call in
                 }]
             }
         },
+        'call to complex-dynamically referenced instance method with no arguments': {
+            code: '$obj->{$firstVar . $secondVar}(21);',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_METHOD_CALL',
+                        object: {
+                            name: 'N_VARIABLE',
+                            variable: 'obj'
+                        },
+                        calls: [{
+                            func: {
+                                left: {
+                                    name: 'N_VARIABLE',
+                                    variable: 'firstVar'
+                                },
+                                name: 'N_EXPRESSION',
+                                right: [{
+                                    operator: '.',
+                                    operand: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'secondVar'
+                                    }
+                                }]
+                            },
+                            args: [{
+                                name: 'N_INTEGER',
+                                number: '21'
+                            }]
+                        }]
+                    }
+                }]
+            }
+        },
         'call to statically referenced method of object returned by closure call': {
             code: '$getObj()->doSomething();',
             expectedAST: {

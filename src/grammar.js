@@ -673,7 +673,7 @@ module.exports = {
                                     name: 'calls',
                                     oneOrMoreOf: [
                                         'T_OBJECT_OPERATOR',
-                                        {name: 'func', oneOf: ['N_STRING', 'N_VARIABLE']},
+                                        {name: 'func', what: 'N_INSTANCE_MEMBER'},
                                         (/\(/),
                                         {
                                             name: 'args',
