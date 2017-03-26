@@ -1150,7 +1150,7 @@ module.exports = {
         },
         'N_SELF': {
             allowMerge: false,
-            what: /self\b(?=\s*::)/
+            what: /self\b(?=\s*::)/i
         },
         'N_STATIC': {
             allowMerge: false,

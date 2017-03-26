@@ -73,10 +73,10 @@ EOS
                 }]
             }
         },
-        '"self" used to dereference a static class property with whitespace before the "::" operator': {
+        '"self" used to dereference a static class property with mixed case and whitespace before the "::" operator': {
             code: nowdoc(function () {/*<<<EOS
 <?php
-    echo self ::$something;
+    echo sELf ::$something;
 EOS
 */;}), // jshint ignore:line
             expectedAST: {
