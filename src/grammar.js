@@ -1130,6 +1130,10 @@ module.exports = {
             allowMerge: false,
             what: (/null\b/i)
         },
+        'N_PARENT': {
+            allowMerge: false,
+            what: /parent\b(?=\s*::)/i
+        },
         'N_PROGRAM': {
             components: [{optionally: 'T_OPEN_TAG'}, {name: 'statements', zeroOrMoreOf: 'N_STATEMENT'}, {oneOf: ['T_CLOSE_TAG', {what: '<EOF>'}]}]
         },
@@ -1271,6 +1275,7 @@ module.exports = {
                 'N_INCLUDE_EXPRESSION',
                 'N_INCLUDE_ONCE_EXPRESSION',
                 'N_SELF',
+                'N_PARENT',
                 'N_STATIC',
                 'N_NULL',
                 'N_NAMESPACED_REFERENCE',
