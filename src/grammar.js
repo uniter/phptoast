@@ -1154,7 +1154,7 @@ module.exports = {
         },
         'N_STATIC': {
             allowMerge: false,
-            what: /static\b(?=\s*::)/
+            what: /static\b(?=\s*::)/i
         },
         'N_STATIC_INTERFACE_METHOD_DEFINITION': {
             components: [

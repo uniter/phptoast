@@ -73,10 +73,10 @@ EOS
                 }]
             }
         },
-        '"static" used to dereference a static class property with whitespace before the "::" operator': {
+        '"static" used to dereference a static class property with mixed case and whitespace before the "::" operator': {
             code: nowdoc(function () {/*<<<EOS
 <?php
-    echo static ::$something;
+    echo sTATic ::$something;
 EOS
 */;}), // jshint ignore:line
             expectedAST: {
