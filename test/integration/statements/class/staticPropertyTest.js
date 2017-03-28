@@ -175,6 +175,39 @@ EOS
                     }]
                 }]
             }
+        },
+        'class with one public static property with default value referencing a class constant': {
+            code: nowdoc(function () {/*<<<EOS
+<?php
+    class MyClass
+    {
+        public static $myStaticProp = YourClass::YOUR_CONST;
+    }
+EOS
+*/;}), // jshint ignore:line
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    className: 'MyClass',
+                    members: [{
+                        name: 'N_STATIC_PROPERTY_DEFINITION',
+                        visibility: 'public',
+                        variable: {
+                            name: 'N_VARIABLE',
+                            variable: 'myStaticProp'
+                        },
+                        value: {
+                            name: 'N_CLASS_CONSTANT',
+                            className: {
+                                name: 'N_STRING',
+                                string: 'YourClass'
+                            },
+                            constant: 'YOUR_CONST'
+                        }
+                    }]
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

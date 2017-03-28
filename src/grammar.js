@@ -371,9 +371,9 @@ module.exports = {
         },
         'N_ARGUMENT': {
             components: {oneOf: [
-                [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_TERM'}],
+                [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', oneOf: ['N_CLASS_CONSTANT', 'N_TERM']}],
                 [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}],
-                [{name: 'type', oneOf: ['N_NAMESPACE', 'T_STRING']}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_TERM'}],
+                [{name: 'type', oneOf: ['N_NAMESPACE', 'T_STRING']}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', oneOf: ['N_CLASS_CONSTANT', 'N_TERM']}],
                 [{name: 'type', oneOf: ['N_NAMESPACE', 'T_STRING']}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}]
             ]}
         },
@@ -1036,7 +1036,7 @@ module.exports = {
             components: {oneOf: ['N_STRING', 'N_VARIABLE', [(/\{/), 'N_EXPRESSION', (/\}/)]]}
         },
         'N_INSTANCE_PROPERTY_DEFINITION': {
-            components: [{name: 'visibility', oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}, {name: 'variable', what: 'N_VARIABLE'}, {optionally: [(/=/), {name: 'value', what: 'N_TERM'}]}, 'N_END_STATEMENT']
+            components: [{name: 'visibility', oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}, {name: 'variable', what: 'N_VARIABLE'}, {optionally: [(/=/), {name: 'value', oneOf: ['N_CLASS_CONSTANT', 'N_TERM']}]}, 'N_END_STATEMENT']
         },
         'N_INTEGER': {
             components: {name: 'number', what: 'T_LNUMBER'}
@@ -1219,7 +1219,7 @@ module.exports = {
                     ['T_STATIC', {name: 'visibility', rule: 'N_VISIBILITY'}],
                     'T_STATIC'
                 ]},
-                {name: 'variable', what: 'N_VARIABLE'}, {optionally: [(/=/), {name: 'value', what: 'N_TERM'}]}, 'N_END_STATEMENT'
+                {name: 'variable', what: 'N_VARIABLE'}, {optionally: [(/=/), {name: 'value', oneOf: ['N_CLASS_CONSTANT', 'N_TERM']}]}, 'N_END_STATEMENT'
             ]
         },
         'N_STRING': {

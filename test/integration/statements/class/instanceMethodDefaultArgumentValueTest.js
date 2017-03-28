@@ -99,6 +99,109 @@ EOS
                     }]
                 }]
             }
+        },
+        'method definition with untyped parameter default value that references a class constant': {
+            code: nowdoc(function () {/*<<<EOS
+<?php
+    class Thing {
+        const MY_CONST = 21;
+
+        public function doNothing($myParam = self::MY_CONST) {}
+    }
+EOS
+*/;}), // jshint ignore:line
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    className: 'Thing',
+                    members: [{
+                        name: 'N_CONSTANT_DEFINITION',
+                        constant: 'MY_CONST',
+                        value: {
+                            name: 'N_INTEGER',
+                            number: '21'
+                        }
+                    }, {
+                        name: 'N_METHOD_DEFINITION',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'doNothing'
+                        },
+                        visibility: 'public',
+                        args: [{
+                            name: 'N_ARGUMENT',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'myParam'
+                            },
+                            value: {
+                                name: 'N_CLASS_CONSTANT',
+                                className: {
+                                    name: 'N_SELF'
+                                },
+                                constant: 'MY_CONST'
+                            }
+                        }],
+                        body: {
+                            name: 'N_COMPOUND_STATEMENT',
+                            statements: []
+                        }
+                    }]
+                }]
+            }
+        },
+        'method definition with typed parameter default value that references a class constant': {
+            code: nowdoc(function () {/*<<<EOS
+<?php
+    class Thing {
+        const MY_CONST = 21;
+
+        public function doNothing(MyClass $myParam = self::MY_CONST) {}
+    }
+EOS
+*/;}), // jshint ignore:line
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    className: 'Thing',
+                    members: [{
+                        name: 'N_CONSTANT_DEFINITION',
+                        constant: 'MY_CONST',
+                        value: {
+                            name: 'N_INTEGER',
+                            number: '21'
+                        }
+                    }, {
+                        name: 'N_METHOD_DEFINITION',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'doNothing'
+                        },
+                        visibility: 'public',
+                        args: [{
+                            name: 'N_ARGUMENT',
+                            type: 'MyClass',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'myParam'
+                            },
+                            value: {
+                                name: 'N_CLASS_CONSTANT',
+                                className: {
+                                    name: 'N_SELF'
+                                },
+                                constant: 'MY_CONST'
+                            }
+                        }],
+                        body: {
+                            name: 'N_COMPOUND_STATEMENT',
+                            statements: []
+                        }
+                    }]
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
