@@ -254,7 +254,7 @@ module.exports = {
         'T_IS_SMALLER_OR_EQUAL': /<=/,
         'T_LINE': /__LINE__\b/i,
         'T_LIST': /list\b/i,
-        'T_LNUMBER': /\d+|0x[0-9a-f]/i,
+        'T_LNUMBER': /0x[0-9a-f]+|\d+/i,
         'T_LOGICAL_AND': /and\b/i,
         'T_LOGICAL_OR': /or\b/i,
         'T_LOGICAL_XOR': /xor\b/i,
@@ -1039,7 +1039,19 @@ module.exports = {
             components: [{name: 'visibility', oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}, {name: 'variable', what: 'N_VARIABLE'}, {optionally: [(/=/), {name: 'value', oneOf: ['N_CLASS_CONSTANT', 'N_TERM']}]}, 'N_END_STATEMENT']
         },
         'N_INTEGER': {
-            components: {name: 'number', what: 'T_LNUMBER'}
+            components: {name: 'number', what: 'T_LNUMBER'},
+            processor: function (node) {
+                if (/^0x/i.test(node.number)) {
+                    // Number is in hexadecimal
+                    node.number = parseInt(node.number, 16) + '';
+                } else if (/^0/i.test(node.number)) {
+                    // In strict mode, parseInt(...) will parse an octal literal as decimal
+                    // so eg. parseInt('021') will return 21 instead of 17
+                    node.number = parseInt(node.number, 8) + '';
+                }
+
+                return node;
+            }
         },
         'N_INTERFACE_METHOD_DEFINITION': {
             components: [{name: 'visibility', oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}, 'T_FUNCTION', {name: 'func', what: 'N_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), 'N_END_STATEMENT']
