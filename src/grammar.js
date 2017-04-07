@@ -1019,6 +1019,42 @@ module.exports = {
         'N_GOTO_STATEMENT': {
             components: ['T_GOTO', {name: 'label', what: 'T_STRING'}, 'N_END_STATEMENT']
         },
+        'N_HEREDOC': {
+            components: [{name: 'string', what: /<<<("?)([a-z0-9_]+)\1\r?\n([\s\S]*?)\r?\n\2(?=;?(?:\r?\n|$))/i, captureIndex: 3}],
+            processor: function (node, parse) {
+                var innerMatch,
+                    parts;
+
+                if (node.string === '') {
+                    parts = [{
+                        name: 'N_STRING_LITERAL',
+                        string: ''
+                    }];
+                } else {
+                    innerMatch = parse(node.string, {}, 'N_HEREDOC_INNER');
+
+                    if (innerMatch === null) {
+                        return node;
+                    }
+
+                    parts = innerMatch.parts;
+                }
+
+                return {
+                    name: 'N_HEREDOC',
+                    parts: parts
+                };
+            }
+        },
+        'N_HEREDOC_INNER': {
+            components: [{name: 'parts', oneOrMoreOf: {oneOf: ['N_STRING_VARIABLE', 'N_STRING_VARIABLE_EXPRESSION', 'N_HEREDOC_TEXT']}}]
+        },
+        // Needs its own rule rather than reusing N_STRING_TEXT, as we don't need quotes
+        // to be escaped in a heredoc, unlike a string literal
+        'N_HEREDOC_TEXT': {
+            captureAs: 'N_STRING_LITERAL',
+            components: {name: 'string', what: (/(?:[^\\$]|\\[\s\S]|\$(?=\$))+/), ignoreWhitespace: false, replace: stringEscapeReplacements}
+        },
         'N_IF_STATEMENT': {
             components: ['T_IF', (/\(/), {name: 'condition', what: 'N_EXPRESSION'}, (/\)/), {name: 'consequentStatement', what: 'N_STATEMENT'}, {optionally: [(/else(\b|(?=if\b))/), {name: 'alternateStatement', what: 'N_STATEMENT'}]}]
         },
@@ -1137,6 +1173,9 @@ module.exports = {
         'N_NAMESPACED_REFERENCE': {
             captureAs: 'N_STRING',
             components: {name: 'string', what: 'N_NAMESPACE'}
+        },
+        'N_NOWDOC': {
+            components: [{name: 'string', what: /<<<'([a-z0-9_]+)'\r?\n([\s\S]*?)\r?\n\1(?=;?(?:\r?\n|$))/i, captureIndex: 2}]
         },
         'N_NULL': {
             allowMerge: false,
@@ -1291,7 +1330,9 @@ module.exports = {
                 'N_STATIC',
                 'N_NULL',
                 'N_NAMESPACED_REFERENCE',
-                'N_STRING'
+                'N_STRING',
+                'N_HEREDOC',
+                'N_NOWDOC'
             ]}
         },
         'N_THROW_STATEMENT': {
