@@ -605,23 +605,8 @@ module.exports = {
             components: ['T_DO', {name: 'body', what: 'N_STATEMENT'}, 'T_WHILE', (/\(/), {name: 'condition', what: 'N_EXPRESSION'}, (/\)/), 'N_END_STATEMENT']
         },
         'N_EXPRESSION_LEVEL_1_B': {
-            captureAs: 'N_FUNCTION_CALL',
-            components: {oneOf: [
-                [
-                    {name: 'func', oneOf: ['N_NAMESPACED_REFERENCE', 'N_EXPRESSION_LEVEL_1_A']},
-                    [
-                        (/\(/),
-                        {name: 'args', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
-                        (/\)/)
-                    ]
-                ],
-                {name: 'next', what: 'N_EXPRESSION_LEVEL_1_A'}
-            ]},
-            ifNoMatch: {component: 'func', capture: 'next'}
-        },
-        'N_EXPRESSION_LEVEL_1_C': {
             captureAs: 'N_UNARY_EXPRESSION',
-            components: [{name: 'operator', optionally: 'T_CLONE'}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_1_B'}],
+            components: [{name: 'operator', optionally: 'T_CLONE'}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_1_A'}],
             ifNoMatch: {component: 'operator', capture: 'operand'},
             options: {prefix: true}
         },
@@ -629,11 +614,11 @@ module.exports = {
             captureAs: 'N_CLASS_CONSTANT',
             components: {oneOf: [
                 [
-                    {name: 'className', oneOf: ['N_NAMESPACED_REFERENCE', 'N_EXPRESSION_LEVEL_1_C']},
+                    {name: 'className', oneOf: ['N_NAMESPACED_REFERENCE', 'N_EXPRESSION_LEVEL_1_B']},
                     'T_DOUBLE_COLON',
                     {name: 'constant', what: ['T_STRING', (/(?!\()/)]}
                 ],
-                {name: 'next', what: 'N_EXPRESSION_LEVEL_1_C'}
+                {name: 'next', what: 'N_EXPRESSION_LEVEL_1_B'}
             ]},
             ifNoMatch: {component: 'constant', capture: 'next'}
         },
@@ -716,6 +701,15 @@ module.exports = {
                                     'T_DOUBLE_COLON',
                                     {name: 'property', what: 'N_STATIC_MEMBER'}
                                 ]
+                            },
+                            // Call to callable stored in array index or static property
+                            {
+                                name: 'callable',
+                                what: [
+                                    (/\(/),
+                                    {name: 'args', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                                    (/\)/)
+                                ]
                             }
                         ]
                     }
@@ -761,6 +755,12 @@ module.exports = {
                             name: 'N_STATIC_PROPERTY',
                             className: result,
                             property: member.static_property.property
+                        };
+                    } else if (member.callable) {
+                        result = {
+                            name: 'N_FUNCTION_CALL',
+                            func: result,
+                            args: member.callable.args
                         };
                     }
 
