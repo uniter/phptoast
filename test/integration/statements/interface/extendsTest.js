@@ -11,6 +11,7 @@
 
 var _ = require('microdash'),
     expect = require('chai').expect,
+    nowdoc = require('nowdoc'),
     tools = require('../../../tools');
 
 describe('PHP Parser grammar interface statement "extends" integration', function () {
@@ -32,7 +33,7 @@ describe('PHP Parser grammar interface statement "extends" integration', functio
                 }, {
                     name: 'N_INTERFACE_STATEMENT',
                     interfaceName: 'Human',
-                    extend: 'Animal',
+                    extend: ['Animal'],
                     members: []
                 }]
             }
@@ -44,8 +45,33 @@ describe('PHP Parser grammar interface statement "extends" integration', functio
                 statements: [{
                     name: 'N_INTERFACE_STATEMENT',
                     interfaceName: 'Drill',
-                    extend: '\\Vendor\\Toolbox\\Tool',
+                    extend: ['\\Vendor\\Toolbox\\Tool'],
                     members: []
+                }]
+            }
+        },
+        'derived interface extending multiple other interfaces': {
+            code: nowdoc(function () {/*<<<EOS
+<?php
+    interface Planet extends Rotatable, Orbitable {
+        const SHAPE = 'sphere';
+    }
+EOS
+*/;}), // jshint ignore:line
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_INTERFACE_STATEMENT',
+                    interfaceName: 'Planet',
+                    extend: ['Rotatable', 'Orbitable'],
+                    members: [{
+                        name: 'N_CONSTANT_DEFINITION',
+                        constant: 'SHAPE',
+                        value: {
+                            name: 'N_STRING_LITERAL',
+                            string: 'sphere'
+                        }
+                    }]
                 }]
             }
         }
