@@ -895,7 +895,13 @@ module.exports = {
         'N_EXPRESSION_LEVEL_11': {
             captureAs: 'N_EXPRESSION',
             components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_10'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/&&/)}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_10']}]}],
-            ifNoMatch: {component: 'right', capture: 'left'}
+            processor: function (node) {
+                if (!node.right) {
+                    return node.left;
+                }
+
+                return buildBinaryExpression(node.left, node.right);
+            }
         },
         'N_EXPRESSION_LEVEL_12': {
             captureAs: 'N_EXPRESSION',
@@ -915,7 +921,13 @@ module.exports = {
         'N_EXPRESSION_LEVEL_15': {
             captureAs: 'N_EXPRESSION',
             components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_14'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/\|\|/)}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_14']}]}],
-            ifNoMatch: {component: 'right', capture: 'left'}
+            processor: function (node) {
+                if (!node.right) {
+                    return node.left;
+                }
+
+                return buildBinaryExpression(node.left, node.right);
+            }
         },
         'N_EXPRESSION_LEVEL_16': {
             captureAs: 'N_TERNARY',

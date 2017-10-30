@@ -137,6 +137,50 @@ describe('PHP Parser grammar logical Or "<value> || <value>" operator integratio
                     }
                 }]
             }
+        },
+        'assigning two chained Ors to another variable': {
+            // "||" is left-associative, so equivalent to `$result = ($value1 || $value2) || $value3;`
+            code: '$result = $value1 || $value2 || $value3;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'result'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_EXPRESSION',
+                                left: {
+                                    name: 'N_EXPRESSION',
+                                    left: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'value1'
+                                    },
+                                    right: [{
+                                        operator: '||',
+                                        operand: {
+                                            name: 'N_VARIABLE',
+                                            variable: 'value2'
+                                        }
+                                    }]
+                                },
+                                right: [{
+                                    operator: '||',
+                                    operand: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'value3'
+                                    }
+                                }]
+                            }
+                        }]
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
