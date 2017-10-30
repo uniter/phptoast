@@ -293,6 +293,32 @@ describe('PHP Parser grammar new operator integration', function () {
                     }
                 }]
             }
+        },
+        'instantiating the current class': {
+            code: '$object = new self();',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'object'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_NEW_EXPRESSION',
+                                className: {
+                                    name: 'N_SELF'
+                                },
+                                args: []
+                            }
+                        }]
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

@@ -501,11 +501,15 @@ module.exports = {
         'N_EXPRESSION_LEVEL_0': {
             components: [{oneOf: ['N_TERM', [(/\(/), 'N_EXPRESSION', (/\)/)]]}]
         },
+        'N_NEW_EXPRESSION_SELF': {
+            captureAs: 'N_SELF',
+            components: [{allowMerge: false, what: /self(?=\s*\()/}]
+        },
         'N_NEW_EXPRESSION_DYNAMIC_CLASS': {
             components: [
                 {
                     name: 'expression',
-                    oneOf: ['N_EXPRESSION_LEVEL_0', 'N_NAMESPACED_REFERENCE']
+                    oneOf: ['N_NEW_EXPRESSION_SELF', 'N_EXPRESSION_LEVEL_0', 'N_NAMESPACED_REFERENCE']
                 },
                 {
                     name: 'member',
