@@ -1228,7 +1228,33 @@ module.exports = {
             components: {oneOf: ['N_NAMESPACE_SCOPED_STATEMENT', 'N_NAMESPACE_STATEMENT']}
         },
         'N_NAMESPACE_SCOPED_STATEMENT': {
-            components: {oneOf: ['N_COMPOUND_STATEMENT', 'N_RETURN_STATEMENT', 'N_INLINE_HTML_STATEMENT', 'N_EMPTY_STATEMENT', 'N_ECHO_STATEMENT', 'N_BREAK_STATEMENT', 'N_CONTINUE_STATEMENT', 'N_UNSET_STATEMENT', 'N_EXPRESSION_STATEMENT', 'N_FUNCTION_STATEMENT', 'N_IF_STATEMENT', 'N_FOREACH_STATEMENT', 'N_FOR_STATEMENT', 'N_WHILE_STATEMENT', 'N_DO_WHILE_STATEMENT', 'N_CLASS_STATEMENT', 'N_INTERFACE_STATEMENT', 'N_SWITCH_STATEMENT', 'N_GLOBAL_STATEMENT', 'N_LABEL_STATEMENT', 'N_GOTO_STATEMENT', 'N_USE_STATEMENT', 'N_THROW_STATEMENT', 'N_TRY_STATEMENT']}
+            components: {oneOf: [
+                'N_COMPOUND_STATEMENT',
+                'N_RETURN_STATEMENT',
+                'N_INLINE_HTML_STATEMENT',
+                'N_EMPTY_STATEMENT',
+                'N_ECHO_STATEMENT',
+                'N_BREAK_STATEMENT',
+                'N_CONTINUE_STATEMENT',
+                'N_UNSET_STATEMENT',
+                'N_EXPRESSION_STATEMENT',
+                'N_FUNCTION_STATEMENT',
+                'N_IF_STATEMENT',
+                'N_FOREACH_STATEMENT',
+                'N_FOR_STATEMENT',
+                'N_WHILE_STATEMENT',
+                'N_DO_WHILE_STATEMENT',
+                'N_CLASS_STATEMENT',
+                'N_INTERFACE_STATEMENT',
+                'N_SWITCH_STATEMENT',
+                'N_GLOBAL_STATEMENT',
+                'N_STATIC_STATEMENT',
+                'N_LABEL_STATEMENT',
+                'N_GOTO_STATEMENT',
+                'N_USE_STATEMENT',
+                'N_THROW_STATEMENT',
+                'N_TRY_STATEMENT'
+            ]}
         },
         'N_REQUIRE_EXPRESSION': {
             components: ['T_REQUIRE', {name: 'path', what: 'N_EXPRESSION'}]
@@ -1243,6 +1269,25 @@ module.exports = {
         'N_STATIC': {
             allowMerge: false,
             what: /static\b(?=\s*::)/i
+        },
+        'N_STATIC_STATEMENT': {
+            components: [
+                'T_STATIC',
+                {
+                    name: 'variables',
+                    oneOrMoreOf: [
+                        {name: 'variable', rule: 'N_VARIABLE'},
+                        {
+                            optionally: [
+                                /=/,
+                                {name: 'initialiser', rule: 'N_EXPRESSION'}
+                            ]
+                        },
+                        (/,|(?=;|[?%]>\n?)/)
+                    ]
+                },
+                'N_END_STATEMENT'
+            ]
         },
         'N_STATIC_INTERFACE_METHOD_DEFINITION': {
             components: [
