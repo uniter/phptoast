@@ -98,6 +98,99 @@ describe('PHP Parser grammar number literal expression integration', function ()
                     }
                 }]
             }
+        },
+        'return of positive lowercase float exponent literal': {
+            code: 'return 5e-3;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_FLOAT',
+                        number: '5e-3'
+                    }
+                }]
+            }
+        },
+        'return of negative uppercase float exponent literal': {
+            code: 'return -5E-3;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_UNARY_EXPRESSION',
+                        operator: '-',
+                        prefix: true,
+                        operand: {
+                            name: 'N_FLOAT',
+                            number: '5E-3'
+                        }
+                    }
+                }]
+            }
+        },
+        'return of positive lowercase explicitly integer exponent literal': {
+            code: 'return 5e+3;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_FLOAT',
+                        number: '5e+3'
+                    }
+                }]
+            }
+        },
+        'return of negative uppercase explicitly integer exponent literal': {
+            code: 'return -5E+3;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_UNARY_EXPRESSION',
+                        operator: '-',
+                        prefix: true,
+                        operand: {
+                            name: 'N_FLOAT',
+                            number: '5E+3'
+                        }
+                    }
+                }]
+            }
+        },
+        'return of positive lowercase implicitly integer exponent literal': {
+            code: 'return 5e3;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_FLOAT',
+                        number: '5e3'
+                    }
+                }]
+            }
+        },
+        'return of negative uppercase implicitly integer exponent literal': {
+            code: 'return -5E3;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_UNARY_EXPRESSION',
+                        operator: '-',
+                        prefix: true,
+                        operand: {
+                            name: 'N_FLOAT',
+                            number: '5E3'
+                        }
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
