@@ -505,11 +505,20 @@ module.exports = {
             captureAs: 'N_SELF',
             components: [{allowMerge: false, what: /self(?=\s*\()/}]
         },
+        'N_NEW_EXPRESSION_STATIC': {
+            captureAs: 'N_STATIC',
+            components: [{allowMerge: false, what: /static(?=\s*\()/}]
+        },
         'N_NEW_EXPRESSION_DYNAMIC_CLASS': {
             components: [
                 {
                     name: 'expression',
-                    oneOf: ['N_NEW_EXPRESSION_SELF', 'N_EXPRESSION_LEVEL_0', 'N_NAMESPACED_REFERENCE']
+                    oneOf: [
+                        'N_NEW_EXPRESSION_SELF',
+                        'N_NEW_EXPRESSION_STATIC',
+                        'N_EXPRESSION_LEVEL_0',
+                        'N_NAMESPACED_REFERENCE'
+                    ]
                 },
                 {
                     name: 'member',
