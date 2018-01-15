@@ -40,7 +40,8 @@ describe('PHP Parser grammar new operator integration', function () {
                                 className: {
                                     name: 'N_STRING',
                                     string: 'Worker'
-                                }
+                                },
+                                args: []
                             }
                         }]
                     }
@@ -96,7 +97,8 @@ describe('PHP Parser grammar new operator integration', function () {
                                     className: {
                                         name: 'N_STRING',
                                         string: '\\stdClass'
-                                    }
+                                    },
+                                    args: []
                                 }
                             }]
                         }
@@ -177,7 +179,8 @@ describe('PHP Parser grammar new operator integration', function () {
                                 className: {
                                     name: 'N_VARIABLE',
                                     variable: 'className'
-                                }
+                                },
+                                args: []
                             }
                         }]
                     }
@@ -212,7 +215,8 @@ describe('PHP Parser grammar new operator integration', function () {
                                             string: 'className'
                                         }
                                     }]
-                                }
+                                },
+                                args: []
                             }
                         }]
                     }
@@ -279,7 +283,8 @@ describe('PHP Parser grammar new operator integration', function () {
                                     className: {
                                         name: 'N_STRING',
                                         string: 'MyClass'
-                                    }
+                                    },
+                                    args: []
                                 },
                                 right: [{
                                     operator: '+',
@@ -320,8 +325,60 @@ describe('PHP Parser grammar new operator integration', function () {
                 }]
             }
         },
+        'instantiating the current class with no argument list': {
+            code: '$object = new self;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'object'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_NEW_EXPRESSION',
+                                className: {
+                                    name: 'N_SELF'
+                                },
+                                args: []
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
         'instantiating the called class': {
             code: '$object = new static();',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'object'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_NEW_EXPRESSION',
+                                className: {
+                                    name: 'N_STATIC'
+                                },
+                                args: []
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
+        'instantiating the called class with no argument list': {
+            code: '$object = new static;',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{

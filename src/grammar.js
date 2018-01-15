@@ -503,11 +503,11 @@ module.exports = {
         },
         'N_NEW_EXPRESSION_SELF': {
             captureAs: 'N_SELF',
-            components: [{allowMerge: false, what: /self(?=\s*\()/}]
+            components: [{allowMerge: false, what: /self\b/}]
         },
         'N_NEW_EXPRESSION_STATIC': {
             captureAs: 'N_STATIC',
-            components: [{allowMerge: false, what: /static(?=\s*\()/}]
+            components: [{allowMerge: false, what: /static\b/}]
         },
         'N_NEW_EXPRESSION_DYNAMIC_CLASS': {
             components: [
@@ -612,7 +612,14 @@ module.exports = {
                 ],
                 {name: 'next', what: 'N_EXPRESSION_LEVEL_0'}
             ]},
-            ifNoMatch: {component: 'className', capture: 'next'}
+            ifNoMatch: {component: 'className', capture: 'next'},
+            processor: function (node) {
+                if (node.className && !node.args) {
+                    node.args = [];
+                }
+
+                return node;
+            }
         },
         'N_DO_WHILE_STATEMENT': {
             components: ['T_DO', {name: 'body', what: 'N_STATEMENT'}, 'T_WHILE', (/\(/), {name: 'condition', what: 'N_EXPRESSION'}, (/\)/), 'N_END_STATEMENT']

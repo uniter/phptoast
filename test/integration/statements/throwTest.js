@@ -32,7 +32,8 @@ describe('PHP Parser grammar throw statement integration', function () {
                         className: {
                             name: 'N_STRING',
                             string: 'Exception'
-                        }
+                        },
+                        args: []
                     }
                 }]
             }
