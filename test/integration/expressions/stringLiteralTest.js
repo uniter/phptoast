@@ -22,6 +22,40 @@ describe('PHP Parser grammar string literal expression integration', function ()
     });
 
     _.each({
+        'empty single-quoted string literal': {
+            code: nowdoc(function () {/*<<<EOS
+<?php
+return '';
+EOS
+*/;}), //jshint ignore:line
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_STRING_LITERAL',
+                        string: ''
+                    }
+                }]
+            }
+        },
+        'empty double-quoted string literal': {
+            code: nowdoc(function () {/*<<<EOS
+<?php
+return "";
+EOS
+*/;}), //jshint ignore:line
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_STRING_LITERAL',
+                        string: ''
+                    }
+                }]
+            }
+        },
         'single-quoted string literal with double-quote embedded': {
             code: nowdoc(function () {/*<<<EOS
 <?php

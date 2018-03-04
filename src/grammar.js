@@ -181,12 +181,12 @@ module.exports = {
         'T_COMMENT': /(?:\/\/|#)(.*?)[\r\n]+|\/\*(?!\*)([\s\S]*?)\*\//,
         'T_CONCAT_EQUAL': /\.=/,
         'T_CONST': /const\b/i,
-        'T_CONSTANT_ENCAPSED_STRING': {oneOf: [
-            // Single-quoted
-            {what: /'((?:[^\\']|\\[\s\S])*)'/, captureIndex: 1, replace: singleQuotedStringEscapeReplacements},
-            // Double-quoted
-            {what: /"((?:(?!\$\{?[\$a-z0-9_]+)(?:[^\\"]|\\[\s\S]))*)"/, captureIndex: 1, replace: stringEscapeReplacements}
-        ]},
+        // Single-quoted strings - see N_STRING_EXPRESSION for double-quoted ones
+        'T_CONSTANT_ENCAPSED_STRING': {
+            what: /'((?:[^\\']|\\[\s\S])*)'/,
+            captureIndex: 1,
+            replace: singleQuotedStringEscapeReplacements
+        },
         'T_CONTINUE': /continue\b/i,
         'T_CURLY_OPEN': /\{(?=\$)/,
         'T_DEC': /--/i,
@@ -299,7 +299,7 @@ module.exports = {
         'T_SR_EQUAL': />>=/,
         'T_START_HEREDOC': /<<<(["']?)([\$a-z0-9_]+)\1\n?/,
         'T_STATIC': /static\b/i,
-        'T_STRING': /(?![\$0-9])[\$a-z0-9_]+/i,
+        'T_STRING': /(?![\$0-9])[a-z0-9_]+/i,
         'T_STRING_CAST': /\(\s*string\s*\)/i,
         'T_STRING_VARNAME': /(?![\$0-9])[\$a-z0-9_]+/,
         'T_SWITCH': /switch\b/i,
@@ -1079,7 +1079,7 @@ module.exports = {
             }
         },
         'N_HEREDOC_INNER': {
-            components: [{name: 'parts', oneOrMoreOf: {oneOf: ['N_STRING_VARIABLE', 'N_STRING_VARIABLE_EXPRESSION', 'N_HEREDOC_TEXT']}}]
+            components: [{name: 'parts', oneOrMoreOf: {oneOf: ['N_STRING_INTERPOLATED_EXPRESSION', 'N_HEREDOC_TEXT']}}]
         },
         // Needs its own rule rather than reusing N_STRING_TEXT, as we don't need quotes
         // to be escaped in a heredoc, unlike a string literal
@@ -1371,31 +1371,223 @@ module.exports = {
             components: {name: 'string', what: 'T_STRING'}
         },
         'N_STRING_EXPRESSION': {
-            components: [(/"/), {name: 'parts', oneOrMoreOf: {oneOf: ['N_STRING_VARIABLE', 'N_STRING_VARIABLE_EXPRESSION', 'N_STRING_TEXT']}}, (/"/)]
+            components: [(/"/), {name: 'parts', zeroOrMoreOf: {oneOf: ['N_STRING_INTERPOLATED_EXPRESSION', 'N_STRING_TEXT']}}, (/"/)],
+            processor: function (node) {
+                if (node.parts.length === 1 && node.parts[0].name === 'N_STRING_LITERAL') {
+                    // Double-quoted string is not complex as it does not contain any interpolation -
+                    // no need to wrap it in an N_STRING_EXPRESSION
+                    return node.parts[0];
+                }
+
+                if (node.parts.length === 0) {
+                    // Handle empty string literals
+                    return {
+                        name: 'N_STRING_LITERAL',
+                        string: ''
+                    };
+                }
+
+                return node;
+            }
         },
         'N_STRING_LITERAL': {
             components: {oneOf: [{name: 'string', what: 'T_CONSTANT_ENCAPSED_STRING'}, 'N_STRING_EXPRESSION']}
         },
         'N_STRING_TEXT': {
             captureAs: 'N_STRING_LITERAL',
-            components: {name: 'string', what: (/(?:[^\\"\$]|\\[\s\S]|\$(?=\$))+/), ignoreWhitespace: false, replace: stringEscapeReplacements}
+            components: {name: 'string', what: (/(?:[^\\"${]|\\[\s\S]|\$(?=\$)|\$[^{a-zA-Z]|{\\\$|{[^$])+/), ignoreWhitespace: false, replace: stringEscapeReplacements}
         },
-        'N_STRING_VARIABLE': {
-            captureAs: 'N_VARIABLE',
-            components: [
-                {oneOf: [
-                    {name: 'variable', what: 'T_VARIABLE'},
-                    {name: 'variable', what: (/\$\{([a-z0-9_]+)\}/i), captureIndex: 1}
-                ]}
-            ]
+        'N_STRING_INTERPOLATED_EXPRESSION': {
+            components: {oneOf: [
+                'N_STRING_SIMPLE_INTERPOLATED_EXPRESSION',
+                'N_STRING_COMPLEX_INTERPOLATED_EXPRESSION'
+            ]}
         },
-        'N_STRING_VARIABLE_EXPRESSION': {
+        'N_STRING_SIMPLE_INTERPOLATED_EXPRESSION': {
+            components: {oneOf: [
+                'N_STRING_SIMPLE_UNBRACED_INTERPOLATED_EXPRESSION',
+                'N_STRING_SIMPLE_BRACED_INTERPOLATED_EXPRESSION'
+            ]}
+        },
+        'N_STRING_SIMPLE_UNBRACED_INTERPOLATED_EXPRESSION': {
+            components: [(/\$/), 'N_STRING_SIMPLE_INTERPOLATED_DEREFERENCE']
+        },
+        'N_STRING_SIMPLE_BRACED_INTERPOLATED_EXPRESSION': {
             captureAs: 'N_VARIABLE_EXPRESSION',
             components: [
-                {oneOf: [
-                    {name: 'expression', what: [(/\$\{(?=\$)/), 'N_VARIABLE', (/\}/)]}
-                ]}
+                (/\${/),
+                'N_STRING_SIMPLE_INTERPOLATED_DEREFERENCE',
+                (/\}/)
             ]
+        },
+        'N_STRING_SIMPLE_VARIABLE_VARIABLE': {
+            captureAs: 'N_VARIABLE_EXPRESSION',
+            components: {name: 'expression', what: [(/\$\{(?=\$)/), 'N_VARIABLE', (/\}/)]}
+        },
+        'N_STRING_SIMPLE_INTERPOLATED_BRACED_BARE_VARIABLE': {
+            // Don't swallow whitespace - it should remain inside the captured plain text parts of the string
+            components: [{name: 'variable', what: 'T_STRING'}, {ignoreWhitespace: false, what: (/(?!\s*::)/)}]
+        },
+        'N_STRING_SIMPLE_INTERPOLATED_BRACED_CLASS_NAME': {
+            // Don't swallow whitespace - it should remain inside the captured plain text parts of the string
+            components: [{name: 'string', what: 'T_STRING'}, {ignoreWhitespace: false, what: (/(?=\s*::)/)}]
+        },
+        /**
+         * PHP's "simple" interpolated syntax has its own set of rules around how dereferencing is parsed:
+         * - Instance method calls are not allowed
+         * - Array indices must be barewords in the unbraced syntax (eg. "before $myArray[el] after")
+         * - Array indices must be quoted in the braced syntax (eg. "before ${myArray['el']} after")
+         */
+        'N_STRING_SIMPLE_INTERPOLATED_DEREFERENCE': {
+            components: [
+                {oneOf: [
+                    {name: 'expression', what: 'N_VARIABLE'},
+                    {name: 'expression', oneOf: [
+                        'N_STRING_SIMPLE_INTERPOLATED_BRACED_BARE_VARIABLE',
+                        'N_STRING_SIMPLE_INTERPOLATED_BRACED_CLASS_NAME'
+                    ]}
+                ]},
+                {
+                    name: 'member',
+                    zeroOrMoreOf: {
+                        oneOf: [
+                            // Array index
+                            {
+                                name: 'array_index',
+                                oneOf: [
+                                    'N_EMPTY_ARRAY_INDEX',
+                                    {
+                                        name: 'indices',
+                                        oneOrMoreOf: [
+                                            (/\[/), {name: 'index', what: 'N_EXPRESSION'}, (/\]/)
+                                        ]
+                                    }
+                                ]
+                            },
+                            // Object property
+                            {
+                                name: 'object_property',
+                                what: {
+                                    name: 'properties',
+                                    oneOrMoreOf: [
+                                        'T_OBJECT_OPERATOR',
+                                        {name: 'property', what: 'N_INSTANCE_MEMBER'}
+                                    ]
+                                }
+                            },
+                            // Static method call
+                            {
+                                name: 'static_method_call',
+                                what: [
+                                    'T_DOUBLE_COLON',
+                                    {name: 'method', oneOf: ['N_STRING', 'N_VARIABLE', 'N_VARIABLE_EXPRESSION']},
+                                    (/\(/),
+                                    {name: 'args', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                                    (/\)/)
+                                ]
+                            },
+                            // Static object property
+                            {
+                                name: 'static_property',
+                                what: [
+                                    'T_DOUBLE_COLON',
+                                    {name: 'property', what: 'N_STATIC_MEMBER'}
+                                ]
+                            },
+                            // Class constant
+                            {
+                                name: 'class_constant',
+                                what: [
+                                    'T_DOUBLE_COLON',
+                                    {name: 'constant', what: ['T_STRING', (/(?!\()/)]}
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            processor: function (node) {
+                var isVariableVariable = false,
+                    result;
+
+                if (!node || !node.expression) {
+                    return node;
+                }
+
+                if (node.expression.name === 'N_VARIABLE') {
+                    // A variable was used inside the braces (eg. "${$myVar->prop}") -
+                    // will resolve to the value of the variable whose name is contained in ->prop
+                    isVariableVariable = true;
+                } else if (node.expression.name === 'N_STRING_SIMPLE_INTERPOLATED_BRACED_BARE_VARIABLE') {
+                    // A bare string was used inside the braces referencing a variable (eg. "${myVar->prop}") -
+                    // will resolve to the value of ->prop
+                    node.expression.name = 'N_VARIABLE';
+                } else if (node.expression.name === 'N_STRING_SIMPLE_INTERPOLATED_BRACED_CLASS_NAME') {
+                    // A bare string was used inside the braces referencing a class (eg. "${MyClass::MY_CONST}") -
+                    // will resolve to the value of the variable whose name is contained in ::MY_CONST
+                    isVariableVariable = true;
+                    node.expression.name = 'N_STRING';
+                } else {
+                    throw new Error(
+                        'N_STRING_SIMPLE_INTERPOLATED_DEREFERENCE :: Unexpected node type "' +
+                        node.expression.name +
+                        '"'
+                    );
+                }
+
+                result = node.expression;
+
+                _.each(node.member, function (member) {
+                    if (member.array_index) {
+                        result = {
+                            name: 'N_ARRAY_INDEX',
+                            array: result,
+                            indices: member.array_index.indices
+                        };
+                    } else if (member.object_property) {
+                        result = {
+                            name: 'N_OBJECT_PROPERTY',
+                            object: result,
+                            properties: member.object_property.properties
+                        };
+                    } else if (member.static_method_call) {
+                        result = {
+                            name: 'N_STATIC_METHOD_CALL',
+                            className: result,
+                            method: member.static_method_call.method,
+                            args: member.static_method_call.args
+                        };
+                    } else if (member.static_property) {
+                        result = {
+                            name: 'N_STATIC_PROPERTY',
+                            className: result,
+                            property: member.static_property.property
+                        };
+                    } else if (member.class_constant) {
+                        result = {
+                            name: 'N_CLASS_CONSTANT',
+                            className: result,
+                            constant: member.class_constant.constant
+                        };
+                    }
+
+                    if (member.offset) {
+                        result.offset = member.offset;
+                    }
+                });
+
+                if (isVariableVariable) {
+                    result = {
+                        name: 'N_VARIABLE_EXPRESSION',
+                        expression: result
+                    };
+                }
+
+                return result;
+            }
+        },
+        'N_STRING_COMPLEX_INTERPOLATED_EXPRESSION': {
+            components: {what: [(/{(?=\$)/), 'N_EXPRESSION', (/\}/)]}
         },
         'N_SWITCH_STATEMENT': {
             components: ['T_SWITCH', (/\(/), {name: 'expression', what: 'N_EXPRESSION'}, (/\)/), (/\{/), {name: 'cases', zeroOrMoreOf: {oneOf: ['N_CASE', 'N_DEFAULT_CASE']}}, (/\}/)]
@@ -1426,7 +1618,8 @@ module.exports = {
                 'N_NAMESPACED_REFERENCE',
                 'N_STRING',
                 'N_HEREDOC',
-                'N_NOWDOC'
+                'N_NOWDOC',
+                'N_VARIABLE_EXPRESSION'
             ]}
         },
         'N_THROW_STATEMENT': {
