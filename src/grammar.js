@@ -1079,7 +1079,13 @@ module.exports = {
             }
         },
         'N_HEREDOC_INNER': {
-            components: [{name: 'parts', oneOrMoreOf: {oneOf: ['N_STRING_INTERPOLATED_EXPRESSION', 'N_HEREDOC_TEXT']}}]
+            components: [
+                {
+                    name: 'parts',
+                    oneOrMoreOf: {oneOf: ['N_STRING_INTERPOLATED_EXPRESSION', 'N_HEREDOC_TEXT']},
+                    ignoreWhitespace: false
+                }
+            ]
         },
         // Needs its own rule rather than reusing N_STRING_TEXT, as we don't need quotes
         // to be escaped in a heredoc, unlike a string literal
@@ -1371,7 +1377,17 @@ module.exports = {
             components: {name: 'string', what: 'T_STRING'}
         },
         'N_STRING_EXPRESSION': {
-            components: [(/"/), {name: 'parts', zeroOrMoreOf: {oneOf: ['N_STRING_INTERPOLATED_EXPRESSION', 'N_STRING_TEXT']}}, (/"/)],
+            components: [
+                (/"/),
+                {
+                    name: 'parts',
+                    zeroOrMoreOf: {
+                        oneOf: ['N_STRING_INTERPOLATED_EXPRESSION', 'N_STRING_TEXT']
+                    },
+                    ignoreWhitespace: false
+                },
+                (/"/)
+            ],
             processor: function (node) {
                 if (node.parts.length === 1 && node.parts[0].name === 'N_STRING_LITERAL') {
                     // Double-quoted string is not complex as it does not contain any interpolation -
@@ -1391,17 +1407,31 @@ module.exports = {
             }
         },
         'N_STRING_LITERAL': {
-            components: {oneOf: [{name: 'string', what: 'T_CONSTANT_ENCAPSED_STRING'}, 'N_STRING_EXPRESSION']}
+            components: {
+                oneOf: [
+                    // Single-quoted string
+                    {name: 'string', what: 'T_CONSTANT_ENCAPSED_STRING'},
+
+                    // Double-quoted string
+                    'N_STRING_EXPRESSION'
+                ]
+            }
         },
         'N_STRING_TEXT': {
             captureAs: 'N_STRING_LITERAL',
-            components: {name: 'string', what: (/(?:[^\\"${]|\\[\s\S]|\$(?=\$)|\$[^{a-zA-Z]|{\\\$|{[^$])+/), ignoreWhitespace: false, replace: stringEscapeReplacements}
+            components: {
+                name: 'string',
+                what: (/(?:[^\\"${]|\\[\s\S]|\$(?=\$)|\$[^{a-zA-Z]|{\\\$|{[^$])+/),
+                replace: stringEscapeReplacements
+            }
         },
         'N_STRING_INTERPOLATED_EXPRESSION': {
-            components: {oneOf: [
-                'N_STRING_SIMPLE_INTERPOLATED_EXPRESSION',
-                'N_STRING_COMPLEX_INTERPOLATED_EXPRESSION'
-            ]}
+            components: {
+                oneOf: [
+                    'N_STRING_SIMPLE_INTERPOLATED_EXPRESSION',
+                    'N_STRING_COMPLEX_INTERPOLATED_EXPRESSION'
+                ]
+            }
         },
         'N_STRING_SIMPLE_INTERPOLATED_EXPRESSION': {
             components: {oneOf: [
@@ -1426,11 +1456,11 @@ module.exports = {
         },
         'N_STRING_SIMPLE_INTERPOLATED_BRACED_BARE_VARIABLE': {
             // Don't swallow whitespace - it should remain inside the captured plain text parts of the string
-            components: [{name: 'variable', what: 'T_STRING'}, {ignoreWhitespace: false, what: (/(?!\s*::)/)}]
+            components: [{name: 'variable', what: 'T_STRING'}, (/(?!\s*::)/)]
         },
         'N_STRING_SIMPLE_INTERPOLATED_BRACED_CLASS_NAME': {
             // Don't swallow whitespace - it should remain inside the captured plain text parts of the string
-            components: [{name: 'string', what: 'T_STRING'}, {ignoreWhitespace: false, what: (/(?=\s*::)/)}]
+            components: [{name: 'string', what: 'T_STRING'}, (/(?=\s*::)/)]
         },
         /**
          * PHP's "simple" interpolated syntax has its own set of rules around how dereferencing is parsed:
@@ -1587,7 +1617,14 @@ module.exports = {
             }
         },
         'N_STRING_COMPLEX_INTERPOLATED_EXPRESSION': {
-            components: {what: [(/{(?=\$)/), 'N_EXPRESSION', (/\}/)]}
+            components: {
+                what: [
+                    (/{(?=\$)/),
+                    // Allow whitespace inside the embedded expression, eg. around ternary operators `?` and `:`
+                    {rule: 'N_EXPRESSION', ignoreWhitespace: true},
+                    (/\}/)
+                ]
+            }
         },
         'N_SWITCH_STATEMENT': {
             components: ['T_SWITCH', (/\(/), {name: 'expression', what: 'N_EXPRESSION'}, (/\)/), (/\{/), {name: 'cases', zeroOrMoreOf: {oneOf: ['N_CASE', 'N_DEFAULT_CASE']}}, (/\}/)]

@@ -602,8 +602,8 @@ describe('PHP Parser grammar string interpolation construct integration', functi
                 }]
             }
         },
-        'complex syntax: string interpolation with method call containing ternary': {
-            code: '<?php return "before{$myObject->myMethod($myBool ? 21 : 100)}after";',
+        'complex syntax: string interpolation with method call containing ternary with whitespace': {
+            code: '<?php return "before{$myObject->myMethod($myBool ?   21 : 100)}after";',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
