@@ -45,6 +45,40 @@ EOS
                     }]
                 }]
             }
+        },
+        'class constant with default constant expression value': {
+            code: nowdoc(function () {/*<<<EOS
+<?php
+    class Planet {
+        const SHAPE = 'sphere' . ' not circle';
+    }
+EOS
+*/;}), // jshint ignore:line
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    className: 'Planet',
+                    members: [{
+                        name: 'N_CONSTANT_DEFINITION',
+                        constant: 'SHAPE',
+                        value: {
+                            name: 'N_EXPRESSION',
+                            left: {
+                                name: 'N_STRING_LITERAL',
+                                string: 'sphere'
+                            },
+                            right: [{
+                                operator: '.',
+                                operand: {
+                                    name: 'N_STRING_LITERAL',
+                                    string: ' not circle'
+                                }
+                            }]
+                        }
+                    }]
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

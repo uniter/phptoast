@@ -48,6 +48,44 @@ describe('PHP Parser grammar function definition statement default argument valu
                 }]
             }
         },
+        'empty function definition with argument with no type hint and a default constant expression value': {
+            code: 'function doNothing($value = 21 + 4) {}',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_FUNCTION_STATEMENT',
+                    func: {
+                        name: 'N_STRING',
+                        string: 'doNothing'
+                    },
+                    args: [{
+                        name: 'N_ARGUMENT',
+                        variable: {
+                            name: 'N_VARIABLE',
+                            variable: 'value'
+                        },
+                        value: {
+                            name: 'N_EXPRESSION',
+                            left: {
+                                name: 'N_INTEGER',
+                                number: '21'
+                            },
+                            right: [{
+                                operator: '+',
+                                operand: {
+                                    name: 'N_INTEGER',
+                                    number: '4'
+                                }
+                            }]
+                        }
+                    }],
+                    body: {
+                        name: 'N_COMPOUND_STATEMENT',
+                        statements: []
+                    }
+                }]
+            }
+        },
         'empty function definition with "array" type hinted argument with a default value of null': {
             code: 'function doNothing(array $value = null) {}',
             expectedAST: {
@@ -67,6 +105,48 @@ describe('PHP Parser grammar function definition statement default argument valu
                         },
                         value: {
                             name: 'N_NULL'
+                        }
+                    }],
+                    body: {
+                        name: 'N_COMPOUND_STATEMENT',
+                        statements: []
+                    }
+                }]
+            }
+        },
+        'empty function definition with "array" type hinted argument with a default constant expression array value': {
+            code: 'function doNothing(array $value = [101 + 4]) {}',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_FUNCTION_STATEMENT',
+                    func: {
+                        name: 'N_STRING',
+                        string: 'doNothing'
+                    },
+                    args: [{
+                        name: 'N_ARGUMENT',
+                        type: 'array',
+                        variable: {
+                            name: 'N_VARIABLE',
+                            variable: 'value'
+                        },
+                        value: {
+                            name: 'N_ARRAY_LITERAL',
+                            elements: [{
+                                name: 'N_EXPRESSION',
+                                left: {
+                                    name: 'N_INTEGER',
+                                    number: '101'
+                                },
+                                right: [{
+                                    operator: '+',
+                                    operand: {
+                                        name: 'N_INTEGER',
+                                        number: '4'
+                                    }
+                                }]
+                            }]
                         }
                     }],
                     body: {

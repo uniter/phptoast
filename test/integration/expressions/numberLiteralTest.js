@@ -21,7 +21,7 @@ describe('PHP Parser grammar number literal expression integration', function ()
     });
 
     _.each({
-        'return of integer literal': {
+        'return of positive integer literal': {
             code: 'return 21;',
             expectedAST: {
                 name: 'N_PROGRAM',
@@ -30,6 +30,24 @@ describe('PHP Parser grammar number literal expression integration', function ()
                     expression: {
                         name: 'N_INTEGER',
                         number: '21'
+                    }
+                }]
+            }
+        },
+        'return of negative integer literal': {
+            code: 'return -27;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_UNARY_EXPRESSION',
+                        operator: '-',
+                        prefix: true,
+                        operand: {
+                            name: 'N_INTEGER',
+                            number: '27'
+                        }
                     }
                 }]
             }

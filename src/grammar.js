@@ -371,9 +371,9 @@ module.exports = {
         },
         'N_ARGUMENT': {
             components: {oneOf: [
-                [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', oneOf: ['N_CLASS_CONSTANT', 'N_TERM']}],
+                [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}],
                 [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}],
-                [{name: 'type', oneOf: ['N_NAMESPACE', 'T_STRING']}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', oneOf: ['N_CLASS_CONSTANT', 'N_TERM']}],
+                [{name: 'type', oneOf: ['N_NAMESPACE', 'T_STRING']}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}],
                 [{name: 'type', oneOf: ['N_NAMESPACE', 'T_STRING']}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}]
             ]}
         },
@@ -448,7 +448,7 @@ module.exports = {
             components: [(/\{/), {name: 'statements', zeroOrMoreOf: 'N_STATEMENT'}, (/\}/)]
         },
         'N_CONSTANT_DEFINITION': {
-            components: ['T_CONST', {name: 'constant', what: 'T_STRING'}, (/=/), {name: 'value', oneOf: ['N_CLASS_CONSTANT', 'N_TERM']}, 'N_END_STATEMENT']
+            components: ['T_CONST', {name: 'constant', what: 'T_STRING'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}, 'N_END_STATEMENT']
         },
         'N_CONTINUE_STATEMENT': {
             components: ['T_CONTINUE', {name: 'levels', oneOf: ['N_INTEGER', 'N_JUMP_ONE_LEVEL']}, 'N_END_STATEMENT']
