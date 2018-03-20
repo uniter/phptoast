@@ -240,7 +240,7 @@ module.exports = {
         'T_INC': /\+\+/,
         'T_INCLUDE': /include\b/i,
         'T_INCLUDE_ONCE': /include_once\b/i,
-        'T_INLINE_HTML': /(?:[^<]|<[^?%]|<\?(?!php)[\s\S]{3})+/,
+        'T_INLINE_HTML': /(?:[^<]|<[^?%]|<\?(?!php))+/,
         'T_INSTANCEOF': /instanceof\b/i,
         'T_INSTEADOF': /insteadof\b/i,
         'T_INT_CAST': /\(\s*int(eger)?\s*\)/i,
@@ -1105,7 +1105,22 @@ module.exports = {
         'N_INCLUDE_ONCE_EXPRESSION': {
             components: ['T_INCLUDE_ONCE', {name: 'path', what: 'N_EXPRESSION'}]
         },
-        'N_INLINE_HTML_STATEMENT': [{oneOf: ['T_CLOSE_TAG', '<BOF>']}, {name: 'html', what: 'T_INLINE_HTML'}, {oneOf: ['T_OPEN_TAG', '<EOF>']}],
+        'N_INLINE_HTML_STATEMENT': {
+            oneOf: [
+                [
+                    // eg. `?> my HTML here <?php` or `?> my HTML here <EOF>`
+                    'T_CLOSE_TAG',
+                    {name: 'html', what: 'T_INLINE_HTML', ignoreWhitespace: false},
+                    {oneOf: ['T_OPEN_TAG', '<EOF>']}
+                ],
+                [
+                    // eg. `?><?php` or `?>  <?php`
+                    'T_CLOSE_TAG',
+                    {name: 'html', what: /()/},
+                    'T_OPEN_TAG'
+                ]
+            ]
+        },
         'N_INSTANCE_MEMBER': {
             components: {oneOf: ['N_STRING', 'N_VARIABLE', [(/\{/), 'N_EXPRESSION', (/\}/)]]}
         },
@@ -1236,15 +1251,53 @@ module.exports = {
             allowMerge: false,
             what: (/null\b/i)
         },
+        'N_OPEN_TAG_AT_START': {
+            what: [
+                '<BOF>',
+                'T_OPEN_TAG'
+            ]
+        },
         'N_PARENT': {
             allowMerge: false,
             what: /parent\b(?=\s*::)/i
         },
         'N_PROGRAM': {
-            components: [{optionally: 'T_OPEN_TAG'}, {name: 'statements', zeroOrMoreOf: 'N_STATEMENT'}, {oneOf: ['T_CLOSE_TAG', {what: '<EOF>'}]}]
+            components: {
+                // Don't swallow whitespace at the very beginning of the program
+                // eg. for `   before <?php print 'inside'; ?> after`
+                ignoreWhitespace: false,
+                what: [
+                    // Consume any opening `<?php` tag right at the start of the file -
+                    // if there is any whitespace just before it this will be added as a N_INLINE_HTML_STATEMENT
+                    {optionally: 'N_OPEN_TAG_AT_START'},
+
+                    // Start matching statements - any embedded HTML output will be parsed as an N_INLINE_HTML_STATEMENT
+                    // eg. `... ?>anything like this<?php ...`
+                    {name: 'statements', zeroOrMoreOf: 'N_TOP_LEVEL_STATEMENT'},
+
+                    // Ignore any whitespace at the end of the file, before either:
+                    // - its closing `?>` tag
+                    // - the very end of the file, if it is self-closing (`?>` tag omitted)
+                    {oneOf: ['T_CLOSE_TAG', {what: '<EOF>'}], ignoreWhitespace: true}
+                ]
+            }
         },
         'N_RETURN_STATEMENT': {
             components: ['T_RETURN', {name: 'expression', optionally: 'N_EXPRESSION'}, 'N_END_STATEMENT']
+        },
+        'N_INLINE_HTML_STATEMENT_AT_START': {
+            captureAs: 'N_INLINE_HTML_STATEMENT',
+            what: [
+                '<BOF>',
+                {name: 'html', what: 'T_INLINE_HTML'},
+                {oneOf: ['T_OPEN_TAG', '<EOF>']}
+            ]
+        },
+        'N_TOP_LEVEL_STATEMENT': {
+            components: {oneOf: [
+                'N_INLINE_HTML_STATEMENT_AT_START',
+                {rule: 'N_STATEMENT', ignoreWhitespace: true}
+            ]}
         },
         'N_STATEMENT': {
             components: {oneOf: ['N_NAMESPACE_SCOPED_STATEMENT', 'N_NAMESPACE_STATEMENT']}

@@ -39,6 +39,16 @@ describe('PHP Parser grammar small program integration', function () {
             }
         },
         {
+            code: 'echo "this should not be treated as PHP";',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_INLINE_HTML_STATEMENT',
+                    html: 'echo "this should not be treated as PHP";'
+                }]
+            }
+        },
+        {
             code: '<?php',
             expectedAST: {
                 name: 'N_PROGRAM',
@@ -50,6 +60,98 @@ describe('PHP Parser grammar small program integration', function () {
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: []
+            }
+        },
+        // Just whitespace before the first `<?php` tag
+        {
+            code: '  <?php ?>',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_INLINE_HTML_STATEMENT',
+                    html: '  '
+                }]
+            }
+        },
+        // Just whitespace before and after the last `?>` tag
+        {
+            code: '<?php echo 21;  ?>  ',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_ECHO_STATEMENT',
+                    expressions: [{
+                        name: 'N_INTEGER',
+                        number: '21'
+                    }]
+                }, {
+                    name: 'N_INLINE_HTML_STATEMENT',
+                    html: '  '
+                }]
+            }
+        },
+        // Check that an empty PHP tag is treated as valid
+        {
+            code: '<?php     ?><?php echo 21;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_INLINE_HTML_STATEMENT',
+                    html: ''
+                }, {
+                    name: 'N_ECHO_STATEMENT',
+                    expressions: [{
+                        name: 'N_INTEGER',
+                        number: '21'
+                    }]
+                }]
+            }
+        },
+        {
+            code: ' first <?php echo 21; ?> second ',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_INLINE_HTML_STATEMENT',
+                    html: ' first '
+                }, {
+                    name: 'N_ECHO_STATEMENT',
+                    expressions: [{
+                        name: 'N_INTEGER',
+                        number: '21'
+                    }]
+                }, {
+                    name: 'N_INLINE_HTML_STATEMENT',
+                    html: ' second '
+                }]
+            }
+        },
+        {
+            code: ' first <?php echo 21; ?> second <?php echo 1001; ?> third ',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_INLINE_HTML_STATEMENT',
+                    html: ' first '
+                }, {
+                    name: 'N_ECHO_STATEMENT',
+                    expressions: [{
+                        name: 'N_INTEGER',
+                        number: '21'
+                    }]
+                }, {
+                    name: 'N_INLINE_HTML_STATEMENT',
+                    html: ' second '
+                }, {
+                    name: 'N_ECHO_STATEMENT',
+                    expressions: [{
+                        name: 'N_INTEGER',
+                        number: '1001'
+                    }]
+                }, {
+                    name: 'N_INLINE_HTML_STATEMENT',
+                    html: ' third '
+                }]
             }
         },
         {
@@ -156,6 +258,20 @@ describe('PHP Parser grammar small program integration', function () {
                             }
                         }]
                     }
+                }]
+            }
+        },
+        // Trailing whitespace after the last statement, where closing `?>` tag is omitted
+        {
+            code: '<?php echo 21;  ',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_ECHO_STATEMENT',
+                    expressions: [{
+                        name: 'N_INTEGER',
+                        number: '21'
+                    }]
                 }]
             }
         },
