@@ -14,7 +14,7 @@ var _ = require('microdash'),
     nowdoc = require('nowdoc'),
     tools = require('../tools');
 
-describe('PHP Parser grammar offset capture integration', function () {
+describe('PHP Parser grammar bounds capture integration', function () {
     var parser;
 
     beforeEach(function () {
