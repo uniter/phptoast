@@ -465,6 +465,14 @@ module.exports = {
                 ]
             }
         },
+        'N_EVAL': {
+            components: [
+                'T_EVAL',
+                (/\(/),
+                {name: 'code', rule: 'N_EXPRESSION'},
+                (/\)/)
+            ]
+        },
         'N_EXIT': {
             components: {oneOf: ['N_EXIT_WITH_STATUS', 'N_EXIT_WITH_MESSAGE', 'N_EXIT_BARE']}
         },
@@ -1707,6 +1715,7 @@ module.exports = {
                 'N_STATIC',
                 'N_NULL',
                 'N_NAMESPACED_REFERENCE',
+                'N_EVAL',
                 'N_STRING',
                 'N_HEREDOC',
                 'N_NOWDOC',

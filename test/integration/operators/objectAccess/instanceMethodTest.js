@@ -44,6 +44,32 @@ describe('PHP Parser grammar object access operator "->" instance method call in
                 }]
             }
         },
+        'call to statically referenced instance method called "eval"': {
+            code: '$obj->eval("not some PHP code");',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_METHOD_CALL',
+                        object: {
+                            name: 'N_VARIABLE',
+                            variable: 'obj'
+                        },
+                        calls: [{
+                            func: {
+                                name: 'N_STRING',
+                                string: 'eval'
+                            },
+                            args: [{
+                                name: 'N_STRING_LITERAL',
+                                string: 'not some PHP code'
+                            }]
+                        }]
+                    }
+                }]
+            }
+        },
         'call to dynamically referenced instance method with no arguments': {
             code: '$obj->$methodName();',
             expectedAST: {
