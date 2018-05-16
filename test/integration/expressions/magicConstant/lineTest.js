@@ -29,11 +29,17 @@ describe('PHP Parser grammar __LINE__ magic constant expression integration', fu
                     name: 'N_ECHO_STATEMENT',
                     expressions: [{
                         name: 'N_MAGIC_LINE_CONSTANT',
-                        offset: {
-                            length: 8,
-                            line: 1,
-                            column: 6 + 6,
-                            offset: 11
+                        bounds: {
+                            start: {
+                                offset: 6 + 5,
+                                line: 1,
+                                column: 7 + 5
+                            },
+                            end: {
+                                offset: 6 + 13,
+                                line: 1,
+                                column: 7 + 13
+                            }
                         }
                     }]
                 }]
@@ -47,11 +53,17 @@ describe('PHP Parser grammar __LINE__ magic constant expression integration', fu
                     name: 'N_ECHO_STATEMENT',
                     expressions: [{
                         name: 'N_MAGIC_LINE_CONSTANT',
-                        offset: {
-                            length: 8,
-                            line: 1,
-                            column: 6 + 6,
-                            offset: 11
+                        bounds: {
+                            start: {
+                                offset: 6 + 5,
+                                line: 1,
+                                column: 7 + 5
+                            },
+                            end: {
+                                offset: 6 + 13,
+                                line: 1,
+                                column: 7 + 13
+                            }
                         }
                     }]
                 }]
@@ -73,11 +85,17 @@ describe('PHP Parser grammar __LINE__ magic constant expression integration', fu
                             operator: '=',
                             operand: {
                                 name: 'N_MAGIC_LINE_CONSTANT',
-                                offset: {
-                                    length: 8,
-                                    line: 1,
-                                    column: 6 + 9,
-                                    offset: 14
+                                bounds: {
+                                    start: {
+                                        offset: 6 + 8,
+                                        line: 1,
+                                        column: 7 + 8
+                                    },
+                                    end: {
+                                        offset: 6 + 16,
+                                        line: 1,
+                                        column: 7 + 16
+                                    }
                                 }
                             }
                         }]

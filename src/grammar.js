@@ -74,12 +74,10 @@ var _ = require('microdash'),
                 ]
             };
 
-            if (result.offset) {
-                binaryNode.offset = {
-                    length: (element.offset.offset - result.offset.offset) + element.offset.length,
-                    line: result.offset.line,
-                    column: result.offset.column,
-                    offset: result.offset.offset
+            if (result.bounds) {
+                binaryNode.bounds = {
+                    start: result.bounds.start,
+                    end: element.bounds.end
                 };
             }
 
@@ -96,13 +94,10 @@ var _ = require('microdash'),
         function completeTernary(alternateNode) {
             ternaryNode.alternate = alternateNode;
 
-            if (condition.offset) {
-                ternaryNode.offset = {
-                    length: (alternateNode.offset.offset - ternaryNode.condition.offset.offset) +
-                        alternateNode.offset.length,
-                    line: ternaryNode.condition.offset.line,
-                    column: ternaryNode.condition.offset.column,
-                    offset: ternaryNode.condition.offset.offset
+            if (condition.bounds) {
+                ternaryNode.bounds = {
+                    start: ternaryNode.condition.bounds.start,
+                    end: alternateNode.bounds.end
                 };
             }
         }
@@ -590,8 +585,8 @@ module.exports = {
                         };
                     }
 
-                    if (member.offset) {
-                        result.offset = member.offset;
+                    if (member.bounds) {
+                        result.bounds = member.bounds;
                     }
                 });
 
@@ -784,8 +779,8 @@ module.exports = {
                         };
                     }
 
-                    if (member.offset) {
-                        result.offset = member.offset;
+                    if (member.bounds) {
+                        result.bounds = member.bounds;
                     }
                 });
 
@@ -1198,7 +1193,7 @@ module.exports = {
             components: {what: 'T_FUNC_C', replace: uppercaseReplacements, allowMerge: false}
         },
         'N_MAGIC_LINE_CONSTANT': {
-            components: {what: 'T_LINE', replace: uppercaseReplacements, captureOffsetAs: 'offset'}
+            components: {what: 'T_LINE', replace: uppercaseReplacements, captureBoundsAs: 'bounds'}
         },
         'N_MAGIC_METHOD_CONSTANT': {
             components: {what: 'T_METHOD_C', replace: uppercaseReplacements, allowMerge: false}
@@ -1605,6 +1600,12 @@ module.exports = {
                     // A bare string was used inside the braces referencing a variable (eg. "${myVar->prop}") -
                     // will resolve to the value of ->prop
                     node.expression.name = 'N_VARIABLE';
+
+                    if (node.expression.bounds) {
+                        // Account for the leading dollar
+                        node.expression.bounds.start.offset--;
+                        node.expression.bounds.start.column--;
+                    }
                 } else if (node.expression.name === 'N_STRING_SIMPLE_INTERPOLATED_BRACED_CLASS_NAME') {
                     // A bare string was used inside the braces referencing a class (eg. "${MyClass::MY_CONST}") -
                     // will resolve to the value of the variable whose name is contained in ::MY_CONST
