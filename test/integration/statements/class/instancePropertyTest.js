@@ -54,6 +54,40 @@ EOS
                     }]
                 }]
             }
+        },
+        'class with one public instance property with negative integer default value': {
+            code: nowdoc(function () {/*<<<EOS
+<?php
+    class MyClass
+    {
+        public $myProp = -21;
+    }
+EOS
+*/;}), // jshint ignore:line
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_CLASS_STATEMENT',
+                    className: 'MyClass',
+                    members: [{
+                        name: 'N_INSTANCE_PROPERTY_DEFINITION',
+                        visibility: 'public',
+                        variable: {
+                            name: 'N_VARIABLE',
+                            variable: 'myProp'
+                        },
+                        value: {
+                            name: 'N_UNARY_EXPRESSION',
+                            operator: '-',
+                            prefix: true,
+                            operand: {
+                                name: 'N_INTEGER',
+                                number: '21'
+                            }
+                        }
+                    }]
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
