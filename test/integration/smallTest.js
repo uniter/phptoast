@@ -605,8 +605,11 @@ describe('PHP Parser grammar small program integration', function () {
                             operand: {
                                 name: 'N_ARRAY_LITERAL',
                                 elements: [{
-                                    name: 'N_INTEGER',
-                                    number: '7'
+                                    name: 'N_VALUE',
+                                    value: {
+                                        name: 'N_INTEGER',
+                                        number: '7'
+                                    }
                                 }]
                             }
                         }]
@@ -637,21 +640,27 @@ describe('PHP Parser grammar small program integration', function () {
                             operand: {
                                 name: 'N_ARRAY_LITERAL',
                                 elements: [{
-                                    name: 'N_STRING_LITERAL',
-                                    string: 'hello'
+                                    name: 'N_VALUE',
+                                    value: {
+                                        name: 'N_STRING_LITERAL',
+                                        string: 'hello'
+                                    }
                                 }, {
-                                    name: 'N_EXPRESSION',
-                                    left: {
-                                        name: 'N_INTEGER',
-                                        number: '84'
-                                    },
-                                    right: [{
-                                        operator: '+',
-                                        operand: {
+                                    name: 'N_VALUE',
+                                    value: {
+                                        name: 'N_EXPRESSION',
+                                        left: {
                                             name: 'N_INTEGER',
-                                            number: '3'
-                                        }
-                                    }]
+                                            number: '84'
+                                        },
+                                        right: [{
+                                            operator: '+',
+                                            operand: {
+                                                name: 'N_INTEGER',
+                                                number: '3'
+                                            }
+                                        }]
+                                    }
                                 }]
                             }
                         }]

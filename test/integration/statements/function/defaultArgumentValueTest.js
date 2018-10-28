@@ -134,18 +134,21 @@ describe('PHP Parser grammar function definition statement default argument valu
                         value: {
                             name: 'N_ARRAY_LITERAL',
                             elements: [{
-                                name: 'N_EXPRESSION',
-                                left: {
-                                    name: 'N_INTEGER',
-                                    number: '101'
-                                },
-                                right: [{
-                                    operator: '+',
-                                    operand: {
+                                name: 'N_VALUE',
+                                value: {
+                                    name: 'N_EXPRESSION',
+                                    left: {
                                         name: 'N_INTEGER',
-                                        number: '4'
-                                    }
-                                }]
+                                        number: '101'
+                                    },
+                                    right: [{
+                                        operator: '+',
+                                        operand: {
+                                            name: 'N_INTEGER',
+                                            number: '4'
+                                        }
+                                    }]
+                                }
                             }]
                         }
                     }],

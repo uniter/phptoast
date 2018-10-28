@@ -41,8 +41,11 @@ describe('PHP Parser grammar list(...) construct integration', function () {
                             operand: {
                                 name: 'N_ARRAY_LITERAL',
                                 elements: [{
-                                    name: 'N_INTEGER',
-                                    number: '1'
+                                    name: 'N_VALUE',
+                                    value: {
+                                        name: 'N_INTEGER',
+                                        number: '1'
+                                    }
                                 }]
                             }
                         }]
@@ -76,14 +79,23 @@ describe('PHP Parser grammar list(...) construct integration', function () {
                             operand: {
                                 name: 'N_ARRAY_LITERAL',
                                 elements: [{
-                                    name: 'N_INTEGER',
-                                    number: '3'
+                                    name: 'N_VALUE',
+                                    value: {
+                                        name: 'N_INTEGER',
+                                        number: '3'
+                                    }
                                 }, {
-                                    name: 'N_STRING_LITERAL',
-                                    string: 'me'
+                                    name: 'N_VALUE',
+                                    value: {
+                                        name: 'N_STRING_LITERAL',
+                                        string: 'me'
+                                    }
                                 }, {
-                                    name: 'N_INTEGER',
-                                    number: '6'
+                                    name: 'N_VALUE',
+                                    value: {
+                                        name: 'N_INTEGER',
+                                        number: '6'
+                                    }
                                 }]
                             }
                         }]
@@ -114,8 +126,11 @@ describe('PHP Parser grammar list(...) construct integration', function () {
                             operand: {
                                 name: 'N_ARRAY_LITERAL',
                                 elements: [{
-                                    name: 'N_INTEGER',
-                                    number: '1'
+                                    name: 'N_VALUE',
+                                    value: {
+                                        name: 'N_INTEGER',
+                                        number: '1'
+                                    }
                                 }]
                             }
                         }]

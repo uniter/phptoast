@@ -397,11 +397,55 @@ module.exports = {
         },
         'N_LONG_ARRAY_LITERAL': {
             captureAs: 'N_ARRAY_LITERAL',
-            components: ['T_ARRAY', (/\(/), {name: 'elements', zeroOrMoreOf: [{oneOf: ['N_KEY_VALUE_PAIR', 'N_EXPRESSION']}, {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/)]
+            components: [
+                'T_ARRAY',
+                (/\(/),
+                {
+                    name: 'elements',
+                    zeroOrMoreOf: [
+                        {
+                            oneOf: [
+                                'N_KEY_REFERENCE_PAIR',
+                                'N_KEY_VALUE_PAIR',
+                                'N_ARRAY_REFERENCE_ELEMENT',
+                                'N_ARRAY_VALUE_ELEMENT'
+                            ]
+                        },
+                        {what: (/(,|(?=\)))()/), captureIndex: 2}
+                    ]
+                },
+                (/\)/)
+            ]
+        },
+        'N_ARRAY_REFERENCE_ELEMENT': {
+            // Captures elements that are references, eg. `[&$myVar]`
+            components: 'N_REFERENCE'
+        },
+        'N_ARRAY_VALUE_ELEMENT': {
+            // Captures elements that are values, eg. `[$myVar, 21]`
+            captureAs: 'N_VALUE',
+            components: {name: 'value', rule: 'N_EXPRESSION'}
         },
         'N_SHORT_ARRAY_LITERAL': {
             captureAs: 'N_ARRAY_LITERAL',
-            components: [(/\[/), {name: 'elements', zeroOrMoreOf: [{oneOf: ['N_KEY_VALUE_PAIR', 'N_EXPRESSION']}, {what: (/(,|(?=\]))()/), captureIndex: 2}]}, (/\]/)]
+            components: [
+                (/\[/),
+                {
+                    name: 'elements',
+                    zeroOrMoreOf: [
+                        {
+                            oneOf: [
+                                'N_KEY_REFERENCE_PAIR',
+                                'N_KEY_VALUE_PAIR',
+                                'N_ARRAY_REFERENCE_ELEMENT',
+                                'N_ARRAY_VALUE_ELEMENT'
+                            ]
+                        },
+                        {what: (/(,|(?=\]))()/), captureIndex: 2}
+                    ]
+                },
+                (/\]/)
+            ]
         },
         'N_BINARY_LITERAL': {
             components: [
@@ -1175,6 +1219,9 @@ module.exports = {
             captureAs: 'N_INTEGER',
             components: {name: 'number', what: (/()/)},
             options: {number: '1'}
+        },
+        'N_KEY_REFERENCE_PAIR': {
+            components: [{name: 'key', what: 'N_EXPRESSION'}, 'T_DOUBLE_ARROW', (/&/), {name: 'reference', what: 'N_EXPRESSION'}]
         },
         'N_KEY_VALUE_PAIR': {
             components: [{name: 'key', what: 'N_EXPRESSION'}, 'T_DOUBLE_ARROW', {name: 'value', what: 'N_EXPRESSION'}]

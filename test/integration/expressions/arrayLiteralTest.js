@@ -106,8 +106,11 @@ describe('PHP Parser grammar array literal expression integration', function () 
                                 array: {
                                     name: 'N_ARRAY_LITERAL',
                                     elements: [{
-                                        name: 'N_INTEGER',
-                                        number: '21'
+                                        name: 'N_VALUE',
+                                        value: {
+                                            name: 'N_INTEGER',
+                                            number: '21'
+                                        }
                                     }]
                                 },
                                 indices: [{index: {
@@ -139,6 +142,39 @@ describe('PHP Parser grammar array literal expression integration', function () 
                                 elements: [{
                                     name: 'N_REFERENCE',
                                     operand: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'myVar'
+                                    }
+                                }]
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
+        'short array syntax with one associative element using variable reference': {
+            code: '$array = ["my_key" => &$myVar];',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'array'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_ARRAY_LITERAL',
+                                elements: [{
+                                    name: 'N_KEY_REFERENCE_PAIR',
+                                    key: {
+                                        name: 'N_STRING_LITERAL',
+                                        string: 'my_key'
+                                    },
+                                    reference: {
                                         name: 'N_VARIABLE',
                                         variable: 'myVar'
                                     }
