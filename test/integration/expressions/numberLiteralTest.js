@@ -117,6 +117,19 @@ describe('PHP Parser grammar number literal expression integration', function ()
                 }]
             }
         },
+        'return of float literal with leading zero omitted': {
+            code: 'return .7654;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_FLOAT',
+                        number: '.7654'
+                    }
+                }]
+            }
+        },
         'return of positive lowercase float exponent literal': {
             code: 'return 5e-3;',
             expectedAST: {

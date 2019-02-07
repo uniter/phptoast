@@ -191,7 +191,7 @@ module.exports = {
         'T_DIV_EQUAL': /\/=/,
 
         // See http://www.php.net/manual/en/language.types.float.php
-        'T_DNUMBER': /\d+\.\d+|\d\.\d+e\d+|\d+e[+-]?\d+/i,
+        'T_DNUMBER': /\d*\.\d+|\d\.\d+e\d+|\d+e[+-]?\d+/i,
 
         'T_DOC_COMMENT': /\/\*\*([\s\S]*?)\*\//,
         'T_DO': /do\b/i,
