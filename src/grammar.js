@@ -173,7 +173,7 @@ module.exports = {
         'T_CLASS_C': /__CLASS__/i,
         'T_CLONE': /clone/i,
         'T_CLOSE_TAG': /[?%]>\n?/,
-        'T_COMMENT': /(?:\/\/|#)(.*?)[\r\n]+|\/\*(?!\*)([\s\S]*?)\*\//,
+        'T_COMMENT': /(?:\/\/|#)(.*?)(?:[\r\n]+|$)|\/\*(?!\*)([\s\S]*?)\*\//,
         'T_CONCAT_EQUAL': /\.=/,
         'T_CONST': /const\b/i,
         // Single-quoted strings - see N_STRING_EXPRESSION for double-quoted ones
