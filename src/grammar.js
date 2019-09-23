@@ -1777,7 +1777,7 @@ module.exports = {
             components: {name: 'value', what: (/,()/), captureIndex: 1}
         },
         'N_WHILE_STATEMENT': {
-            components: ['T_WHILE', (/\(/), {name: 'condition', what: 'N_EXPRESSION'}, (/\)/), (/\{/), {name: 'statements', zeroOrMoreOf: 'N_STATEMENT'}, (/\}/)]
+            components: ['T_WHILE', (/\(/), {name: 'condition', what: 'N_EXPRESSION'}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
         }
     },
     start: 'N_PROGRAM'
