@@ -31,7 +31,10 @@ describe('PHP Parser grammar while statement integration', function () {
                         name: 'N_BOOLEAN',
                         bool: 'true'
                     },
-                    statements: []
+                    body: {
+                        name: 'N_COMPOUND_STATEMENT',
+                        statements: []
+                    }
                 }]
             }
         },
@@ -45,13 +48,16 @@ describe('PHP Parser grammar while statement integration', function () {
                         name: 'N_BOOLEAN',
                         bool: 'true'
                     },
-                    statements: [{
-                        name: 'N_ECHO_STATEMENT',
-                        expressions: [{
-                            name: 'N_INTEGER',
-                            number: '4'
+                    body: {
+                        name: 'N_COMPOUND_STATEMENT',
+                        statements: [{
+                            name: 'N_ECHO_STATEMENT',
+                            expressions: [{
+                                name: 'N_INTEGER',
+                                number: '4'
+                            }]
                         }]
-                    }]
+                    }
                 }]
             }
         },
@@ -79,7 +85,10 @@ describe('PHP Parser grammar while statement integration', function () {
                             }
                         }]
                     },
-                    statements: []
+                    body: {
+                        name: 'N_COMPOUND_STATEMENT',
+                        statements: []
+                    }
                 }]
             }
         }
