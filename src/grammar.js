@@ -1052,7 +1052,7 @@ module.exports = {
             components: ['T_GLOBAL', {name: 'variables', oneOrMoreOf: ['N_VARIABLE', (/,|(?=;|[?%]>\n?)/)]}, 'N_END_STATEMENT']
         },
         'N_GOTO_STATEMENT': {
-            components: ['T_GOTO', {name: 'label', what: 'T_STRING'}, 'N_END_STATEMENT']
+            components: ['T_GOTO', {name: 'label', what: 'N_STRING'}, 'N_END_STATEMENT']
         },
         'N_HEREDOC': {
             components: [{name: 'string', what: /<<<("?)([a-z0-9_]+)\1\r?\n([\s\S]*?)\r?\n\2(?=;?(?:\r?\n|$))/i, captureIndex: 3}],
@@ -1180,7 +1180,7 @@ module.exports = {
             components: [{name: 'key', what: 'N_EXPRESSION'}, 'T_DOUBLE_ARROW', {name: 'value', what: 'N_EXPRESSION'}]
         },
         'N_LABEL_STATEMENT': {
-            components: [{name: 'label', what: [(/(?!default\b)/i), 'T_STRING']}, (/:/)]
+            components: [{name: 'label', what: [(/(?!default\b)/i), 'N_STRING']}, (/:/)]
         },
         'N_LIST': {
             components: ['T_LIST', (/\(/), {name: 'elements', zeroOrMoreOf: {oneOf: [[{oneOf: ['N_VARIABLE', 'N_ARRAY_INDEX']}, {what: (/(,|(?=\)))()/), captureIndex: 2}], 'N_VOID']}}, (/\)/)]
