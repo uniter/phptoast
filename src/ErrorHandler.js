@@ -22,42 +22,34 @@ function ErrorHandler(stderr, state) {
      * @type {State}
      */
     this.state = state;
-    /**
-     * @type {Stream}
-     */
-    this.stderr = stderr;
 }
 
 _.extend(ErrorHandler.prototype, {
     /**
      * Throws a PHPParseError from the provided parser error from Parsing
      *
-     * @param {Exception} parseException
+     * @param {ParseException} parseException
      * @throws {PHPParseError}
      */
     handle: function (parseException) {
         var handler = this,
+            message,
             text = parseException.getText(),
-            error,
-            what;
+            translator = handler.state.getTranslator();
 
         if (parseException.unexpectedEndOfInput()) {
-            what = '$end';
+            message = translator.translate('core.unexpected_end_of_input');
         } else {
-            what = '\'' + text.substr(parseException.getFurthestMatchEnd(), 1) + '\'';
+            message = translator.translate('core.syntax_error', {
+                'what': '\'' + text.substr(parseException.getFurthestMatchEnd(), 1) + '\''
+            });
         }
 
-        error = new PHPParseError(PHPParseError.SYNTAX_UNEXPECTED, {
-            'file': handler.state.getPath(),
-            'line': parseException.getLineNumber(),
-            'what': what
-        });
-
-        if (handler.state.isMainProgram() && handler.stderr) {
-            handler.stderr.write(error.message);
-        }
-
-        throw error;
+        throw new PHPParseError(
+            message,
+            handler.state.getPath(),
+            parseException.getLineNumber()
+        );
     }
 });
 
