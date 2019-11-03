@@ -1286,7 +1286,14 @@ module.exports = {
             }
         },
         'N_RETURN_STATEMENT': {
-            components: ['T_RETURN', {name: 'expression', optionally: 'N_EXPRESSION'}, 'N_END_STATEMENT']
+            components: ['T_RETURN', {name: 'expression', optionally: 'N_EXPRESSION'}, 'N_END_STATEMENT'],
+            processor: function (node) {
+                if (node.expression === '') {
+                    delete node.expression;
+                }
+
+                return node;
+            }
         },
         'N_INLINE_HTML_STATEMENT_AT_START': {
             captureAs: 'N_INLINE_HTML_STATEMENT',
