@@ -29,6 +29,7 @@ describe('PHP Parser grammar closure expression default argument value integrati
                     name: 'N_EXPRESSION_STATEMENT',
                     expression: {
                         name: 'N_CLOSURE',
+                        static: false,
                         args: [{
                             name: 'N_ARGUMENT',
                             variable: {
