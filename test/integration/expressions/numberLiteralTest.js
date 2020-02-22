@@ -222,6 +222,37 @@ describe('PHP Parser grammar number literal expression integration', function ()
                     }
                 }]
             }
+        },
+        'return of float literal with exponent in addition to dot': {
+            code: 'return 1.2e4;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_FLOAT',
+                        number: '1.2e4'
+                    }
+                }]
+            }
+        },
+        'return of negative float literal with uppercase exponent in addition to dot': {
+            code: 'return -7.2E6;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_UNARY_EXPRESSION',
+                        operator: '-',
+                        prefix: true,
+                        operand: {
+                            name: 'N_FLOAT',
+                            number: '7.2E6'
+                        }
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

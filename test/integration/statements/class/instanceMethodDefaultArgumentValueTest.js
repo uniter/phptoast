@@ -82,7 +82,9 @@ EOS
                         visibility: 'public',
                         args: [{
                             name: 'N_ARGUMENT',
-                            type: 'array',
+                            type: {
+                                name: 'N_ARRAY_TYPE'
+                            },
                             variable: {
                                 name: 'N_VARIABLE',
                                 variable: 'items'
@@ -182,7 +184,10 @@ EOS
                         visibility: 'public',
                         args: [{
                             name: 'N_ARGUMENT',
-                            type: 'MyClass',
+                            type: {
+                                name: 'N_CLASS_TYPE',
+                                className: 'MyClass'
+                            },
                             variable: {
                                 name: 'N_VARIABLE',
                                 variable: 'myParam'

@@ -191,7 +191,7 @@ module.exports = {
         'T_DIV_EQUAL': /\/=/,
 
         // See http://www.php.net/manual/en/language.types.float.php
-        'T_DNUMBER': /\d*\.\d+|\d\.\d+e\d+|\d+e[+-]?\d+/i,
+        'T_DNUMBER': /\d\.\d+e\d+|\d*\.\d+|\d+e[+-]?\d+/i,
 
         'T_DOC_COMMENT': /\/\*\*([\s\S]*?)\*\//,
         'T_DO': /do\b/i,
@@ -368,8 +368,8 @@ module.exports = {
             components: {oneOf: [
                 [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}],
                 [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}],
-                [{name: 'type', oneOf: ['N_NAMESPACE', 'T_STRING']}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}],
-                [{name: 'type', oneOf: ['N_NAMESPACE', 'T_STRING']}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}]
+                [{name: 'type', rule: 'N_TYPE'}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}],
+                [{name: 'type', rule: 'N_TYPE'}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}]
             ]}
         },
         'N_ARGUMENT_VARIABLE': {
@@ -1756,6 +1756,23 @@ module.exports = {
 
                 return node;
             }
+        },
+        'N_ARRAY_TYPE': {
+            components: [{allowMerge: false, rule: 'T_ARRAY'}]
+        },
+        'N_CALLABLE_TYPE': {
+            components: [{allowMerge: false, rule: 'T_CALLABLE'}]
+        },
+        'N_CLASS_TYPE': {
+            components: [{name: 'className', oneOf: ['N_NAMESPACE', 'T_STRING']}]
+        },
+        'N_ITERABLE_TYPE': {
+            components: [{allowMerge: false, what: /iterable\b/i}]
+        },
+        'N_TYPE': {
+            components: [
+                {oneOf: ['N_ARRAY_TYPE', 'N_CALLABLE_TYPE', 'N_ITERABLE_TYPE', 'N_CLASS_TYPE']}
+            ]
         },
         'N_UNSET_STATEMENT': {
             components: ['T_UNSET', (/\(/), {name: 'variables', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), 'N_END_STATEMENT']

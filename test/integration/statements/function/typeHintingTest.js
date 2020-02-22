@@ -33,10 +33,66 @@ describe('PHP Parser grammar function definition statement type hinting integrat
                     },
                     args: [{
                         name: 'N_ARGUMENT',
-                        type: 'array',
+                        type: {
+                            name: 'N_ARRAY_TYPE'
+                        },
                         variable: {
                             name: 'N_VARIABLE',
                             variable: 'a'
+                        }
+                    }],
+                    body: {
+                        name: 'N_COMPOUND_STATEMENT',
+                        statements: []
+                    }
+                }]
+            }
+        },
+        'empty function definition with one "callable" type hinted arg but no statements': {
+            code: 'function doNothing(callable $c) {}',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_FUNCTION_STATEMENT',
+                    func: {
+                        name: 'N_STRING',
+                        string: 'doNothing'
+                    },
+                    args: [{
+                        name: 'N_ARGUMENT',
+                        type: {
+                            name: 'N_CALLABLE_TYPE'
+                        },
+                        variable: {
+                            name: 'N_VARIABLE',
+                            variable: 'c'
+                        }
+                    }],
+                    body: {
+                        name: 'N_COMPOUND_STATEMENT',
+                        statements: []
+                    }
+                }]
+            }
+        },
+        'empty function definition with one "iterable" type hinted arg but no statements': {
+            code: 'function doNothing(iterable $i) {}',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_FUNCTION_STATEMENT',
+                    func: {
+                        name: 'N_STRING',
+                        string: 'doNothing'
+                    },
+                    args: [{
+                        name: 'N_ARGUMENT',
+                        type: {
+                            name: 'N_ITERABLE_TYPE'
+                        },
+                        variable: {
+                            name: 'N_VARIABLE',
+                            variable: 'i'
                         }
                     }],
                     body: {
@@ -58,7 +114,10 @@ describe('PHP Parser grammar function definition statement type hinting integrat
                     },
                     args: [{
                         name: 'N_ARGUMENT',
-                        type: 'Response',
+                        type: {
+                            name: 'N_CLASS_TYPE',
+                            className: 'Response'
+                        },
                         variable: {
                             name: 'N_VARIABLE',
                             variable: 'a'
@@ -83,7 +142,10 @@ describe('PHP Parser grammar function definition statement type hinting integrat
                     },
                     args: [{
                         name: 'N_ARGUMENT',
-                        type: '\\Creator\\Framework\\Request',
+                        type: {
+                            name: 'N_CLASS_TYPE',
+                            className: '\\Creator\\Framework\\Request'
+                        },
                         variable: {
                             name: 'N_VARIABLE',
                             variable: 'a'
