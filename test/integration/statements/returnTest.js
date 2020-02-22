@@ -11,9 +11,9 @@
 
 var _ = require('microdash'),
     expect = require('chai').expect,
-    tools = require('../../../tools');
+    tools = require('../../tools');
 
-describe('PHP Parser grammar closure expression default argument value integration', function () {
+describe('PHP Parser return statement integration', function () {
     var parser;
 
     beforeEach(function () {
@@ -21,31 +21,24 @@ describe('PHP Parser grammar closure expression default argument value integrati
     });
 
     _.each({
-        'empty closure in void context with parameter with default value': {
-            code: 'function ($a = 4) {};',
+        'return with no argument': {
+            code: 'return;',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
-                    name: 'N_EXPRESSION_STATEMENT',
+                    name: 'N_RETURN_STATEMENT'
+                }]
+            }
+        },
+        'return with integer argument': {
+            code: 'return 121;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
                     expression: {
-                        name: 'N_CLOSURE',
-                        static: false,
-                        args: [{
-                            name: 'N_ARGUMENT',
-                            variable: {
-                                name: 'N_VARIABLE',
-                                variable: 'a'
-                            },
-                            value: {
-                                name: 'N_INTEGER',
-                                number: '4'
-                            }
-                        }],
-                        bindings: [],
-                        body: {
-                            name: 'N_COMPOUND_STATEMENT',
-                            statements: []
-                        }
+                        name: 'N_INTEGER',
+                        number: '121'
                     }
                 }]
             }

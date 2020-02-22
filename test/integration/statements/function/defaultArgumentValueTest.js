@@ -98,7 +98,9 @@ describe('PHP Parser grammar function definition statement default argument valu
                     },
                     args: [{
                         name: 'N_ARGUMENT',
-                        type: 'array',
+                        type: {
+                            name: 'N_ARRAY_TYPE'
+                        },
                         variable: {
                             name: 'N_VARIABLE',
                             variable: 'value'
@@ -126,7 +128,9 @@ describe('PHP Parser grammar function definition statement default argument valu
                     },
                     args: [{
                         name: 'N_ARGUMENT',
-                        type: 'array',
+                        type: {
+                            name: 'N_ARRAY_TYPE'
+                        },
                         variable: {
                             name: 'N_VARIABLE',
                             variable: 'value'

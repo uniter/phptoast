@@ -44,7 +44,9 @@ EOS
                         visibility: 'public',
                         args: [{
                             name: 'N_ARGUMENT',
-                            type: 'array',
+                            type: {
+                                name: 'N_ARRAY_TYPE'
+                            },
                             variable: {
                                 name: 'N_VARIABLE',
                                 variable: 'items'
@@ -76,7 +78,10 @@ EOS
                         visibility: 'public',
                         args: [{
                             name: 'N_ARGUMENT',
-                            type: 'ItemList',
+                            type: {
+                                name: 'N_CLASS_TYPE',
+                                className: 'ItemList'
+                            },
                             variable: {
                                 name: 'N_VARIABLE',
                                 variable: 'items'
@@ -108,7 +113,10 @@ EOS
                         visibility: 'public',
                         args: [{
                             name: 'N_ARGUMENT',
-                            type: '\\Creator\\Framework\\Request',
+                            type: {
+                                name: 'N_CLASS_TYPE',
+                                className: '\\Creator\\Framework\\Request'
+                            },
                             variable: {
                                 name: 'N_VARIABLE',
                                 variable: 'items'

@@ -29,6 +29,26 @@ describe('PHP Parser grammar closure expression integration', function () {
                     name: 'N_EXPRESSION_STATEMENT',
                     expression: {
                         name: 'N_CLOSURE',
+                        static: false,
+                        args: [],
+                        bindings: [],
+                        body: {
+                            name: 'N_COMPOUND_STATEMENT',
+                            statements: []
+                        }
+                    }
+                }]
+            }
+        },
+        'empty static closure in void context': {
+            code: 'static function () {};',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_CLOSURE',
+                        static: true,
                         args: [],
                         bindings: [],
                         body: {
@@ -47,6 +67,7 @@ describe('PHP Parser grammar closure expression integration', function () {
                     name: 'N_EXPRESSION_STATEMENT',
                     expression: {
                         name: 'N_CLOSURE',
+                        static: false,
                         args: [],
                         bindings: [{
                             name: 'N_VARIABLE',
@@ -71,6 +92,7 @@ describe('PHP Parser grammar closure expression integration', function () {
                     name: 'N_EXPRESSION_STATEMENT',
                     expression: {
                         name: 'N_CLOSURE',
+                        static: false,
                         args: [],
                         bindings: [{
                             name: 'N_VARIABLE',
@@ -98,6 +120,7 @@ describe('PHP Parser grammar closure expression integration', function () {
                     name: 'N_EXPRESSION_STATEMENT',
                     expression: {
                         name: 'N_CLOSURE',
+                        static: false,
                         args: [{
                             name: 'N_ARGUMENT',
                             variable: {
@@ -128,6 +151,7 @@ describe('PHP Parser grammar closure expression integration', function () {
                     name: 'N_EXPRESSION_STATEMENT',
                     expression: {
                         name: 'N_CLOSURE',
+                        static: false,
                         args: [{
                             name: 'N_ARGUMENT',
                             variable: {
@@ -169,6 +193,7 @@ describe('PHP Parser grammar closure expression integration', function () {
                             operator: '=',
                             operand: {
                                 name: 'N_CLOSURE',
+                                static: false,
                                 args: [{
                                     name: 'N_ARGUMENT',
                                     variable: {
@@ -206,6 +231,7 @@ describe('PHP Parser grammar closure expression integration', function () {
                             operator: '=',
                             operand: {
                                 name: 'N_CLOSURE',
+                                static: false,
                                 args: [{
                                     name: 'N_ARGUMENT',
                                     variable: {

@@ -69,14 +69,20 @@ EOS
                         visibility: 'protected',
                         args: [{
                             name: 'N_ARGUMENT',
-                            type: 'MyArg',
+                            type: {
+                                name: 'N_CLASS_TYPE',
+                                className: 'MyArg'
+                            },
                             variable: {
                                 name: 'N_VARIABLE',
                                 variable: 'arg1'
                             }
                         }, {
                             name: 'N_ARGUMENT',
-                            type: 'YourArg',
+                            type: {
+                                name: 'N_CLASS_TYPE',
+                                className: 'YourArg'
+                            },
                             variable: {
                                 name: 'N_VARIABLE',
                                 variable: 'arg2'
@@ -109,14 +115,20 @@ EOS
                         visibility: 'protected',
                         args: [{
                             name: 'N_ARGUMENT',
-                            type: 'MyArg',
+                            type: {
+                                name: 'N_CLASS_TYPE',
+                                className: 'MyArg'
+                            },
                             variable: {
                                 name: 'N_VARIABLE',
                                 variable: 'arg1'
                             }
                         }, {
                             name: 'N_ARGUMENT',
-                            type: 'YourArg',
+                            type: {
+                                name: 'N_CLASS_TYPE',
+                                className: 'YourArg'
+                            },
                             variable: {
                                 name: 'N_VARIABLE',
                                 variable: 'arg2'
