@@ -450,6 +450,21 @@ module.exports = {
         'N_CONSTANT_DEFINITION': {
             components: ['T_CONST', {name: 'constant', what: 'T_STRING'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}, 'N_END_STATEMENT']
         },
+        'N_CONSTANT_STATEMENT': {
+            components: [
+                'T_CONST',
+                {
+                    name: 'constants',
+                    oneOrMoreOf: [
+                        {name: 'constant', rule: 'T_STRING'},
+                        (/=/),
+                        {name: 'value', rule: 'N_EXPRESSION'},
+                        (/,|(?=;|[?%]>\n?)/)
+                    ]
+                },
+                'N_END_STATEMENT'
+            ]
+        },
         'N_CONTINUE_STATEMENT': {
             components: ['T_CONTINUE', {name: 'levels', oneOf: ['N_INTEGER', 'N_JUMP_ONE_LEVEL']}, 'N_END_STATEMENT']
         },
@@ -1338,6 +1353,7 @@ module.exports = {
                 'N_INTERFACE_STATEMENT',
                 'N_SWITCH_STATEMENT',
                 'N_GLOBAL_STATEMENT',
+                'N_CONSTANT_STATEMENT',
                 'N_STATIC_STATEMENT',
                 'N_LABEL_STATEMENT',
                 'N_GOTO_STATEMENT',
