@@ -55,7 +55,7 @@ _.extend(State.prototype, {
         if (state.translator === null) {
             state.translator = new Translator();
 
-            // Add our parsing-related messages to the provided translator
+            // Add our parsing-related messages to the custom translator
             // (note that these may be overridden later by an external library)
             state.translator.addTranslations(parserMessages);
         }
