@@ -653,29 +653,16 @@ module.exports = {
             ifNoMatch: {component: 'operator', capture: 'operand'},
             options: {prefix: true}
         },
-        'N_EXPRESSION_LEVEL_2_A': {
-            captureAs: 'N_CLASS_CONSTANT',
-            components: {oneOf: [
-                [
-                    {name: 'className', oneOf: ['N_NAMESPACED_REFERENCE', 'N_EXPRESSION_LEVEL_1_B']},
-                    'T_DOUBLE_COLON',
-                    {name: 'constant', what: ['T_STRING', (/(?!\()/)]}
-                ],
-                {name: 'next', what: 'N_EXPRESSION_LEVEL_1_B'}
-            ]},
-            ifNoMatch: {component: 'constant', capture: 'next'}
-        },
-        'N_CLASS_CONSTANT': 'N_EXPRESSION_LEVEL_2_A',
         'N_EMPTY_ARRAY_INDEX': {
             captureAs: 'N_ARRAY_INDEX',
             components: {name: 'indices', what: [(/\[/), (/\]/)]},
             options: {indices: true}
         },
-        'N_EXPRESSION_LEVEL_2_B': {
+        'N_EXPRESSION_LEVEL_2_A': {
             components: [
                 {
                     name: 'expression',
-                    oneOf: ['N_EXPRESSION_LEVEL_2_A', 'N_NAMESPACED_REFERENCE']
+                    oneOf: ['N_EXPRESSION_LEVEL_1_B', 'N_NAMESPACED_REFERENCE']
                 },
                 {
                     name: 'member',
@@ -745,6 +732,14 @@ module.exports = {
                                     {name: 'property', what: 'N_STATIC_MEMBER'}
                                 ]
                             },
+                            // Class constant
+                            {
+                                name: 'class_constant',
+                                what: [
+                                    'T_DOUBLE_COLON',
+                                    {name: 'constant', what: ['T_STRING', (/(?!\()/)]}
+                                ]
+                            },
                             // Call to callable stored in array index or static property
                             {
                                 name: 'callable',
@@ -799,6 +794,12 @@ module.exports = {
                             className: result,
                             property: member.static_property.property
                         };
+                    } else if (member.class_constant) {
+                        result = {
+                            name: 'N_CLASS_CONSTANT',
+                            className: result,
+                            constant: member.class_constant.constant
+                        };
                     } else if (member.callable) {
                         result = {
                             name: 'N_FUNCTION_CALL',
@@ -816,10 +817,10 @@ module.exports = {
             }
         },
         'N_EXPRESSION_LEVEL_2_C': {
-            components: {oneOf: ['N_REFERENCE', 'N_EXPRESSION_LEVEL_2_B']}
+            components: {oneOf: ['N_REFERENCE', 'N_EXPRESSION_LEVEL_2_A']}
         },
         'N_REFERENCE': {
-            components: [(/&/), {name: 'operand', what: 'N_EXPRESSION_LEVEL_2_B'}]
+            components: [(/&/), {name: 'operand', what: 'N_EXPRESSION_LEVEL_2_A'}]
         },
         'N_EXPRESSION_LEVEL_3_A': {
             oneOf: ['N_UNARY_PREFIX_EXPRESSION', 'N_UNARY_SUFFIX_EXPRESSION', 'N_EXPRESSION_LEVEL_2_C']
@@ -1052,7 +1053,7 @@ module.exports = {
         'N_EXPRESSION_LEVEL_21': {
             components: 'N_EXPRESSION_LEVEL_20'
         },
-        'N_LEFT_HAND_SIDE_EXPRESSION': 'N_EXPRESSION_LEVEL_2_B',
+        'N_LEFT_HAND_SIDE_EXPRESSION': 'N_EXPRESSION_LEVEL_2_A',
         'N_EXPRESSION_STATEMENT': {
             components: [{name: 'expression', what: 'N_EXPRESSION'}, 'N_END_STATEMENT']
         },

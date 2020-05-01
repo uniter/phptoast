@@ -54,6 +54,58 @@ describe('PHP Parser grammar scope resolution operator "::" constant integration
                     }
                 }]
             }
+        },
+        'reading constant from instance method call result': {
+            code: 'return $myObject->myMethod()::MY_CONST;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_CLASS_CONSTANT',
+                        className: {
+                            name: 'N_METHOD_CALL',
+                            object: {
+                                name: 'N_VARIABLE',
+                                variable: 'myObject'
+                            },
+                            calls: [{
+                                func: {
+                                    name: 'N_STRING',
+                                    string: 'myMethod'
+                                },
+                                args: []
+                            }]
+                        },
+                        constant: 'MY_CONST'
+                    }
+                }]
+            }
+        },
+        'reading constant from static method call result': {
+            code: 'return MyClass::myStaticMethod()::MY_CONST;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_CLASS_CONSTANT',
+                        className: {
+                            name: 'N_STATIC_METHOD_CALL',
+                            className: {
+                                name: 'N_STRING',
+                                string: 'MyClass'
+                            },
+                            method: {
+                                name: 'N_STRING',
+                                string: 'myStaticMethod'
+                            },
+                            args: []
+                        },
+                        constant: 'MY_CONST'
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
