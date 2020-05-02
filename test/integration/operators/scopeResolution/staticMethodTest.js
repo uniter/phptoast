@@ -240,6 +240,40 @@ describe('PHP Parser grammar scope resolution operator "::" static method integr
                     }
                 }]
             }
+        },
+        'calling dynamically ({<expr>}) referenced static method with name referenced by expression': {
+            code: 'MyClass::{"my" . "StaticMethod"}(4);',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_STATIC_METHOD_CALL',
+                        className: {
+                            name: 'N_STRING',
+                            string: 'MyClass'
+                        },
+                        method: {
+                            name: 'N_EXPRESSION',
+                            left: {
+                                name: 'N_STRING_LITERAL',
+                                string: 'my'
+                            },
+                            right: [{
+                                operator: '.',
+                                operand: {
+                                    name: 'N_STRING_LITERAL',
+                                    string: 'StaticMethod'
+                                }
+                            }]
+                        },
+                        args: [{
+                            name: 'N_INTEGER',
+                            number: '4'
+                        }]
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

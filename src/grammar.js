@@ -718,7 +718,7 @@ module.exports = {
                                 name: 'static_method_call',
                                 what: [
                                     'T_DOUBLE_COLON',
-                                    {name: 'method', oneOf: ['N_STRING', 'N_VARIABLE', 'N_VARIABLE_EXPRESSION']},
+                                    {name: 'method', oneOf: ['N_STRING', 'N_VARIABLE', 'N_VARIABLE_EXPRESSION', 'N_MEMBER_EXPRESSION']},
                                     (/\(/),
                                     {name: 'args', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                                     (/\)/)
@@ -1809,6 +1809,9 @@ module.exports = {
                     {name: 'variable', what: (/\$\{([a-z0-9_]+)\}/i), captureIndex: 1}
                 ]}
             ]
+        },
+        'N_MEMBER_EXPRESSION': {
+            components: [(/\{/), 'N_EXPRESSION', (/\}/)]
         },
         'N_VARIABLE_EXPRESSION': {
             components: {
