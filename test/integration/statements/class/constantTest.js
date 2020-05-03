@@ -37,11 +37,13 @@ EOS
                     className: 'Planet',
                     members: [{
                         name: 'N_CONSTANT_DEFINITION',
-                        constant: 'SHAPE',
-                        value: {
-                            name: 'N_STRING_LITERAL',
-                            string: 'sphere'
-                        }
+                        constants: [{
+                            constant: 'SHAPE',
+                            value: {
+                                name: 'N_STRING_LITERAL',
+                                string: 'sphere'
+                            }
+                        }]
                     }]
                 }]
             }
@@ -61,21 +63,23 @@ EOS
                     className: 'Planet',
                     members: [{
                         name: 'N_CONSTANT_DEFINITION',
-                        constant: 'SHAPE',
-                        value: {
-                            name: 'N_EXPRESSION',
-                            left: {
-                                name: 'N_STRING_LITERAL',
-                                string: 'sphere'
-                            },
-                            right: [{
-                                operator: '.',
-                                operand: {
+                        constants: [{
+                            constant: 'SHAPE',
+                            value: {
+                                name: 'N_EXPRESSION',
+                                left: {
                                     name: 'N_STRING_LITERAL',
-                                    string: ' not circle'
-                                }
-                            }]
-                        }
+                                    string: 'sphere'
+                                },
+                                right: [{
+                                    operator: '.',
+                                    operand: {
+                                        name: 'N_STRING_LITERAL',
+                                        string: ' not circle'
+                                    }
+                                }]
+                            }
+                        }]
                     }]
                 }]
             }

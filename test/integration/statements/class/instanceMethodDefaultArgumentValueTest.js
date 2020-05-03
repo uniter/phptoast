@@ -119,11 +119,13 @@ EOS
                     className: 'Thing',
                     members: [{
                         name: 'N_CONSTANT_DEFINITION',
-                        constant: 'MY_CONST',
-                        value: {
-                            name: 'N_INTEGER',
-                            number: '21'
-                        }
+                        constants: [{
+                            constant: 'MY_CONST',
+                            value: {
+                                name: 'N_INTEGER',
+                                number: '21'
+                            }
+                        }]
                     }, {
                         name: 'N_METHOD_DEFINITION',
                         func: {
@@ -170,11 +172,13 @@ EOS
                     className: 'Thing',
                     members: [{
                         name: 'N_CONSTANT_DEFINITION',
-                        constant: 'MY_CONST',
-                        value: {
-                            name: 'N_INTEGER',
-                            number: '21'
-                        }
+                        constants: [{
+                            constant: 'MY_CONST',
+                            value: {
+                                name: 'N_INTEGER',
+                                number: '21'
+                            }
+                        }]
                     }, {
                         name: 'N_METHOD_DEFINITION',
                         func: {

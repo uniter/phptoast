@@ -38,11 +38,13 @@ EOS
                     implement: ['Rotatable'],
                     members: [{
                         name: 'N_CONSTANT_DEFINITION',
-                        constant: 'SHAPE',
-                        value: {
-                            name: 'N_STRING_LITERAL',
-                            string: 'sphere'
-                        }
+                        constants: [{
+                            constant: 'SHAPE',
+                            value: {
+                                name: 'N_STRING_LITERAL',
+                                string: 'sphere'
+                            }
+                        }]
                     }]
                 }]
             }
@@ -63,11 +65,13 @@ EOS
                     implement: ['Rotatable', 'Orbitable'],
                     members: [{
                         name: 'N_CONSTANT_DEFINITION',
-                        constant: 'SHAPE',
-                        value: {
-                            name: 'N_STRING_LITERAL',
-                            string: 'sphere'
-                        }
+                        constants: [{
+                            constant: 'SHAPE',
+                            value: {
+                                name: 'N_STRING_LITERAL',
+                                string: 'sphere'
+                            }
+                        }]
                     }]
                 }]
             }

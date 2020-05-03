@@ -448,7 +448,19 @@ module.exports = {
             components: [(/\{/), {name: 'statements', zeroOrMoreOf: 'N_STATEMENT'}, (/\}/)]
         },
         'N_CONSTANT_DEFINITION': {
-            components: ['T_CONST', {name: 'constant', what: 'T_STRING'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}, 'N_END_STATEMENT']
+            components: [
+                'T_CONST',
+                {
+                    name: 'constants',
+                    oneOrMoreOf: [
+                        {name: 'constant', rule: 'T_STRING'},
+                        (/=/),
+                        {name: 'value', rule: 'N_EXPRESSION'},
+                        (/,|(?=;|[?%]>\n?)/)
+                    ]
+                },
+                'N_END_STATEMENT'
+            ]
         },
         'N_CONSTANT_STATEMENT': {
             components: [
