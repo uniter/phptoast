@@ -1531,7 +1531,7 @@ module.exports = {
             captureAs: 'N_VARIABLE_EXPRESSION',
             components: [
                 (/\${/),
-                'N_STRING_SIMPLE_INTERPOLATED_DEREFERENCE',
+                {rule: 'N_STRING_SIMPLE_INTERPOLATED_DEREFERENCE', ignoreWhitespace: true},
                 (/\}/)
             ]
         },
@@ -1595,7 +1595,7 @@ module.exports = {
                                 name: 'static_method_call',
                                 what: [
                                     'T_DOUBLE_COLON',
-                                    {name: 'method', oneOf: ['N_STRING', 'N_VARIABLE', 'N_VARIABLE_EXPRESSION']},
+                                    {name: 'method', oneOf: ['N_STRING', 'N_VARIABLE', 'N_VARIABLE_EXPRESSION', 'N_MEMBER_EXPRESSION']},
                                     (/\(/),
                                     {name: 'args', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                                     (/\)/)
