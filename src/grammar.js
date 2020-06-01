@@ -1550,10 +1550,6 @@ module.exports = {
                 (/\}/)
             ]
         },
-        'N_STRING_SIMPLE_VARIABLE_VARIABLE': {
-            captureAs: 'N_VARIABLE_EXPRESSION',
-            components: {name: 'expression', what: [(/\$\{(?=\$)/), 'N_VARIABLE', (/\}/)]}
-        },
         'N_STRING_SIMPLE_INTERPOLATED_BRACED_BARE_VARIABLE': {
             // Don't swallow whitespace - it should remain inside the captured plain text parts of the string
             components: [{name: 'variable', what: 'T_STRING'}, (/(?!\s*::)/)]
