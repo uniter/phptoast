@@ -1091,7 +1091,7 @@ module.exports = {
             components: ['T_GOTO', {name: 'label', what: 'N_STRING'}, 'N_END_STATEMENT']
         },
         'N_HEREDOC': {
-            components: [{name: 'string', what: /<<<("?)([a-z0-9_]+)\1\r?\n([\s\S]*?)\r?\n\2(?=;?(?:\r?\n|$))/i, captureIndex: 3}],
+            components: [{name: 'string', what: /<<<\s*("?)([a-z0-9_]+)\1\r?\n([\s\S]*?)\r?\n\2(?=;?(?:\r?\n|$))/i, captureIndex: 3}],
             processor: function (node, parse) {
                 var innerMatch,
                     parts;
@@ -1284,7 +1284,7 @@ module.exports = {
             components: {name: 'string', what: 'N_NAMESPACE'}
         },
         'N_NOWDOC': {
-            components: [{name: 'string', what: /<<<'([a-z0-9_]+)'\r?\n([\s\S]*?)\r?\n\1(?=;?(?:\r?\n|$))/i, captureIndex: 2}]
+            components: [{name: 'string', what: /<<<\s*'([a-z0-9_]+)'\r?\n([\s\S]*?)\r?\n\1(?=;?(?:\r?\n|$))/i, captureIndex: 2}]
         },
         'N_NULL': {
             allowMerge: false,

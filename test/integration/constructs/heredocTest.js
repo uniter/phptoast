@@ -69,6 +69,22 @@ describe('PHP Parser grammar heredoc construct integration', function () {
                 }]
             }
         },
+        'quoted heredoc with whitespace before identifier containing only an interpolated variable': {
+            code: '<?php return <<< "EOS"\n$myValue\nEOS;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_HEREDOC',
+                        parts: [{
+                            name: 'N_VARIABLE',
+                            variable: 'myValue'
+                        }]
+                    }
+                }]
+            }
+        },
         'quoted heredoc containing an escaped variable': {
             code: '<?php return <<<"EOS"\nthis is not \\$a variable\nEOS;',
             expectedAST: {
@@ -87,6 +103,25 @@ describe('PHP Parser grammar heredoc construct integration', function () {
         },
         'unquoted heredoc containing some text followed by an interpolated variable': {
             code: '<?php return <<<EOS\nabc$myValue\nEOS;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_HEREDOC',
+                        parts: [{
+                            name: 'N_STRING_LITERAL',
+                            string: 'abc'
+                        }, {
+                            name: 'N_VARIABLE',
+                            variable: 'myValue'
+                        }]
+                    }
+                }]
+            }
+        },
+        'unquoted heredoc with whitespace before identifier containing some text followed by an interpolated variable': {
+            code: '<?php return <<< EOS\nabc$myValue\nEOS;',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
