@@ -660,10 +660,13 @@ module.exports = {
             components: ['T_DO', {name: 'body', what: 'N_STATEMENT'}, 'T_WHILE', (/\(/), {name: 'condition', what: 'N_EXPRESSION'}, (/\)/), 'N_END_STATEMENT']
         },
         'N_EXPRESSION_LEVEL_1_B': {
-            captureAs: 'N_UNARY_EXPRESSION',
-            components: [{name: 'operator', optionally: 'T_CLONE'}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_1_A'}],
-            ifNoMatch: {component: 'operator', capture: 'operand'},
-            options: {prefix: true}
+            captureAs: 'N_CLONE_EXPRESSION',
+            components: {
+                oneOf: [
+                    ['T_CLONE', {name: 'operand', what: 'N_EXPRESSION_LEVEL_1_A'}],
+                    'N_EXPRESSION_LEVEL_1_A'
+                ]
+            }
         },
         'N_EMPTY_ARRAY_INDEX': {
             captureAs: 'N_ARRAY_INDEX',
