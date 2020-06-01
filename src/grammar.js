@@ -1521,7 +1521,7 @@ module.exports = {
             captureAs: 'N_STRING_LITERAL',
             components: {
                 name: 'string',
-                what: (/(?:[^\\"${]|\\[\s\S]|\$(?=\$)|\$[^{a-zA-Z]|{\\\$|{[^$])+/),
+                what: (/(?:[^\\"${]|\\[\s\S]|\$(?=\$)|\$(?![{a-zA-Z])|{\\\$|{(?!\$))+/),
                 replace: stringEscapeReplacements
             }
         },
