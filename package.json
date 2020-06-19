@@ -24,14 +24,14 @@
     "test": "npm run jshint && npm run mocha"
   },
   "dependencies": {
-    "microdash": "^1.4.0",
+    "microdash": "^1.4.1",
     "parsing": "^2.1.0",
     "phpcommon": "^2.0.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "jshint": "^2.11.1",
-    "mocha": "^7.1.2",
+    "mocha": "^7.2.0",
     "nowdoc": "^1.0.1",
     "sinon": "^5.1.1"
   },
