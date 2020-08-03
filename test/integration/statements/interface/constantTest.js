@@ -37,11 +37,13 @@ EOS
                     interfaceName: 'Planet',
                     members: [{
                         name: 'N_CONSTANT_DEFINITION',
-                        constant: 'SHAPE',
-                        value: {
-                            name: 'N_STRING_LITERAL',
-                            string: 'sphere'
-                        }
+                        constants: [{
+                            constant: 'SHAPE',
+                            value: {
+                                name: 'N_STRING_LITERAL',
+                                string: 'sphere'
+                            }
+                        }]
                     }]
                 }]
             }
@@ -61,14 +63,16 @@ EOS
                     interfaceName: 'Thing',
                     members: [{
                         name: 'N_CONSTANT_DEFINITION',
-                        constant: 'FIRST',
-                        value: {
-                            name: 'N_CLASS_CONSTANT',
-                            className: {
-                                name: 'N_SELF'
-                            },
-                            constant: 'SECOND'
-                        }
+                        constants: [{
+                            constant: 'FIRST',
+                            value: {
+                                name: 'N_CLASS_CONSTANT',
+                                className: {
+                                    name: 'N_SELF'
+                                },
+                                constant: 'SECOND'
+                            }
+                        }]
                     }]
                 }]
             }

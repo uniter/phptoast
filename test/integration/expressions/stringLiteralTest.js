@@ -290,6 +290,40 @@ EOS
                     }
                 }]
             }
+        },
+        'double-quoted string containing a trailing dollar, potentially confused with interpolated variable': {
+            code: nowdoc(function () {/*<<<EOS
+<?php
+return "my string $";
+EOS
+*/;}), //jshint ignore:line
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_STRING_LITERAL',
+                        string: 'my string $'
+                    }
+                }]
+            }
+        },
+        'double-quoted string containing a trailing opening brace, potentially confused with complex interpolation syntax': {
+            code: nowdoc(function () {/*<<<EOS
+<?php
+return "my string {";
+EOS
+*/;}), //jshint ignore:line
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_STRING_LITERAL',
+                        string: 'my string {'
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

@@ -97,6 +97,28 @@ describe('PHP Parser grammar string interpolation construct integration', functi
                 }]
             }
         },
+        'simple syntax: string interpolation with ${...} (dollar before braces) with leading whitespace': {
+            code: '<?php return "before${ value}after";',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_STRING_EXPRESSION',
+                        parts: [{
+                            name: 'N_STRING_LITERAL',
+                            string: 'before'
+                        }, {
+                            name: 'N_VARIABLE',
+                            variable: 'value'
+                        }, {
+                            name: 'N_STRING_LITERAL',
+                            string: 'after'
+                        }]
+                    }
+                }]
+            }
+        },
         'simple syntax: string interpolation with ${...} (dollar before braces) array dereference': {
             code: '<?php return "before ${myArray[21]} after";',
             expectedAST: {
@@ -249,6 +271,49 @@ describe('PHP Parser grammar string interpolation construct integration', functi
                                 method: {
                                     name: 'N_STRING',
                                     string: 'myStaticMethod'
+                                },
+                                args: []
+                            }
+                        }, {
+                            name: 'N_STRING_LITERAL',
+                            string: 'after'
+                        }]
+                    }
+                }]
+            }
+        },
+        'simple syntax: string interpolation with ${...} (dollar before braces) variable-variable dynamic static method call dereference': {
+            code: '<?php return "before${MyClass::{\'my\' . \'StaticMethod\'}()}after";',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_STRING_EXPRESSION',
+                        parts: [{
+                            name: 'N_STRING_LITERAL',
+                            string: 'before'
+                        }, {
+                            name: 'N_VARIABLE_EXPRESSION',
+                            expression: {
+                                name: 'N_STATIC_METHOD_CALL',
+                                className: {
+                                    name: 'N_STRING',
+                                    string: 'MyClass'
+                                },
+                                method: {
+                                    name: 'N_EXPRESSION',
+                                    left: {
+                                        name: 'N_STRING_LITERAL',
+                                        string: 'my'
+                                    },
+                                    right: [{
+                                        operator: '.',
+                                        operand: {
+                                            name: 'N_STRING_LITERAL',
+                                            string: 'StaticMethod'
+                                        }
+                                    }]
                                 },
                                 args: []
                             }

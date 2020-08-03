@@ -34,6 +34,32 @@ describe('PHP Parser grammar nowdoc construct integration', function () {
                 }]
             }
         },
+        'nowdoc containing plain text': {
+            code: '<?php return <<<\'EOS\'\nMy text goes here!\nEOS;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_NOWDOC',
+                        string: 'My text goes here!'
+                    }
+                }]
+            }
+        },
+        'nowdoc containing plain text with whitespace before identifier': {
+            code: '<?php return <<< \'EOS\'\nMy text goes here!\nEOS;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_NOWDOC',
+                        string: 'My text goes here!'
+                    }
+                }]
+            }
+        },
         'nowdoc containing unescaped quotes': {
             code: '<?php return <<<\'EOS\'\ndouble-quote: " and single quote: \'\nEOS;',
             expectedAST: {

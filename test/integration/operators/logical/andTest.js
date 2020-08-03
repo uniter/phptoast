@@ -181,6 +181,49 @@ describe('PHP Parser grammar logical And "<value> && <value>" operator integrati
                     }
                 }]
             }
+        },
+        'precedence should be higher than a logical AND': {
+            code: '$result = $value1 && $value2 & $mask;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'result'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_EXPRESSION',
+                                left: {
+                                    name: 'N_VARIABLE',
+                                    variable: 'value1'
+                                },
+                                right: [{
+                                    operator: '&&',
+                                    operand: {
+                                        name: 'N_EXPRESSION',
+                                        left: {
+                                            name: 'N_VARIABLE',
+                                            variable: 'value2'
+                                        },
+                                        right: [{
+                                            operator: '&',
+                                            operand: {
+                                                name: 'N_VARIABLE',
+                                                variable: 'mask'
+                                            }
+                                        }]
+                                    }
+                                }]
+                            }
+                        }]
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

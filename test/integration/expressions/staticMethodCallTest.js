@@ -83,87 +83,32 @@ describe('PHP Parser grammar static method call expression integration', functio
                     }
                 }]
             }
-        }/*,
-        'call to callable': {
-            code: '$myCallable();',
-            expectedAST: {
-                name: 'N_PROGRAM',
-                statements: [{
-                    name: 'N_EXPRESSION_STATEMENT',
-                    expression: {
-                        name: 'N_FUNCTION_CALL',
-                        func: {
-                            name: 'N_VARIABLE',
-                            variable: 'myCallable'
-                        },
-                        args: []
-                    }
-                }]
-            }
         },
-        'function call as term in expression with arguments including an expression': {
-            code: '$a = doSomething(1, 4 + 2, "test");',
+        'return of static method call of callable result': {
+            code: 'return $myCallable()::myStaticMethod();',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
-                    name: 'N_EXPRESSION_STATEMENT',
+                    name: 'N_RETURN_STATEMENT',
                     expression: {
-                        name: 'N_EXPRESSION',
-                        left: {
-                            name: 'N_VARIABLE',
-                            variable: 'a'
+                        name: 'N_STATIC_METHOD_CALL',
+                        className: {
+                            name: 'N_FUNCTION_CALL',
+                            func: {
+                                name: 'N_VARIABLE',
+                                variable: 'myCallable'
+                            },
+                            args: []
                         },
-                        right: [{
-                            operator: '=',
-                            operand: {
-                                name: 'N_FUNCTION_CALL',
-                                func: {
-                                    name: 'N_STRING',
-                                    string: 'doSomething'
-                                },
-                                args: [{
-                                    name: 'N_INTEGER',
-                                    number: '1'
-                                }, {
-                                    name: 'N_EXPRESSION',
-                                    left: {
-                                        name: 'N_INTEGER',
-                                        number: '4'
-                                    },
-                                    right: [{
-                                        operator: '+',
-                                        operand: {
-                                            name: 'N_INTEGER',
-                                            number: '2'
-                                        }
-                                    }]
-                                }, {
-                                    name: 'N_STRING_LITERAL',
-                                    string: 'test'
-                                }]
-                            }
-                        }]
-                    }
-                }]
-            }
-        },
-        'calling function in global namespace with prefixed path': {
-            code: '\\now();',
-            expectedAST: {
-                name: 'N_PROGRAM',
-                statements: [{
-                    name: 'N_EXPRESSION_STATEMENT',
-                    expression: {
-                        name: 'N_FUNCTION_CALL',
-                        func: {
+                        method: {
                             name: 'N_STRING',
-                            string: '\\now'
+                            string: 'myStaticMethod'
                         },
                         args: []
                     }
                 }]
             }
-        }*/
+        }
     }, function (scenario, description) {
         describe(description, function () {
             var code = '<?php ' + scenario.code;
