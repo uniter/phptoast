@@ -142,6 +142,23 @@ EOS
                 }]
             }
         },
+        'single-quoted string literal with all escape sequences (most are ignored unless double-quoted)': {
+            code: nowdoc(function () {/*<<<EOS
+<?php
+return 'Start: \n, \r, \t, \v, \e, \f, \\, \$, \", \0, \3, \21, \377, \x3f, \u1234 and finish';
+EOS
+*/;}), //jshint ignore:line
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_STRING_LITERAL',
+                        string: 'Start: \\n, \\r, \\t, \\v, \\e, \\f, \\, \\$, \\", \\0, \\3, \\21, \\377, \\x3f, \\u1234 and finish'
+                    }
+                }]
+            }
+        },
         'double-quoted string literal with escaped double-quote embedded': {
             code: nowdoc(function () {/*<<<EOS
 <?php
@@ -321,6 +338,23 @@ EOS
                     expression: {
                         name: 'N_STRING_LITERAL',
                         string: 'my string {'
+                    }
+                }]
+            }
+        },
+        'double-quoted string literal with all escape sequences': {
+            code: nowdoc(function () {/*<<<EOS
+<?php
+return "Start: \n, \r, \t, \v, \e, \f, \\, \$, \", \0, \3, \21, \377, \x3f, \x2F, \u1234, \u1Aa4 and finish";
+EOS
+*/;}), //jshint ignore:line
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_STRING_LITERAL',
+                        string: 'Start: \n, \r, \t, \v, \x1b, \f, \\, \$, ", \x00, \x03, \x11, \xff, \x3f, \x2f, \u1234, \u1aa4 and finish'
                     }
                 }]
             }
