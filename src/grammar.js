@@ -27,8 +27,20 @@ var _ = require('microdash'),
         }
     }],
     stringEscapeReplacements = [{
-        pattern: /\\([\$efnrtv\\"])/g,
-        replacement: function (all, chr) {
+        pattern: /\\(?:([\$efnrtv\\"])|([0-7]+)|u([0-9a-fA-F]+)|x([0-9a-fA-F]{1,2}))/g,
+        replacement: function (all, escapeSymbol, octalCodepoint, unicodeCodepointInHex, asciiCodepointInHex) {
+            if (octalCodepoint) {
+                return String.fromCharCode(parseInt(octalCodepoint, 8));
+            }
+
+            if (unicodeCodepointInHex) {
+                return String.fromCharCode(parseInt(unicodeCodepointInHex, 16));
+            }
+
+            if (asciiCodepointInHex) {
+                return String.fromCharCode(parseInt(asciiCodepointInHex, 16));
+            }
+
             return {
                 'e': '\x1B', // Escape
                 'f': '\f',   // Form feed
@@ -39,7 +51,7 @@ var _ = require('microdash'),
                 '\\': '\\',
                 '$': '$',
                 '"': '"'
-            }[chr];
+            }[escapeSymbol];
         }
     }],
     singleQuotedStringEscapeReplacements = [{
