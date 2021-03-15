@@ -11,7 +11,10 @@
 
 var _ = require('microdash'),
     expect = require('chai').expect,
-    tools = require('../../tools');
+    nowdoc = require('nowdoc'),
+    phpCommon = require('phpcommon'),
+    tools = require('../../tools'),
+    PHPFatalError = phpCommon.PHPFatalError;
 
 describe('PHP Parser grammar namespace {...} construct integration', function () {
     var parser;
@@ -167,5 +170,175 @@ describe('PHP Parser grammar namespace {...} construct integration', function ()
                 });
             });
         });
+    });
+
+    it('should raise a PHP fatal error when braced namespace declarations are nested', function () {
+        var caughtError,
+            code = nowdoc(function () {/*<<<EOS
+<?php
+namespace My\Outer\One
+{
+    namespace Your\Inner\One
+    {
+        return 'The nesting is invalid';
+    }
+}
+EOS
+*/}); // jshint ignore:line
+        parser.getState().setPath('/path/to/my_module.php');
+
+        try {
+            parser.parse(code);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).to.be.an.instanceOf(PHPFatalError);
+        expect(caughtError.getMessage()).to.equal('Namespace declarations cannot be nested');
+        expect(caughtError.getFilePath()).to.equal('/path/to/my_module.php');
+        expect(caughtError.getLevel()).to.equal('Fatal error');
+        expect(caughtError.getLineNumber()).to.equal(4);
+    });
+
+    it('should raise a PHP fatal error when namespace declaration types are mixed semicolon -> braced', function () {
+        var caughtError,
+            code = nowdoc(function () {/*<<<EOS
+<?php
+
+namespace My\Semicolon\One;
+
+namespace Your\Braced\One
+{
+    return 'The mixing is invalid';
+}
+EOS
+*/}); // jshint ignore:line
+        parser.getState().setPath('/path/to/my_module.php');
+
+        try {
+            parser.parse(code);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).to.be.an.instanceOf(PHPFatalError);
+        expect(caughtError.getMessage()).to.equal('Cannot mix bracketed namespace declarations with unbracketed namespace declarations');
+        expect(caughtError.getFilePath()).to.equal('/path/to/my_module.php');
+        expect(caughtError.getLevel()).to.equal('Fatal error');
+        expect(caughtError.getLineNumber()).to.equal(5);
+    });
+
+    it('should raise a PHP fatal error when namespace declaration types are mixed braced -> semicolon', function () {
+        var caughtError,
+            code = nowdoc(function () {/*<<<EOS
+<?php
+
+namespace Your\Braced\One
+{
+    return 'The mixing is invalid';
+}
+
+namespace My\Semicolon\One;
+
+EOS
+*/}); // jshint ignore:line
+        parser.getState().setPath('/path/to/my_module.php');
+
+        try {
+            parser.parse(code);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).to.be.an.instanceOf(PHPFatalError);
+        expect(caughtError.getMessage()).to.equal('Cannot mix bracketed namespace declarations with unbracketed namespace declarations');
+        expect(caughtError.getFilePath()).to.equal('/path/to/my_module.php');
+        expect(caughtError.getLevel()).to.equal('Fatal error');
+        expect(caughtError.getLineNumber()).to.equal(8);
+    });
+
+    it('should raise a PHP fatal error when code is above a semicolon namespace declaration', function () {
+        var caughtError,
+            code = nowdoc(function () {/*<<<EOS
+<?php
+
+myFunc();
+
+namespace My\Semicolon\One;
+
+EOS
+*/}); // jshint ignore:line
+        parser.getState().setPath('/path/to/my_module.php');
+
+        try {
+            parser.parse(code);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).to.be.an.instanceOf(PHPFatalError);
+        expect(caughtError.getMessage()).to.equal('Namespace declaration statement has to be the very first statement or after any declare call in the script');
+        expect(caughtError.getFilePath()).to.equal('/path/to/my_module.php');
+        expect(caughtError.getLevel()).to.equal('Fatal error');
+        expect(caughtError.getLineNumber()).to.equal(5);
+    });
+
+    it('should raise a PHP fatal error when code is above a braced namespace declaration', function () {
+        var caughtError,
+            code = nowdoc(function () {/*<<<EOS
+<?php
+
+myFunc();
+
+namespace My\Braced\One
+{
+    return 'The mixing is invalid';
+}
+
+EOS
+*/}); // jshint ignore:line
+        parser.getState().setPath('/path/to/my_module.php');
+
+        try {
+            parser.parse(code);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).to.be.an.instanceOf(PHPFatalError);
+        expect(caughtError.getMessage()).to.equal('Namespace declaration statement has to be the very first statement or after any declare call in the script');
+        expect(caughtError.getFilePath()).to.equal('/path/to/my_module.php');
+        expect(caughtError.getLevel()).to.equal('Fatal error');
+        expect(caughtError.getLineNumber()).to.equal(5);
+    });
+
+    it('should raise a PHP fatal error when code is below a braced namespace declaration', function () {
+        var caughtError,
+            code = nowdoc(function () {/*<<<EOS
+<?php
+
+
+namespace My\Braced\One
+{
+    myFunc();
+}
+
+return 'The mixing is invalid';
+
+EOS
+*/}); // jshint ignore:line
+        parser.getState().setPath('/path/to/my_module.php');
+
+        try {
+            parser.parse(code);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).to.be.an.instanceOf(PHPFatalError);
+        expect(caughtError.getMessage()).to.equal('No code may exist outside of namespace {}');
+        expect(caughtError.getFilePath()).to.equal('/path/to/my_module.php');
+        expect(caughtError.getLevel()).to.equal('Fatal error');
+        expect(caughtError.getLineNumber()).to.equal(9);
     });
 });
