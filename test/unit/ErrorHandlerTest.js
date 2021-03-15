@@ -14,23 +14,28 @@ var expect = require('chai').expect,
     sinon = require('sinon'),
     ErrorHandler = require('../../src/ErrorHandler'),
     ParseException = require('parsing/src/Exception/Parse'),
+    PHPFatalError = phpCommon.PHPFatalError,
     PHPParseError = phpCommon.PHPParseError,
     State = require('../../src/State'),
     Translator = phpCommon.Translator;
 
 describe('ErrorHandler', function () {
-    var errorHandler,
+    var errorContext,
+        errorHandler,
         parseException,
         state,
         translator;
 
     beforeEach(function () {
+        errorContext = {};
         parseException = sinon.createStubInstance(ParseException);
         state = sinon.createStubInstance(State);
         translator = sinon.createStubInstance(Translator);
 
+        parseException.getContext.returns(errorContext);
+        parseException.getStartLineNumber.returns(100);
         parseException.getFurthestMatchEnd.returns(6);
-        parseException.getLineNumber.returns(121);
+        parseException.getEndLineNumber.returns(121);
         parseException.getText.returns('my source text');
         parseException.unexpectedEndOfInput.returns(false);
         state.getPath.returns('/path/to/my_module.php');
@@ -44,6 +49,38 @@ describe('ErrorHandler', function () {
     });
 
     describe('handle()', function () {
+        describe('the PHPFatalError thrown on non-syntax error', function () {
+            beforeEach(function () {
+                errorContext.translationKey = 'my_fatal_error_translation';
+                errorContext.translationVariables = {my: 'variable value'};
+            });
+
+            it('should have the correct message', function () {
+                expect(function () {
+                    errorHandler.handle(parseException);
+                }).to.throw(
+                    PHPFatalError,
+                    'PHP Fatal error: [my_fatal_error_translation]: {"my":"variable value"} in /path/to/my_module.php on line 100'
+                );
+            });
+
+            it('should have the correct path', function () {
+                try {
+                    errorHandler.handle(parseException);
+                } catch (error) {
+                    expect(error.getFilePath()).to.equal('/path/to/my_module.php');
+                }
+            });
+
+            it('should have the correct line number', function () {
+                try {
+                    errorHandler.handle(parseException);
+                } catch (error) {
+                    expect(error.getLineNumber()).to.equal(100); // Note the start line is used for these
+                }
+            });
+        });
+
         describe('the PHPParseError thrown on unexpected character', function () {
             it('should have the correct message', function () {
                 expect(function () {
@@ -67,7 +104,7 @@ describe('ErrorHandler', function () {
                 try {
                     errorHandler.handle(parseException);
                 } catch (error) {
-                    expect(error.getLineNumber()).to.equal(121);
+                    expect(error.getLineNumber()).to.equal(121); // Note the end line is used for these
                 }
             });
         });
@@ -98,7 +135,7 @@ describe('ErrorHandler', function () {
                 try {
                     errorHandler.handle(parseException);
                 } catch (error) {
-                    expect(error.getLineNumber()).to.equal(121);
+                    expect(error.getLineNumber()).to.equal(121); // Note the end line is used for these
                 }
             });
         });

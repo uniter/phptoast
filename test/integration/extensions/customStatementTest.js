@@ -64,19 +64,23 @@ describe('PHP Parser grammar custom statement integration', function () {
             }
         },
         'custom trap statement nested inside namespace statement': {
-            code: 'myFunc(); namespace A\\B { trap_it @ 22; }',
+            code: 'namespace { myFunc(); } namespace A\\B { trap_it @ 22; }',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
-                    name: 'N_EXPRESSION_STATEMENT',
-                    expression: {
-                        name: 'N_FUNCTION_CALL',
-                        func: {
-                            name: 'N_STRING',
-                            string: 'myFunc'
-                        },
-                        args: []
-                    }
+                    name: 'N_NAMESPACE_STATEMENT',
+                    namespace: '',
+                    statements: [{
+                        name: 'N_EXPRESSION_STATEMENT',
+                        expression: {
+                            name: 'N_FUNCTION_CALL',
+                            func: {
+                                name: 'N_STRING',
+                                string: 'myFunc'
+                            },
+                            args: []
+                        }
+                    }]
                 }, {
                     name: 'N_NAMESPACE_STATEMENT',
                     namespace: 'A\\B',

@@ -14,6 +14,10 @@
  */
 
 var _ = require('microdash'),
+    CANNOT_MIX_NAMESPACE_DECLARATION_TYPES = 'core.cannot_mix_namespace_declaration_types',
+    CANNOT_NEST_NAMESPACE_DECLARATIONS = 'core.cannot_nest_namespace_declarations',
+    NAMESPACE_DECLARATION_MUST_COME_FIRST = 'core.namespace_declaration_must_come_first',
+    NO_CODE_OUTSIDE_NAMESPACE_DECLARATION_BRACES = 'core.no_code_outside_namespace_declaration_braces',
     lowercaseReplacements = [{
         pattern: /.*/g,
         replacement: function (all) {
@@ -1286,16 +1290,53 @@ module.exports = {
         'N_NAMESPACE': {
             components: [(/(?!(?:new|use)\b)/i), {optionally: 'T_STRING'}, {oneOrMoreOf: ['T_NS_SEPARATOR', 'T_STRING']}]
         },
-        'N_NAMESPACE_STATEMENT': {
-            oneOf: ['N_SEMICOLON_NAMESPACE_STATEMENT', 'N_BRACED_NAMESPACE_STATEMENT']
-        },
         'N_SEMICOLON_NAMESPACE_STATEMENT': {
             captureAs: 'N_NAMESPACE_STATEMENT',
-            components: ['T_NAMESPACE', {name: 'namespace', oneOf: ['N_NAMESPACE', 'T_STRING']}, (/;/), {name: 'statements', zeroOrMoreOf: 'N_NAMESPACE_SCOPED_STATEMENT'}]
+            components: [
+                'T_NAMESPACE',
+                {name: 'namespace', oneOf: ['N_NAMESPACE', 'T_STRING']},
+                (/;/),
+                {name: 'statements', zeroOrMoreOf: 'N_NAMESPACE_SCOPED_STATEMENT'},
+
+                // Check for mixed namespace types
+                {optionally: {
+                    rule: 'N_BRACED_NAMESPACE_STATEMENT',
+                    modifier: function (capture, parse, fail) {
+                        fail('Cannot mix namespace declaration types', {
+                            translationKey: CANNOT_MIX_NAMESPACE_DECLARATION_TYPES
+                        });
+                    }
+                }}
+            ]
         },
         'N_BRACED_NAMESPACE_STATEMENT': {
             captureAs: 'N_NAMESPACE_STATEMENT',
-            components: ['T_NAMESPACE', {name: 'namespace', oneOf: ['N_NAMESPACE', 'T_STRING', (/()/)]}, (/\{/), {name: 'statements', zeroOrMoreOf: 'N_NAMESPACE_SCOPED_STATEMENT'}, (/\}/)]
+            components: [
+                'T_NAMESPACE',
+                {name: 'namespace', oneOf: ['N_NAMESPACE', 'T_STRING', (/()/)]},
+                (/\{/),
+                {name: 'statements', zeroOrMoreOf: {oneOf: [
+                    'N_NAMESPACE_SCOPED_STATEMENT',
+
+                    // Check for nested braced namespaces, which are invalid
+                    {rule: 'T_NAMESPACE', modifier: function (capture, parse, fail) {
+                        fail('Cannot nest namespace declarations', {
+                            translationKey: CANNOT_NEST_NAMESPACE_DECLARATIONS
+                        });
+                    }}
+                ]}},
+                (/\}/),
+
+                // Check for mixed namespace types
+                {optionally: {
+                    rule: 'N_SEMICOLON_NAMESPACE_STATEMENT',
+                    modifier: function (capture, parse, fail) {
+                        fail('Cannot mix namespace declaration types', {
+                            translationKey: CANNOT_MIX_NAMESPACE_DECLARATION_TYPES
+                        });
+                    }
+                }}
+            ]
         },
         'N_NAMESPACED_REFERENCE': {
             captureAs: 'N_STRING',
@@ -1360,12 +1401,45 @@ module.exports = {
         'N_TOP_LEVEL_STATEMENT': {
             components: {oneOf: [
                 'N_INLINE_HTML_STATEMENT_AT_START',
-                {rule: 'N_STATEMENT', ignoreWhitespace: true}
+                {
+                    oneOf: [
+                        'N_SEMICOLON_NAMESPACE_STATEMENT',
+
+                        // Braced semicolon statements must not be followed by any other statements
+                        [
+                            'N_BRACED_NAMESPACE_STATEMENT',
+
+                            // Check for any normal code after the namespace braces (which would be invalid)
+                            {optionally: {
+                                rule: 'N_STATEMENT',
+                                modifier: function (capture, parse, fail) {
+                                    fail('No code may exist outside of namespace braces', {
+                                        translationKey: NO_CODE_OUTSIDE_NAMESPACE_DECLARATION_BRACES
+                                    });
+                                }
+                            }}
+                        ],
+
+                        // Normal statements must not be followed by any namespace declarations
+                        [
+                            'N_STATEMENT',
+
+                            // Check for any namespace statement after the normal statement (which would be invalid)
+                            {optionally: {
+                                oneOf: ['N_SEMICOLON_NAMESPACE_STATEMENT', 'N_BRACED_NAMESPACE_STATEMENT'],
+                                modifier: function (capture, parse, fail) {
+                                    fail('Namespace declaration must come first', {
+                                        translationKey: NAMESPACE_DECLARATION_MUST_COME_FIRST
+                                    });
+                                }
+                            }}
+                        ]
+                    ],
+                    ignoreWhitespace: true // Reset, as it was disabled by N_PROGRAM
+                }
             ]}
         },
-        'N_STATEMENT': {
-            components: {oneOf: ['N_NAMESPACE_SCOPED_STATEMENT', 'N_NAMESPACE_STATEMENT']}
-        },
+        'N_STATEMENT': 'N_NAMESPACE_SCOPED_STATEMENT',
         'N_NAMESPACE_SCOPED_STATEMENT': {
             components: {oneOf: [
                 'N_COMPOUND_STATEMENT',
