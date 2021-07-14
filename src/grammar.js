@@ -64,7 +64,7 @@ var _ = require('microdash'),
         pattern: /\\([\\'])/g,
         replacement: '$1'
     }],
-    buildTree = function (first, rest, buildNode) {
+    buildLeftAssociativeTree = function (first, rest, buildNode) {
         var i,
             length,
             result = first;
@@ -75,10 +75,21 @@ var _ = require('microdash'),
 
         return result;
     },
+    buildRightAssociativeTree = function (first, rest, buildNode) {
+        var elements = [{operand: first}].concat(rest),
+            i,
+            result = elements[elements.length - 1].operand;
+
+        for (i = elements.length - 2; i >= 0; i--) {
+            result = buildNode(result, elements[i]);
+        }
+
+        return result;
+    },
     buildBinaryExpression = function (first, rest) {
         // Transform the captured flat list into an AST
         // which will eliminate any ambiguity over precedence.
-        return buildTree(first, rest, function (result, element) {
+        return buildLeftAssociativeTree(first, rest, function (result, element) {
             var binaryNode = {
                 name: 'N_EXPRESSION',
                 left: result,
@@ -94,6 +105,28 @@ var _ = require('microdash'),
                 binaryNode.bounds = {
                     start: result.bounds.start,
                     end: element.bounds.end
+                };
+            }
+
+            return binaryNode;
+        });
+    },
+    buildRightAssociativeBinaryExpression = function (first, rest, name) {
+        // Transform the captured flat list into an AST
+        // which will eliminate any ambiguity over precedence.
+        return buildRightAssociativeTree(first, rest, function (result, element) {
+            var binaryNode = {
+                name: name,
+                left: element.operand,
+                // Note that operator is not included for unique binary expression types,
+                // such as the null coalescing operator
+                right: result
+            };
+
+            if (result.bounds) {
+                binaryNode.bounds = {
+                    start: result.bounds.start,
+                    end: element.operand.bounds.end
                 };
             }
 
@@ -909,7 +942,7 @@ module.exports = {
                     return node.left;
                 }
 
-                return buildTree(node.left, node.right, function (result, element) {
+                return buildLeftAssociativeTree(node.left, node.right, function (result, element) {
                     return {
                         'name': 'N_INSTANCE_OF',
                         'object': result,
@@ -1008,25 +1041,36 @@ module.exports = {
             }
         },
         'N_EXPRESSION_LEVEL_16': {
+            captureAs: 'N_NULL_COALESCE',
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_15'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/\?\?/)}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_15']}]}],
+            processor: function (node) {
+                if (!node.right) {
+                    return node.left;
+                }
+
+                return buildRightAssociativeBinaryExpression(node.left, node.right, node.name);
+            }
+        },
+        'N_EXPRESSION_LEVEL_17': {
             captureAs: 'N_TERNARY',
             components: [
-                {name: 'condition', what: 'N_EXPRESSION_LEVEL_15'},
+                {name: 'condition', what: 'N_EXPRESSION_LEVEL_16'},
                 {
                     optionally: [
                         {
                             name: 'firstOperand',
                             oneOf: [
-                                [(/\?/), {name: 'consequent', rule: 'N_EXPRESSION_LEVEL_15'}],
-                                [/\?\s*\:/, {name: 'shorthand', rule: 'N_EXPRESSION_LEVEL_15'}] // Shorthand ternary
+                                [(/\?/), {name: 'consequent', rule: 'N_EXPRESSION_LEVEL_16'}],
+                                [/\?\s*\:/, {name: 'shorthand', rule: 'N_EXPRESSION_LEVEL_16'}] // Shorthand ternary
                             ]
                         },
                         {
                             name: 'restOfOperands',
                             zeroOrMoreOf: {
                                 oneOf: [
-                                    [(/\?/), {name: 'consequent', rule: 'N_EXPRESSION_LEVEL_15'}],
-                                    [(/:/), {name: 'alternate', rule: 'N_EXPRESSION_LEVEL_15'}],
-                                    [/\?\s*\:/, {name: 'shorthand', rule: 'N_EXPRESSION_LEVEL_15'}] // Shorthand ternary
+                                    [(/\?/), {name: 'consequent', rule: 'N_EXPRESSION_LEVEL_16'}],
+                                    [(/:/), {name: 'alternate', rule: 'N_EXPRESSION_LEVEL_16'}],
+                                    [/\?\s*\:/, {name: 'shorthand', rule: 'N_EXPRESSION_LEVEL_16'}] // Shorthand ternary
                                 ]
                             }
                         }
@@ -1048,47 +1092,47 @@ module.exports = {
                 {name: 'right', oneOrMoreOf: [{name: 'operator', what: (/(?:[-+*\/.%&|^]|<<|>>)?=/)}, {name: 'operand', what: 'N_EXPRESSION'}]}
             ]
         },
-        'N_EXPRESSION_LEVEL_17_A': {
+        'N_EXPRESSION_LEVEL_18_A': {
              captureAs: 'N_EXPRESSION',
              components: {
                  // Don't allow binary expressions on the left-hand side of assignments
                  oneOf: [
                      'N_ASSIGNMENT_EXPRESSION',
-                     'N_EXPRESSION_LEVEL_16'
+                     'N_EXPRESSION_LEVEL_17'
                  ]
              }
         },
-        'N_EXPRESSION_LEVEL_17_B': {
+        'N_EXPRESSION_LEVEL_18_B': {
             captureAs: 'N_PRINT_EXPRESSION',
             components: {oneOf: [
                 [
                     'T_PRINT',
-                    {name: 'operand', what: 'N_EXPRESSION_LEVEL_17_A'},
+                    {name: 'operand', what: 'N_EXPRESSION_LEVEL_18_A'},
                 ],
-                {name: 'next', what: 'N_EXPRESSION_LEVEL_17_A'}
+                {name: 'next', what: 'N_EXPRESSION_LEVEL_18_A'}
             ]},
             ifNoMatch: {component: 'operand', capture: 'next'}
         },
-        'N_EXPRESSION_LEVEL_18': {
-            captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_17_B'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_AND', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_17_B'}]}],
-            ifNoMatch: {component: 'right', capture: 'left'}
-            // TODO: Use buildBinaryExpression ahead of deprecating N_EXPRESSION for N_BINARY_EXPRESSION w/a single right operand
-        },
         'N_EXPRESSION_LEVEL_19': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_18'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_XOR', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_18'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_18_B'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_AND', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_18_B'}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
             // TODO: Use buildBinaryExpression ahead of deprecating N_EXPRESSION for N_BINARY_EXPRESSION w/a single right operand
         },
         'N_EXPRESSION_LEVEL_20': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_19'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_OR', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_19'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_19'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_XOR', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_19'}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
             // TODO: Use buildBinaryExpression ahead of deprecating N_EXPRESSION for N_BINARY_EXPRESSION w/a single right operand
         },
         'N_EXPRESSION_LEVEL_21': {
-            components: 'N_EXPRESSION_LEVEL_20'
+            captureAs: 'N_EXPRESSION',
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_20'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_OR', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_20'}]}],
+            ifNoMatch: {component: 'right', capture: 'left'}
+            // TODO: Use buildBinaryExpression ahead of deprecating N_EXPRESSION for N_BINARY_EXPRESSION w/a single right operand
+        },
+        'N_EXPRESSION_LEVEL_22': {
+            components: 'N_EXPRESSION_LEVEL_21'
         },
         'N_LEFT_HAND_SIDE_EXPRESSION': 'N_EXPRESSION_LEVEL_2_A',
         'N_EXPRESSION_STATEMENT': {
