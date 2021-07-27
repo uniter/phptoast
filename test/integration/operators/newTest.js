@@ -209,12 +209,10 @@ describe('PHP Parser grammar new operator integration', function () {
                                         name: 'N_VARIABLE',
                                         variable: 'myObject'
                                     },
-                                    properties: [{
-                                        property: {
-                                            name: 'N_STRING',
-                                            string: 'className'
-                                        }
-                                    }]
+                                    property: {
+                                        name: 'N_STRING',
+                                        string: 'className'
+                                    }
                                 },
                                 args: []
                             }
@@ -245,12 +243,10 @@ describe('PHP Parser grammar new operator integration', function () {
                                         name: 'N_VARIABLE',
                                         variable: 'myObject'
                                     },
-                                    properties: [{
-                                        property: {
-                                            name: 'N_STRING',
-                                            string: 'className'
-                                        }
-                                    }]
+                                    property: {
+                                        name: 'N_STRING',
+                                        string: 'className'
+                                    }
                                 },
                                 args: [{
                                     name: 'N_INTEGER',

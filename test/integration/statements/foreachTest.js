@@ -191,19 +191,15 @@ describe('PHP Parser grammar foreach statement integration', function () {
                                 name: 'N_VARIABLE',
                                 variable: 'object'
                             },
-                            properties: [{
-                                property: {
-                                    name: 'N_STRING',
-                                    string: 'array'
-                                }
-                            }]
-                        },
-                        indices: [{
-                            index: {
-                                name: 'N_INTEGER',
-                                number: '7'
+                            property: {
+                                name: 'N_STRING',
+                                string: 'array'
                             }
-                        }]
+                        },
+                        index: {
+                            name: 'N_INTEGER',
+                            number: '7'
+                        }
                     },
                     key: {
                         name: 'N_VARIABLE',

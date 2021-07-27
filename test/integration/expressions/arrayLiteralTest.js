@@ -110,10 +110,10 @@ describe('PHP Parser grammar array literal expression integration', function () 
                                         number: '21'
                                     }]
                                 },
-                                indices: [{index: {
+                                index: {
                                     name: 'N_INTEGER',
                                     number: '0'
-                                }}]
+                                }
                             }
                         }]
                     }
@@ -173,12 +173,10 @@ describe('PHP Parser grammar array literal expression integration', function () 
                                             name: 'N_VARIABLE',
                                             variable: 'myObj'
                                         },
-                                        properties: [{
-                                            property: {
-                                                name: 'N_STRING',
-                                                string: 'myProp'
-                                            }
-                                        }]
+                                        property: {
+                                            name: 'N_STRING',
+                                            string: 'myProp'
+                                        }
                                     }
                                 }]
                             }

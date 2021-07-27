@@ -92,7 +92,7 @@ describe('PHP Parser grammar list(...) construct integration', function () {
             }
         },
         'assignment to list with one variable (after skipping first value) of array with two elements': {
-            code: 'list(, $value) = array(1);',
+            code: 'list(, $value) = array(1, 21);',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
@@ -102,8 +102,7 @@ describe('PHP Parser grammar list(...) construct integration', function () {
                         left: {
                             name: 'N_LIST',
                             elements: [{
-                                name: 'N_VOID',
-                                value: ''
+                                name: 'N_VOID'
                             }, {
                                 name: 'N_VARIABLE',
                                 variable: 'value'
@@ -116,6 +115,9 @@ describe('PHP Parser grammar list(...) construct integration', function () {
                                 elements: [{
                                     name: 'N_INTEGER',
                                     number: '1'
+                                }, {
+                                    name: 'N_INTEGER',
+                                    number: '21'
                                 }]
                             }
                         }]

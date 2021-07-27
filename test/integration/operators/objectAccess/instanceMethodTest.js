@@ -33,13 +33,11 @@ describe('PHP Parser grammar object access operator "->" instance method call in
                             name: 'N_VARIABLE',
                             variable: 'obj'
                         },
-                        calls: [{
-                            func: {
-                                name: 'N_STRING',
-                                string: 'doSomething'
-                            },
-                            args: []
-                        }]
+                        method: {
+                            name: 'N_STRING',
+                            string: 'doSomething'
+                        },
+                        args: []
                     }
                 }]
             }
@@ -56,15 +54,13 @@ describe('PHP Parser grammar object access operator "->" instance method call in
                             name: 'N_VARIABLE',
                             variable: 'obj'
                         },
-                        calls: [{
-                            func: {
-                                name: 'N_STRING',
-                                string: 'eval'
-                            },
-                            args: [{
-                                name: 'N_STRING_LITERAL',
-                                string: 'not some PHP code'
-                            }]
+                        method: {
+                            name: 'N_STRING',
+                            string: 'eval'
+                        },
+                        args: [{
+                            name: 'N_STRING_LITERAL',
+                            string: 'not some PHP code'
                         }]
                     }
                 }]
@@ -82,13 +78,11 @@ describe('PHP Parser grammar object access operator "->" instance method call in
                             name: 'N_VARIABLE',
                             variable: 'obj'
                         },
-                        calls: [{
-                            func: {
-                                name: 'N_VARIABLE',
-                                variable: 'methodName'
-                            },
-                            args: []
-                        }]
+                        method: {
+                            name: 'N_VARIABLE',
+                            variable: 'methodName'
+                        },
+                        args: []
                     }
                 }]
             }
@@ -105,25 +99,23 @@ describe('PHP Parser grammar object access operator "->" instance method call in
                             name: 'N_VARIABLE',
                             variable: 'obj'
                         },
-                        calls: [{
-                            func: {
-                                left: {
-                                    name: 'N_VARIABLE',
-                                    variable: 'firstVar'
-                                },
-                                name: 'N_EXPRESSION',
-                                right: [{
-                                    operator: '.',
-                                    operand: {
-                                        name: 'N_VARIABLE',
-                                        variable: 'secondVar'
-                                    }
-                                }]
+                        method: {
+                            left: {
+                                name: 'N_VARIABLE',
+                                variable: 'firstVar'
                             },
-                            args: [{
-                                name: 'N_INTEGER',
-                                number: '21'
+                            name: 'N_EXPRESSION',
+                            right: [{
+                                operator: '.',
+                                operand: {
+                                    name: 'N_VARIABLE',
+                                    variable: 'secondVar'
+                                }
                             }]
+                        },
+                        args: [{
+                            name: 'N_INTEGER',
+                            number: '21'
                         }]
                     }
                 }]
@@ -145,13 +137,11 @@ describe('PHP Parser grammar object access operator "->" instance method call in
                             },
                             args: []
                         },
-                        calls: [{
-                            func: {
-                                name: 'N_STRING',
-                                string: 'doSomething'
-                            },
-                            args: []
-                        }]
+                        method: {
+                            name: 'N_STRING',
+                            string: 'doSomething'
+                        },
+                        args: []
                     }
                 }]
             }
@@ -170,20 +160,16 @@ describe('PHP Parser grammar object access operator "->" instance method call in
                                 name: 'N_VARIABLE',
                                 variable: 'obj'
                             },
-                            indices: [{
-                                index: {
-                                    name: 'N_INTEGER',
-                                    number: '4'
-                                }
-                            }]
+                            index: {
+                                name: 'N_INTEGER',
+                                number: '4'
+                            }
                         },
-                        calls: [{
-                            func: {
-                                name: 'N_STRING',
-                                string: 'doSomething'
-                            },
-                            args: []
-                        }]
+                        method: {
+                            name: 'N_STRING',
+                            string: 'doSomething'
+                        },
+                        args: []
                     }
                 }]
             }
@@ -202,20 +188,16 @@ describe('PHP Parser grammar object access operator "->" instance method call in
                                 name: 'N_VARIABLE',
                                 variable: 'obj'
                             },
-                            properties: [{
-                                property: {
-                                    name: 'N_STRING',
-                                    string: 'prop'
-                                }
-                            }]
-                        },
-                        calls: [{
-                            func: {
+                            property: {
                                 name: 'N_STRING',
-                                string: 'doSomething'
-                            },
-                            args: []
-                        }]
+                                string: 'prop'
+                            }
+                        },
+                        method: {
+                            name: 'N_STRING',
+                            string: 'doSomething'
+                        },
+                        args: []
                     }
                 }]
             }

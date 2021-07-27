@@ -86,6 +86,27 @@ var _ = require('microdash'),
 
         return result;
     },
+    buildUnaryTree = function (first, count, buildNode) {
+        var i,
+            node,
+            result = first;
+
+        for (i = 0; i < count - 1; i++) {
+            node = buildNode(result);
+
+            // if (result.bounds) {
+            //     node.bounds = {
+            //         start: first.bounds.start,
+            //         // NB: Unlike binary expressions we have only one set of bounds
+            //         end: first.bounds.end
+            //     };
+            // }
+
+            result = node;
+        }
+
+        return result;
+    },
     buildBinaryExpression = function (first, rest) {
         // Transform the captured flat list into an AST
         // which will eliminate any ambiguity over precedence.
@@ -132,6 +153,63 @@ var _ = require('microdash'),
 
             return binaryNode;
         });
+    },
+    buildMemberExpressionTree = function (expression, members) {
+        var result = expression;
+
+        _.each(members, function (member) {
+            if (member.array_index) {
+                result = {
+                    name: 'N_ARRAY_INDEX',
+                    array: result,
+                    index: member.array_index.index
+                };
+            } else if (member.method_call) {
+                result = {
+                    name: 'N_METHOD_CALL',
+                    object: result,
+                    method: member.method_call.method,
+                    args: member.method_call.args
+                };
+            } else if (member.object_property) {
+                result = {
+                    name: 'N_OBJECT_PROPERTY',
+                    object: result,
+                    property: member.object_property.property
+                };
+            } else if (member.static_method_call) {
+                result = {
+                    name: 'N_STATIC_METHOD_CALL',
+                    className: result,
+                    method: member.static_method_call.method,
+                    args: member.static_method_call.args
+                };
+            } else if (member.static_property) {
+                result = {
+                    name: 'N_STATIC_PROPERTY',
+                    className: result,
+                    property: member.static_property.property
+                };
+            } else if (member.class_constant) {
+                result = {
+                    name: 'N_CLASS_CONSTANT',
+                    className: result,
+                    constant: member.class_constant.constant
+                };
+            } else if (member.callable) {
+                result = {
+                    name: 'N_FUNCTION_CALL',
+                    func: result,
+                    args: member.callable.args
+                };
+            }
+
+            if (member.bounds) {
+                result.bounds = member.bounds;
+            }
+        });
+
+        return result;
     },
     buildTernaryExpression = function (condition, rest) {
         var ternaryNode = {
@@ -240,7 +318,7 @@ module.exports = {
         'T_DIV_EQUAL': /\/=/,
 
         // See http://www.php.net/manual/en/language.types.float.php
-        'T_DNUMBER': /\d\.\d+e\d+|\d*\.\d+|\d+e[+-]?\d+/i,
+        'T_DNUMBER': /-?(?:\d\.\d+e\d+|\d*\.\d+|\d+e[+-]?\d+)/i,
 
         'T_DOC_COMMENT': /\/\*\*([\s\S]*?)\*\//,
         'T_DO': /do\b/i,
@@ -298,7 +376,7 @@ module.exports = {
         'T_IS_SMALLER_OR_EQUAL': /<=/,
         'T_LINE': /__LINE__\b/i,
         'T_LIST': /list\b/i,
-        'T_LNUMBER': /0x[0-9a-f]+|\d+/i,
+        'T_LNUMBER': /-?(?:0x[0-9a-f]+|\d+)/i,
         'T_LOGICAL_AND': /and\b/i,
         'T_LOGICAL_OR': /or\b/i,
         'T_LOGICAL_XOR': /xor\b/i,
@@ -465,7 +543,13 @@ module.exports = {
             }
         },
         'N_BOOLEAN': {
-            components: {name: 'bool', what: (/true|false/i)}
+            components: {name: 'bool', what: (/true|false/i)},
+            processor: function (node) {
+                // Cast to a native boolean, accommodating the fact that the keywords are case-insensitive
+                node.bool = node.bool.toLowerCase() === 'true';
+
+                return node;
+            }
         },
         'N_BREAK_STATEMENT': {
             components: ['T_BREAK', {name: 'levels', oneOf: ['N_INTEGER', 'N_JUMP_ONE_LEVEL']}, 'N_END_STATEMENT']
@@ -575,7 +659,7 @@ module.exports = {
             }
         },
         'N_EXPRESSION': {
-            components: {oneOf: ['N_EXPRESSION_LEVEL_21']}
+            components: {oneOf: ['N_EXPRESSION_LEVEL_22']}
         },
 
         /*
@@ -613,24 +697,18 @@ module.exports = {
                                 name: 'array_index',
                                 oneOf: [
                                     'N_EMPTY_ARRAY_INDEX',
-                                    {
-                                        name: 'indices',
-                                        oneOrMoreOf: [
-                                            (/\[/), {name: 'index', what: 'N_EXPRESSION'}, (/\]/)
-                                        ]
-                                    }
+                                    [
+                                        (/\[/), {name: 'index', what: 'N_EXPRESSION'}, (/\]/)
+                                    ]
                                 ]
                             },
                             // Object property
                             {
                                 name: 'object_property',
-                                what: {
-                                    name: 'properties',
-                                    oneOrMoreOf: [
-                                        'T_OBJECT_OPERATOR',
-                                        {name: 'property', what: 'N_INSTANCE_MEMBER'}
-                                    ]
-                                }
+                                what: [
+                                    'T_OBJECT_OPERATOR',
+                                    {name: 'property', what: 'N_INSTANCE_MEMBER'}
+                                ]
                             },
                             // Static object property
                             {
@@ -651,33 +729,7 @@ module.exports = {
                     return node;
                 }
 
-                result = node.expression;
-
-                _.each(node.member, function (member) {
-                    if (member.array_index) {
-                        result = {
-                            name: 'N_ARRAY_INDEX',
-                            array: result,
-                            indices: member.array_index.indices
-                        };
-                    } else if (member.object_property) {
-                        result = {
-                            name: 'N_OBJECT_PROPERTY',
-                            object: result,
-                            properties: member.object_property.properties
-                        };
-                    } else if (member.static_property) {
-                        result = {
-                            name: 'N_STATIC_PROPERTY',
-                            className: result,
-                            property: member.static_property.property
-                        };
-                    }
-
-                    if (member.bounds) {
-                        result.bounds = member.bounds;
-                    }
-                });
+                result = buildMemberExpressionTree(node.expression, node.member);
 
                 return result;
             }
@@ -719,8 +771,8 @@ module.exports = {
         },
         'N_EMPTY_ARRAY_INDEX': {
             captureAs: 'N_ARRAY_INDEX',
-            components: {name: 'indices', what: [(/\[/), (/\]/)]},
-            options: {indices: true}
+            components: {name: 'index', what: [(/\[/), (/\]/)]},
+            options: {index: null}
         },
         'N_EXPRESSION_LEVEL_2_A': {
             components: [
@@ -737,45 +789,30 @@ module.exports = {
                                 name: 'array_index',
                                 oneOf: [
                                     'N_EMPTY_ARRAY_INDEX',
-                                    {
-                                        name: 'indices',
-                                        oneOrMoreOf: [
-                                            (/\[/), {name: 'index', what: 'N_EXPRESSION'}, (/\]/)
-                                        ]
-                                    }
+                                    [
+                                        (/\[/), {name: 'index', what: 'N_EXPRESSION'}, (/\]/)
+                                    ]
                                 ]
                             },
                             // Method call
                             {
                                 name: 'method_call',
-                                what: {
-                                    name: 'calls',
-                                    oneOrMoreOf: [
-                                        'T_OBJECT_OPERATOR',
-                                        {name: 'func', what: 'N_INSTANCE_MEMBER'},
-                                        (/\(/),
-                                        {
-                                            name: 'args',
-                                            zeroOrMoreOf: ['N_EXPRESSION', {
-                                                what: (/(,|(?=\)))()/),
-                                                captureIndex: 2
-                                            }]
-                                        },
-                                        (/\)/)
-                                    ]
-                                }
+                                what: [
+                                    'T_OBJECT_OPERATOR',
+                                    {name: 'method', what: 'N_INSTANCE_MEMBER'},
+                                    (/\(/),
+                                    {name: 'args', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                                    (/\)/)
+                                ]
                             },
                             // Object property
                             {
                                 name: 'object_property',
-                                what: {
-                                    name: 'properties',
-                                    oneOrMoreOf: [
-                                        'T_OBJECT_OPERATOR',
-                                        {name: 'property', what: 'N_INSTANCE_MEMBER'},
-                                        (/(?!\()/)
-                                    ]
-                                }
+                                what: [
+                                    'T_OBJECT_OPERATOR',
+                                    {name: 'property', what: 'N_INSTANCE_MEMBER'},
+                                    (/(?!\()/)
+                                ]
                             },
                             // Static method call
                             {
@@ -824,58 +861,7 @@ module.exports = {
                     return node;
                 }
 
-                result = node.expression;
-
-                _.each(node.member, function (member) {
-                    if (member.array_index) {
-                        result = {
-                            name: 'N_ARRAY_INDEX',
-                            array: result,
-                            indices: member.array_index.indices
-                        };
-                    } else if (member.method_call) {
-                        result = {
-                            name: 'N_METHOD_CALL',
-                            object: result,
-                            calls: member.method_call.calls
-                        };
-                    } else if (member.object_property) {
-                        result = {
-                            name: 'N_OBJECT_PROPERTY',
-                            object: result,
-                            properties: member.object_property.properties
-                        };
-                    } else if (member.static_method_call) {
-                        result = {
-                            name: 'N_STATIC_METHOD_CALL',
-                            className: result,
-                            method: member.static_method_call.method,
-                            args: member.static_method_call.args
-                        };
-                    } else if (member.static_property) {
-                        result = {
-                            name: 'N_STATIC_PROPERTY',
-                            className: result,
-                            property: member.static_property.property
-                        };
-                    } else if (member.class_constant) {
-                        result = {
-                            name: 'N_CLASS_CONSTANT',
-                            className: result,
-                            constant: member.class_constant.constant
-                        };
-                    } else if (member.callable) {
-                        result = {
-                            name: 'N_FUNCTION_CALL',
-                            func: result,
-                            args: member.callable.args
-                        };
-                    }
-
-                    if (member.bounds) {
-                        result.bounds = member.bounds;
-                    }
-                });
+                result = buildMemberExpressionTree(node.expression, node.member);
 
                 return result;
             }
@@ -953,9 +939,34 @@ module.exports = {
         },
         'N_EXPRESSION_LEVEL_5': {
             captureAs: 'N_UNARY_EXPRESSION',
-            components: [{name: 'operator', optionally: (/!/)}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_4']}],
-            ifNoMatch: {component: 'operator', capture: 'operand'},
-            options: {prefix: true}
+            components: [
+                // TODO: <optionally<oneOrMoreOf>> should be replaceable with just <zeroOrMoreOf>,
+                //       but using zeroOrMoreOf breaks bounds handling
+                {name: 'operators', optionally: {oneOrMoreOf: {what: /!/}}},
+                {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_4']}
+            ],
+            processor: function (node) {
+                var count;
+
+                if (node.operators.length === 0) {
+                    return node.operand;
+                }
+
+                count = node.operators.length;
+                delete node.operators;
+
+                node.operator = '!';
+                node.prefix = true;
+
+                return buildUnaryTree(node, count, function (result) {
+                    return {
+                        name: 'N_UNARY_EXPRESSION',
+                        operator: '!',
+                        operand: result,
+                        prefix: true
+                    };
+                });
+            }
         },
         'N_EXPRESSION_LEVEL_6': {
             captureAs: 'N_EXPRESSION',
@@ -970,7 +981,7 @@ module.exports = {
         },
         'N_EXPRESSION_LEVEL_7_A': {
             captureAs: 'N_UNARY_EXPRESSION',
-            components: [{name: 'operator', optionally: (/([+-])(?!\1)/)}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_6'}],
+            components: [{name: 'operator', optionally: (/([+-])(?!\1|\d)/)}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_6'}],
             ifNoMatch: {component: 'operator', capture: 'operand'},
             options: {prefix: true}
         },
@@ -1139,7 +1150,13 @@ module.exports = {
             components: [{name: 'expression', what: 'N_EXPRESSION'}, 'N_END_STATEMENT']
         },
         'N_FLOAT': {
-            components: {name: 'number', what: 'T_DNUMBER'}
+            components: {name: 'number', what: 'T_DNUMBER'},
+            processor: function (node) {
+                // Coerce the matched numeric string to a native JS number
+                node.number = Number(node.number);
+
+                return node;
+            }
         },
         'N_FOR_STATEMENT': {
             components: ['T_FOR', (/\(/), {name: 'initializer', what: 'N_COMMA_EXPRESSION'}, (/;/), {name: 'condition', what: 'N_COMMA_EXPRESSION'}, (/;/), {name: 'update', what: 'N_COMMA_EXPRESSION'}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
@@ -1243,6 +1260,8 @@ module.exports = {
                     // so eg. parseInt('021') will return 21 instead of 17
                     node.number = parseInt(node.number, 8) + '';
                 }
+
+                // TODO: Always parse number property as a native number
 
                 return node;
             }
@@ -1718,24 +1737,18 @@ module.exports = {
                                 name: 'array_index',
                                 oneOf: [
                                     'N_EMPTY_ARRAY_INDEX',
-                                    {
-                                        name: 'indices',
-                                        oneOrMoreOf: [
-                                            (/\[/), {name: 'index', what: 'N_EXPRESSION'}, (/\]/)
-                                        ]
-                                    }
+                                    [
+                                        (/\[/), {name: 'index', what: 'N_EXPRESSION'}, (/\]/)
+                                    ]
                                 ]
                             },
                             // Object property
                             {
                                 name: 'object_property',
-                                what: {
-                                    name: 'properties',
-                                    oneOrMoreOf: [
-                                        'T_OBJECT_OPERATOR',
-                                        {name: 'property', what: 'N_INSTANCE_MEMBER'}
-                                    ]
-                                }
+                                what: [
+                                    'T_OBJECT_OPERATOR',
+                                    {name: 'property', what: 'N_INSTANCE_MEMBER'}
+                                ]
                             },
                             // Static method call
                             {
@@ -1803,46 +1816,7 @@ module.exports = {
                     );
                 }
 
-                result = node.expression;
-
-                _.each(node.member, function (member) {
-                    if (member.array_index) {
-                        result = {
-                            name: 'N_ARRAY_INDEX',
-                            array: result,
-                            indices: member.array_index.indices
-                        };
-                    } else if (member.object_property) {
-                        result = {
-                            name: 'N_OBJECT_PROPERTY',
-                            object: result,
-                            properties: member.object_property.properties
-                        };
-                    } else if (member.static_method_call) {
-                        result = {
-                            name: 'N_STATIC_METHOD_CALL',
-                            className: result,
-                            method: member.static_method_call.method,
-                            args: member.static_method_call.args
-                        };
-                    } else if (member.static_property) {
-                        result = {
-                            name: 'N_STATIC_PROPERTY',
-                            className: result,
-                            property: member.static_property.property
-                        };
-                    } else if (member.class_constant) {
-                        result = {
-                            name: 'N_CLASS_CONSTANT',
-                            className: result,
-                            constant: member.class_constant.constant
-                        };
-                    }
-
-                    if (member.offset) {
-                        result.offset = member.offset;
-                    }
-                });
+                result = buildMemberExpressionTree(node.expression, node.member);
 
                 if (isVariableVariable) {
                     result = {
@@ -1970,7 +1944,8 @@ module.exports = {
             oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']
         },
         'N_VOID': {
-            components: {name: 'value', what: (/,()/), captureIndex: 1}
+            what: (/,/),
+            allowMerge: false
         },
         'N_WHILE_STATEMENT': {
             components: ['T_WHILE', (/\(/), {name: 'condition', what: 'N_EXPRESSION'}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]

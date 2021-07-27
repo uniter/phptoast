@@ -69,13 +69,11 @@ describe('PHP Parser grammar scope resolution operator "::" constant integration
                                 name: 'N_VARIABLE',
                                 variable: 'myObject'
                             },
-                            calls: [{
-                                func: {
-                                    name: 'N_STRING',
-                                    string: 'myMethod'
-                                },
-                                args: []
-                            }]
+                            method: {
+                                name: 'N_STRING',
+                                string: 'myMethod'
+                            },
+                            args: []
                         },
                         constant: 'MY_CONST'
                     }

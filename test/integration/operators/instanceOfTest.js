@@ -43,12 +43,10 @@ describe('PHP Parser grammar instanceof operator integration', function () {
                                         name: 'N_VARIABLE',
                                         variable: 'myObject'
                                     },
-                                    properties: [{
-                                        property: {
-                                            name: 'N_STRING',
-                                            string: 'myProp'
-                                        }
-                                    }]
+                                    property: {
+                                        name: 'N_STRING',
+                                        string: 'myProp'
+                                    }
                                 },
                                 class: {
                                     name: 'N_STRING',
@@ -84,12 +82,10 @@ describe('PHP Parser grammar instanceof operator integration', function () {
                                             name: 'N_VARIABLE',
                                             variable: 'myObject'
                                         },
-                                        properties: [{
-                                            property: {
-                                                name: 'N_STRING',
-                                                string: 'myProp'
-                                            }
-                                        }]
+                                        property: {
+                                            name: 'N_STRING',
+                                            string: 'myProp'
+                                        }
                                     },
                                     class: {
                                         name: 'N_STRING',

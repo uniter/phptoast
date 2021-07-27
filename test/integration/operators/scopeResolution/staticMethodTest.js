@@ -107,12 +107,10 @@ describe('PHP Parser grammar scope resolution operator "::" static method integr
                                 name: 'N_VARIABLE',
                                 variable: 'classes'
                             },
-                            indices: [{
-                                index: {
-                                    name: 'N_INTEGER',
-                                    number: '7'
-                                }
-                            }]
+                            index: {
+                                name: 'N_INTEGER',
+                                number: '7'
+                            }
                         },
                         method: {
                             name: 'N_STRING',

@@ -29,7 +29,7 @@ describe('PHP Parser grammar if statement integration', function () {
                     name: 'N_IF_STATEMENT',
                     condition: {
                         name: 'N_BOOLEAN',
-                        bool: 'true'
+                        bool: true
                     },
                     consequentStatement: {
                         name: 'N_COMPOUND_STATEMENT',
@@ -46,7 +46,7 @@ describe('PHP Parser grammar if statement integration', function () {
                     name: 'N_IF_STATEMENT',
                     condition: {
                         name: 'N_BOOLEAN',
-                        bool: 'true'
+                        bool: true
                     },
                     consequentStatement: {
                         name: 'N_COMPOUND_STATEMENT',
@@ -110,7 +110,7 @@ describe('PHP Parser grammar if statement integration', function () {
                     name: 'N_IF_STATEMENT',
                     condition: {
                         name: 'N_BOOLEAN',
-                        bool: 'true'
+                        bool: true
                     },
                     consequentStatement: {
                         name: 'N_ECHO_STATEMENT',
@@ -130,7 +130,7 @@ describe('PHP Parser grammar if statement integration', function () {
                     name: 'N_IF_STATEMENT',
                     condition: {
                         name: 'N_BOOLEAN',
-                        bool: 'true'
+                        bool: true
                     },
                     consequentStatement: {
                         name: 'N_COMPOUND_STATEMENT',
@@ -140,7 +140,7 @@ describe('PHP Parser grammar if statement integration', function () {
                         name: 'N_IF_STATEMENT',
                         condition: {
                             name: 'N_BOOLEAN',
-                            bool: 'false'
+                            bool: false
                         },
                         consequentStatement: {
                             name: 'N_COMPOUND_STATEMENT',
@@ -158,7 +158,7 @@ describe('PHP Parser grammar if statement integration', function () {
                     name: 'N_IF_STATEMENT',
                     condition: {
                         name: 'N_BOOLEAN',
-                        bool: 'true'
+                        bool: true
                     },
                     consequentStatement: {
                         name: 'N_COMPOUND_STATEMENT',
@@ -168,7 +168,7 @@ describe('PHP Parser grammar if statement integration', function () {
                         name: 'N_IF_STATEMENT',
                         condition: {
                             name: 'N_BOOLEAN',
-                            bool: 'false'
+                            bool: false
                         },
                         consequentStatement: {
                             name: 'N_COMPOUND_STATEMENT',
@@ -186,7 +186,7 @@ describe('PHP Parser grammar if statement integration', function () {
                     name: 'N_IF_STATEMENT',
                     condition: {
                         name: 'N_BOOLEAN',
-                        bool: 'true'
+                        bool: true
                     },
                     consequentStatement: {
                         name: 'N_COMPOUND_STATEMENT',
@@ -196,7 +196,7 @@ describe('PHP Parser grammar if statement integration', function () {
                         name: 'N_IF_STATEMENT',
                         condition: {
                             name: 'N_BOOLEAN',
-                            bool: 'false'
+                            bool: false
                         },
                         consequentStatement: {
                             name: 'N_COMPOUND_STATEMENT',

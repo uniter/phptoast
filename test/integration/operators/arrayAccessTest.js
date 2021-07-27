@@ -41,12 +41,10 @@ describe('PHP Parser grammar array access operator integration', function () {
                                     name: 'N_VARIABLE',
                                     variable: 'elements'
                                 },
-                                indices: [{
-                                    index: {
-                                        name: 'N_INTEGER',
-                                        number: '0'
-                                    }
-                                }]
+                                index: {
+                                    name: 'N_INTEGER',
+                                    number: '0'
+                                }
                             }
                         }]
                     }
@@ -67,12 +65,10 @@ describe('PHP Parser grammar array access operator integration', function () {
                                 name: 'N_VARIABLE',
                                 variable: 'elements'
                             },
-                            indices: [{
-                                index: {
-                                    name: 'N_INTEGER',
-                                    number: '2'
-                                }
-                            }]
+                            index: {
+                                name: 'N_INTEGER',
+                                number: '2'
+                            }
                         },
                         right: [{
                             operator: '=',
@@ -101,19 +97,15 @@ describe('PHP Parser grammar array access operator integration', function () {
                                     name: 'N_VARIABLE',
                                     variable: 'object'
                                 },
-                                properties: [{
-                                    property: {
-                                        name: 'N_STRING',
-                                        string: 'prop'
-                                    }
-                                }]
-                            },
-                            indices: [{
-                                index: {
-                                    name: 'N_INTEGER',
-                                    number: '2'
+                                property: {
+                                    name: 'N_STRING',
+                                    string: 'prop'
                                 }
-                            }]
+                            },
+                            index: {
+                                name: 'N_INTEGER',
+                                number: '2'
+                            }
                         },
                         right: [{
                             operator: '=',
@@ -140,7 +132,38 @@ describe('PHP Parser grammar array access operator integration', function () {
                                 name: 'N_VARIABLE',
                                 variable: 'array'
                             },
-                            indices: true
+                            index: null
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_INTEGER',
+                                number: '6'
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
+        'pushing integer onto two-dimensional array variable': {
+            code: '$array[][] = 6;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_ARRAY_INDEX',
+                            array: {
+                                name: 'N_ARRAY_INDEX',
+                                array: {
+                                    name: 'N_VARIABLE',
+                                    variable: 'array'
+                                },
+                                index: null
+                            },
+                            index: null
                         },
                         right: [{
                             operator: '=',
@@ -167,7 +190,7 @@ describe('PHP Parser grammar array access operator integration', function () {
                                 name: 'N_VARIABLE',
                                 variable: 'array'
                             },
-                            indices: true
+                            index: null
                         },
                         right: [{
                             operator: '=',

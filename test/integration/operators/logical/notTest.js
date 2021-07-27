@@ -49,6 +49,39 @@ describe('PHP Parser grammar logical Not "! <value>" operator integration', func
                 }]
             }
         },
+        'assigning not-not of variable value to another variable': {
+            code: '$notNot = !/* a comment */!$value;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'notNot'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_UNARY_EXPRESSION',
+                                operator: '!',
+                                operand: {
+                                    name: 'N_UNARY_EXPRESSION',
+                                    operator: '!',
+                                    operand: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'value'
+                                    },
+                                    prefix: true
+                                },
+                                prefix: true
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
         'assigning Not of integer to object property': {
             code: '$object->inverse = !7;',
             expectedAST: {
@@ -63,12 +96,10 @@ describe('PHP Parser grammar logical Not "! <value>" operator integration', func
                                 name: 'N_VARIABLE',
                                 variable: 'object'
                             },
-                            properties: [{
-                                property: {
-                                    name: 'N_STRING',
-                                    string: 'inverse'
-                                }
-                            }]
+                            property: {
+                                name: 'N_STRING',
+                                string: 'inverse'
+                            }
                         },
                         right: [{
                             operator: '=',
