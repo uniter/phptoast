@@ -73,6 +73,21 @@ describe('PHP Parser grammar nowdoc construct integration', function () {
                 }]
             }
         },
+        'nowdoc containing backslashes (which should be treated literally)': {
+            // Note that a single backslash is supposed to be embedded in the nowdoc,
+            // but we must escape it as it is being specified inside a native JS string:
+            code: '<?php return <<<\'EOS\'\nHere is my backslash:\\!\nEOS;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_NOWDOC',
+                        string: 'Here is my backslash:\\!'
+                    }
+                }]
+            }
+        },
         'nowdoc containing a string that could be interpreted as an interpolated variable': {
             code: '<?php return <<<\'EOS\'\nhere is my text with $myValue\nEOS;',
             expectedAST: {

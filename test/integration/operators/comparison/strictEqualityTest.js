@@ -39,7 +39,7 @@ describe('PHP Parser grammar strict equality/inequality "<value> !==/=== <value>
                                 name: 'N_EXPRESSION',
                                 left: {
                                     name: 'N_BOOLEAN',
-                                    bool: 'false'
+                                    bool: false
                                 },
                                 right: [{
                                     operator: '!==',

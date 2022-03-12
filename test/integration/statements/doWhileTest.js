@@ -29,7 +29,7 @@ describe('PHP Parser grammar do...while statement integration', function () {
                     name: 'N_DO_WHILE_STATEMENT',
                     condition: {
                         name: 'N_BOOLEAN',
-                        bool: 'true'
+                        bool: true
                     },
                     body: {
                         name: 'N_COMPOUND_STATEMENT',
@@ -46,7 +46,7 @@ describe('PHP Parser grammar do...while statement integration', function () {
                     name: 'N_DO_WHILE_STATEMENT',
                     condition: {
                         name: 'N_BOOLEAN',
-                        bool: 'true'
+                        bool: true
                     },
                     body: {
                         name: 'N_COMPOUND_STATEMENT',
@@ -69,7 +69,7 @@ describe('PHP Parser grammar do...while statement integration', function () {
                     name: 'N_DO_WHILE_STATEMENT',
                     condition: {
                         name: 'N_BOOLEAN',
-                        bool: 'true'
+                        bool: true
                     },
                     body: {
                         name: 'N_ECHO_STATEMENT',

@@ -136,12 +136,10 @@ describe('PHP Parser grammar string interpolation construct integration', functi
                                 name: 'N_VARIABLE',
                                 variable: 'myArray'
                             },
-                            indices: [{
-                                index: {
-                                    name: 'N_INTEGER',
-                                    number: '21'
-                                }
-                            }]
+                            index: {
+                                name: 'N_INTEGER',
+                                number: '21'
+                            }
                         }, {
                             name: 'N_STRING_LITERAL',
                             string: ' after'
@@ -167,12 +165,10 @@ describe('PHP Parser grammar string interpolation construct integration', functi
                                 name: 'N_VARIABLE',
                                 variable: 'myObject'
                             },
-                            properties: [{
-                                property: {
-                                    name: 'N_STRING',
-                                    string: 'myProp'
-                                }
-                            }]
+                            property: {
+                                name: 'N_STRING',
+                                string: 'myProp'
+                            }
                         }, {
                             name: 'N_STRING_LITERAL',
                             string: 'after'
@@ -200,12 +196,10 @@ describe('PHP Parser grammar string interpolation construct integration', functi
                                     name: 'N_VARIABLE',
                                     variable: 'myArray'
                                 },
-                                indices: [{
-                                    index: {
-                                        name: 'N_INTEGER',
-                                        number: '21'
-                                    }
-                                }]
+                                index: {
+                                    name: 'N_INTEGER',
+                                    number: '21'
+                                }
                             }
                         }, {
                             name: 'N_STRING_LITERAL',
@@ -234,12 +228,10 @@ describe('PHP Parser grammar string interpolation construct integration', functi
                                     name: 'N_VARIABLE',
                                     variable: 'myObject'
                                 },
-                                properties: [{
-                                    property: {
-                                        name: 'N_STRING',
-                                        string: 'myProp'
-                                    }
-                                }]
+                                property: {
+                                    name: 'N_STRING',
+                                    string: 'myProp'
+                                }
                             }
                         }, {
                             name: 'N_STRING_LITERAL',
@@ -438,12 +430,10 @@ describe('PHP Parser grammar string interpolation construct integration', functi
                                     },
                                     constant: 'MY_CONST'
                                 },
-                                indices: [{
-                                    index: {
-                                        name: 'N_INTEGER',
-                                        number: '21'
-                                    }
-                                }]
+                                index: {
+                                    name: 'N_INTEGER',
+                                    number: '21'
+                                }
                             }
                         }, {
                             name: 'N_STRING_LITERAL',
@@ -543,12 +533,10 @@ describe('PHP Parser grammar string interpolation construct integration', functi
                                 name: 'N_VARIABLE',
                                 variable: 'complex'
                             },
-                            properties: [{
-                                property: {
-                                    name: 'N_STRING',
-                                    string: 'syntax'
-                                }
-                            }]
+                            property: {
+                                name: 'N_STRING',
+                                string: 'syntax'
+                            }
                         }, {
                             name: 'N_STRING_LITERAL',
                             // Parentheses should not be parsed as a call using the simple syntax
@@ -619,12 +607,10 @@ describe('PHP Parser grammar string interpolation construct integration', functi
                                 name: 'N_VARIABLE',
                                 variable: 'myArray'
                             },
-                            indices: [{
-                                index: {
-                                    name: 'N_INTEGER',
-                                    number: '21'
-                                }
-                            }]
+                            index: {
+                                name: 'N_INTEGER',
+                                number: '21'
+                            }
                         }, {
                             name: 'N_STRING_LITERAL',
                             string: 'after'
@@ -652,12 +638,10 @@ describe('PHP Parser grammar string interpolation construct integration', functi
                                     name: 'N_VARIABLE',
                                     variable: 'myArray'
                                 },
-                                indices: [{
-                                    index: {
-                                        name: 'N_INTEGER',
-                                        number: '21'
-                                    }
-                                }]
+                                index: {
+                                    name: 'N_INTEGER',
+                                    number: '21'
+                                }
                             }
                         }, {
                             name: 'N_STRING_LITERAL',
@@ -684,26 +668,24 @@ describe('PHP Parser grammar string interpolation construct integration', functi
                                 name: 'N_VARIABLE',
                                 variable: 'myObject'
                             },
-                            calls: [{
-                                func: {
-                                    name: 'N_STRING',
-                                    string: 'myMethod'
+                            method: {
+                                name: 'N_STRING',
+                                string: 'myMethod'
+                            },
+                            args: [{
+                                name: 'N_TERNARY',
+                                condition: {
+                                    name: 'N_VARIABLE',
+                                    variable: 'myBool'
                                 },
-                                args: [{
-                                    name: 'N_TERNARY',
-                                    condition: {
-                                        name: 'N_VARIABLE',
-                                        variable: 'myBool'
-                                    },
-                                    consequent: {
-                                        name: 'N_INTEGER',
-                                        number: '21'
-                                    },
-                                    alternate: {
-                                        name: 'N_INTEGER',
-                                        number: '100'
-                                    }
-                                }]
+                                consequent: {
+                                    name: 'N_INTEGER',
+                                    number: '21'
+                                },
+                                alternate: {
+                                    name: 'N_INTEGER',
+                                    number: '100'
+                                }
                             }]
                         }, {
                             name: 'N_STRING_LITERAL',

@@ -41,13 +41,8 @@ describe('PHP Parser grammar number literal expression integration', function ()
                 statements: [{
                     name: 'N_RETURN_STATEMENT',
                     expression: {
-                        name: 'N_UNARY_EXPRESSION',
-                        operator: '-',
-                        prefix: true,
-                        operand: {
-                            name: 'N_INTEGER',
-                            number: '27'
-                        }
+                        name: 'N_INTEGER',
+                        number: '-27'
                     }
                 }]
             }
@@ -112,7 +107,7 @@ describe('PHP Parser grammar number literal expression integration', function ()
                     name: 'N_RETURN_STATEMENT',
                     expression: {
                         name: 'N_FLOAT',
-                        number: '1002.7'
+                        number: 1002.7
                     }
                 }]
             }
@@ -125,7 +120,7 @@ describe('PHP Parser grammar number literal expression integration', function ()
                     name: 'N_RETURN_STATEMENT',
                     expression: {
                         name: 'N_FLOAT',
-                        number: '.7654'
+                        number: 0.7654
                     }
                 }]
             }
@@ -138,7 +133,7 @@ describe('PHP Parser grammar number literal expression integration', function ()
                     name: 'N_RETURN_STATEMENT',
                     expression: {
                         name: 'N_FLOAT',
-                        number: '5e-3'
+                        number: 5e-3
                     }
                 }]
             }
@@ -150,13 +145,8 @@ describe('PHP Parser grammar number literal expression integration', function ()
                 statements: [{
                     name: 'N_RETURN_STATEMENT',
                     expression: {
-                        name: 'N_UNARY_EXPRESSION',
-                        operator: '-',
-                        prefix: true,
-                        operand: {
-                            name: 'N_FLOAT',
-                            number: '5E-3'
-                        }
+                        name: 'N_FLOAT',
+                        number: -5e-3
                     }
                 }]
             }
@@ -169,7 +159,7 @@ describe('PHP Parser grammar number literal expression integration', function ()
                     name: 'N_RETURN_STATEMENT',
                     expression: {
                         name: 'N_FLOAT',
-                        number: '5e+3'
+                        number: 5e+3
                     }
                 }]
             }
@@ -181,13 +171,8 @@ describe('PHP Parser grammar number literal expression integration', function ()
                 statements: [{
                     name: 'N_RETURN_STATEMENT',
                     expression: {
-                        name: 'N_UNARY_EXPRESSION',
-                        operator: '-',
-                        prefix: true,
-                        operand: {
-                            name: 'N_FLOAT',
-                            number: '5E+3'
-                        }
+                        name: 'N_FLOAT',
+                        number: -5e+3
                     }
                 }]
             }
@@ -200,7 +185,7 @@ describe('PHP Parser grammar number literal expression integration', function ()
                     name: 'N_RETURN_STATEMENT',
                     expression: {
                         name: 'N_FLOAT',
-                        number: '5e3'
+                        number: 5e3
                     }
                 }]
             }
@@ -212,13 +197,8 @@ describe('PHP Parser grammar number literal expression integration', function ()
                 statements: [{
                     name: 'N_RETURN_STATEMENT',
                     expression: {
-                        name: 'N_UNARY_EXPRESSION',
-                        operator: '-',
-                        prefix: true,
-                        operand: {
-                            name: 'N_FLOAT',
-                            number: '5E3'
-                        }
+                        name: 'N_FLOAT',
+                        number: -5e3
                     }
                 }]
             }
@@ -231,7 +211,7 @@ describe('PHP Parser grammar number literal expression integration', function ()
                     name: 'N_RETURN_STATEMENT',
                     expression: {
                         name: 'N_FLOAT',
-                        number: '1.2e4'
+                        number: 1.2e4
                     }
                 }]
             }
@@ -243,13 +223,8 @@ describe('PHP Parser grammar number literal expression integration', function ()
                 statements: [{
                     name: 'N_RETURN_STATEMENT',
                     expression: {
-                        name: 'N_UNARY_EXPRESSION',
-                        operator: '-',
-                        prefix: true,
-                        operand: {
-                            name: 'N_FLOAT',
-                            number: '7.2E6'
-                        }
+                        name: 'N_FLOAT',
+                        number: -7.2e6
                     }
                 }]
             }

@@ -677,10 +677,10 @@ describe('PHP Parser grammar small program integration', function () {
                             name: 'N_VARIABLE',
                             variable: 'names'
                         },
-                        indices: [{index: {
+                        index: {
                             name: 'N_INTEGER',
                             number: '2'
-                        }}]
+                        }
                     }
                 }]
             }

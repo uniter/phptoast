@@ -13,7 +13,7 @@ var _ = require('microdash'),
     expect = require('chai').expect,
     tools = require('../../../tools');
 
-describe('PHP Parser grammar array access operator "[...]" callable element integration', function () {
+describe('PHP Parser grammar arithmetic negation "-<value>" operator integration', function () {
     var parser;
 
     beforeEach(function () {
@@ -21,28 +21,29 @@ describe('PHP Parser grammar array access operator "[...]" callable element inte
     });
 
     _.each({
-        'call to callable stored as array element': {
-            code: 'return $myMap[$myKey](21);',
+        'assigning negative of variable value to another variable': {
+            code: '$identity = -$value;',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
-                    name: 'N_RETURN_STATEMENT',
+                    name: 'N_EXPRESSION_STATEMENT',
                     expression: {
-                        name: 'N_FUNCTION_CALL',
-                        func: {
-                            name: 'N_ARRAY_INDEX',
-                            array: {
-                                name: 'N_VARIABLE',
-                                variable: 'myMap'
-                            },
-                            index: {
-                                name: 'N_VARIABLE',
-                                variable: 'myKey'
-                            }
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'identity'
                         },
-                        args: [{
-                            name: 'N_INTEGER',
-                            number: '21'
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_UNARY_EXPRESSION',
+                                operator: '-',
+                                operand: {
+                                    name: 'N_VARIABLE',
+                                    variable: 'value'
+                                },
+                                prefix: true
+                            }
                         }]
                     }
                 }]

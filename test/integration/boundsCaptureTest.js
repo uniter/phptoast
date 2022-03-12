@@ -321,28 +321,14 @@ EOS
                                     }
                                 }
                             },
-                            'properties': [{
-                                'property': {
-                                    'name': 'N_STRING',
-                                    'string': 'myProp',
-                                    'bounds': {
-                                        'start': {
-                                            'offset': 28,
-                                            'line': 2,
-                                            'column': 23
-                                        },
-                                        'end': {
-                                            'offset': 34,
-                                            'line': 2,
-                                            'column': 29
-                                        }
-                                    }
-                                },
+                            'property': {
+                                'name': 'N_STRING',
+                                'string': 'myProp',
                                 'bounds': {
                                     'start': {
-                                        'offset': 26,
+                                        'offset': 28,
                                         'line': 2,
-                                        'column': 21
+                                        'column': 23
                                     },
                                     'end': {
                                         'offset': 34,
@@ -350,7 +336,7 @@ EOS
                                         'column': 29
                                     }
                                 }
-                            }],
+                            },
                             'bounds': {
                                 'start': {
                                     'offset': 26,
@@ -364,36 +350,22 @@ EOS
                                 }
                             }
                         },
-                        'indices': [{
-                            'index': {
-                                'name': 'N_VARIABLE',
-                                'variable': 'myIndex',
-                                'bounds': {
-                                    'start': {
-                                        'offset': 35,
-                                        'line': 2,
-                                        'column': 30
-                                    },
-                                    'end': {
-                                        'offset': 43,
-                                        'line': 2,
-                                        'column': 38
-                                    }
-                                }
-                            },
+                        'index': {
+                            'name': 'N_VARIABLE',
+                            'variable': 'myIndex',
                             'bounds': {
                                 'start': {
-                                    'offset': 34,
+                                    'offset': 35,
                                     'line': 2,
-                                    'column': 29
+                                    'column': 30
                                 },
                                 'end': {
-                                    'offset': 44,
+                                    'offset': 43,
                                     'line': 2,
-                                    'column': 39
+                                    'column': 38
                                 }
                             }
-                        }],
+                        },
                         'bounds': {
                             'start': {
                                 'offset': 17,
@@ -466,28 +438,14 @@ EOS
                                         }
                                     }
                                 },
-                                'properties': [{
-                                    'property': {
-                                        'name': 'N_STRING',
-                                        'string': 'myProp',
-                                        'bounds': {
-                                            'start': {
-                                                'offset': 32,
-                                                'line': 2,
-                                                'column': 27
-                                            },
-                                            'end': {
-                                                'offset': 38,
-                                                'line': 2,
-                                                'column': 33
-                                            }
-                                        }
-                                    },
+                                'property': {
+                                    'name': 'N_STRING',
+                                    'string': 'myProp',
                                     'bounds': {
                                         'start': {
-                                            'offset': 30,
+                                            'offset': 32,
                                             'line': 2,
-                                            'column': 25
+                                            'column': 27
                                         },
                                         'end': {
                                             'offset': 38,
@@ -495,7 +453,7 @@ EOS
                                             'column': 33
                                         }
                                     }
-                                }],
+                                },
                                 'bounds': {
                                     'start': {
                                         'offset': 30,
@@ -509,36 +467,22 @@ EOS
                                     }
                                 }
                             },
-                            'indices': [{
-                                'index': {
-                                    'name': 'N_STRING_LITERAL',
-                                    'string': 'myClassName',
-                                    'bounds': {
-                                        'start': {
-                                            'offset': 39,
-                                            'line': 2,
-                                            'column': 34
-                                        },
-                                        'end': {
-                                            'offset': 52,
-                                            'line': 2,
-                                            'column': 47
-                                        }
-                                    }
-                                },
+                            'index': {
+                                'name': 'N_STRING_LITERAL',
+                                'string': 'myClassName',
                                 'bounds': {
                                     'start': {
-                                        'offset': 38,
+                                        'offset': 39,
                                         'line': 2,
-                                        'column': 33
+                                        'column': 34
                                     },
                                     'end': {
-                                        'offset': 53,
+                                        'offset': 52,
                                         'line': 2,
-                                        'column': 48
+                                        'column': 47
                                     }
                                 }
-                            }],
+                            },
                             'bounds': {
                                 'start': {
                                     'offset': 21,
@@ -638,28 +582,14 @@ EOS
                                     }
                                 }
                             },
-                            'properties': [{
-                                'property': {
-                                    'name': 'N_STRING',
-                                    'string': 'myProp',
-                                    'bounds': {
-                                        'start': {
-                                            'offset': 35,
-                                            'line': 2,
-                                            'column': 30
-                                        },
-                                        'end': {
-                                            'offset': 41,
-                                            'line': 2,
-                                            'column': 36
-                                        }
-                                    }
-                                },
+                            'property': {
+                                'name': 'N_STRING',
+                                'string': 'myProp',
                                 'bounds': {
                                     'start': {
-                                        'offset': 33,
+                                        'offset': 35,
                                         'line': 2,
-                                        'column': 28
+                                        'column': 30
                                     },
                                     'end': {
                                         'offset': 41,
@@ -667,7 +597,7 @@ EOS
                                         'column': 36
                                     }
                                 }
-                            }],
+                            },
                             'bounds': {
                                 'start': {
                                     'offset': 24,

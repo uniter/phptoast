@@ -35,12 +35,10 @@ describe('PHP Parser grammar object access operator "->" instance property integ
                                 name: 'N_VARIABLE',
                                 variable: 'anObject'
                             },
-                            properties: [{
-                                property: {
-                                    name: 'N_STRING',
-                                    string: 'prop'
-                                }
-                            }]
+                            property: {
+                                name: 'N_STRING',
+                                string: 'prop'
+                            }
                         },
                         right: [{
                             operator: '=',
@@ -69,19 +67,15 @@ describe('PHP Parser grammar object access operator "->" instance property integ
                                     name: 'N_VARIABLE',
                                     variable: 'anArray'
                                 },
-                                indices: [{
-                                    index: {
-                                        name: 'N_INTEGER',
-                                        number: '3'
-                                    }
-                                }]
-                            },
-                            properties: [{
-                                property: {
-                                    name: 'N_STRING',
-                                    string: 'aProp'
+                                index: {
+                                    name: 'N_INTEGER',
+                                    number: '3'
                                 }
-                            }]
+                            },
+                            property: {
+                                name: 'N_STRING',
+                                string: 'aProp'
+                            }
                         },
                         right: [{
                             operator: '=',
@@ -108,12 +102,10 @@ describe('PHP Parser grammar object access operator "->" instance property integ
                                 name: 'N_VARIABLE',
                                 variable: 'anObject'
                             },
-                            properties: [{
-                                property: {
-                                    name: 'N_VARIABLE',
-                                    variable: 'propName'
-                                }
-                            }]
+                            property: {
+                                name: 'N_VARIABLE',
+                                variable: 'propName'
+                            }
                         },
                         right: [{
                             operator: '=',
@@ -140,22 +132,20 @@ describe('PHP Parser grammar object access operator "->" instance property integ
                                 name: 'N_VARIABLE',
                                 variable: 'anObject'
                             },
-                            properties: [{
-                                property: {
-                                    name: 'N_EXPRESSION',
-                                    left: {
-                                        name: 'N_VARIABLE',
-                                        variable: 'propName'
-                                    },
-                                    right: [{
-                                        operator: '.',
-                                        operand: {
-                                            name: 'N_STRING_LITERAL',
-                                            string: 'a'
-                                        }
-                                    }]
-                                }
-                            }]
+                            property: {
+                                name: 'N_EXPRESSION',
+                                left: {
+                                    name: 'N_VARIABLE',
+                                    variable: 'propName'
+                                },
+                                right: [{
+                                    operator: '.',
+                                    operand: {
+                                        name: 'N_STRING_LITERAL',
+                                        string: 'a'
+                                    }
+                                }]
+                            }
                         },
                         right: [{
                             operator: '=',
@@ -179,20 +169,20 @@ describe('PHP Parser grammar object access operator "->" instance property integ
                         left: {
                             name: 'N_OBJECT_PROPERTY',
                             object: {
-                                name: 'N_VARIABLE',
-                                variable: 'anObject'
-                            },
-                            properties: [{
+                                name: 'N_OBJECT_PROPERTY',
+                                object: {
+                                    name: 'N_VARIABLE',
+                                    variable: 'anObject'
+                                },
                                 property: {
                                     name: 'N_STRING',
                                     string: 'prop1'
                                 }
-                            }, {
-                                property: {
-                                    name: 'N_STRING',
-                                    string: 'prop2'
-                                }
-                            }]
+                            },
+                            property: {
+                                name: 'N_STRING',
+                                string: 'prop2'
+                            }
                         },
                         right: [{
                             operator: '=',
@@ -221,20 +211,16 @@ describe('PHP Parser grammar object access operator "->" instance property integ
                                     name: 'N_VARIABLE',
                                     variable: 'anObject'
                                 },
-                                calls: [{
-                                    func: {
-                                        name: 'N_STRING',
-                                        string: 'getIt'
-                                    },
-                                    args: []
-                                }]
-                            },
-                            properties: [{
-                                property: {
+                                method: {
                                     name: 'N_STRING',
-                                    string: 'prop1'
-                                }
-                            }]
+                                    string: 'getIt'
+                                },
+                                args: []
+                            },
+                            property: {
+                                name: 'N_STRING',
+                                string: 'prop1'
+                            }
                         },
                         right: [{
                             operator: '=',
@@ -265,27 +251,21 @@ describe('PHP Parser grammar object access operator "->" instance property integ
                                         name: 'N_VARIABLE',
                                         variable: 'anArray'
                                     },
-                                    indices: [{
-                                        index: {
-                                            name: 'N_INTEGER',
-                                            number: '2'
-                                        }
-                                    }]
+                                    index: {
+                                        name: 'N_INTEGER',
+                                        number: '2'
+                                    }
                                 },
-                                calls: [{
-                                    func: {
-                                        name: 'N_STRING',
-                                        string: 'getIt'
-                                    },
-                                    args: []
-                                }]
-                            },
-                            properties: [{
-                                property: {
+                                method: {
                                     name: 'N_STRING',
-                                    string: 'prop1'
-                                }
-                            }]
+                                    string: 'getIt'
+                                },
+                                args: []
+                            },
+                            property: {
+                                name: 'N_STRING',
+                                string: 'prop1'
+                            }
                         },
                         right: [{
                             operator: '=',
@@ -316,26 +296,20 @@ describe('PHP Parser grammar object access operator "->" instance property integ
                                         name: 'N_VARIABLE',
                                         variable: 'anObject'
                                     },
-                                    properties: [{
-                                        property: {
-                                            name: 'N_STRING',
-                                            string: 'prop'
-                                        }
-                                    }]
-                                },
-                                indices: [{
-                                    index: {
-                                        name: 'N_INTEGER',
-                                        number: '2'
+                                    property: {
+                                        name: 'N_STRING',
+                                        string: 'prop'
                                     }
-                                }]
-                            },
-                            properties: [{
-                                property: {
-                                    name: 'N_STRING',
-                                    string: 'prop1'
+                                },
+                                index: {
+                                    name: 'N_INTEGER',
+                                    number: '2'
                                 }
-                            }]
+                            },
+                            property: {
+                                name: 'N_STRING',
+                                string: 'prop1'
+                            }
                         },
                         right: [{
                             operator: '=',

@@ -62,12 +62,10 @@ describe('PHP Parser grammar unset(...) construct integration', function () {
                             name: 'N_VARIABLE',
                             variable: 'an_array'
                         },
-                        indices: [{
-                            index: {
-                                name: 'N_INTEGER',
-                                number: '8'
-                            }
-                        }]
+                        index: {
+                            name: 'N_INTEGER',
+                            number: '8'
+                        }
                     }]
                 }]
             }
@@ -84,12 +82,10 @@ describe('PHP Parser grammar unset(...) construct integration', function () {
                             name: 'N_VARIABLE',
                             variable: 'an_object'
                         },
-                        properties: [{
-                            property: {
-                                name: 'N_STRING',
-                                string: 'prop'
-                            }
-                        }]
+                        property: {
+                            name: 'N_STRING',
+                            string: 'prop'
+                        }
                     }]
                 }]
             }

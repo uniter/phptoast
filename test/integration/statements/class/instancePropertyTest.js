@@ -77,13 +77,8 @@ EOS
                             variable: 'myProp'
                         },
                         value: {
-                            name: 'N_UNARY_EXPRESSION',
-                            operator: '-',
-                            prefix: true,
-                            operand: {
-                                name: 'N_INTEGER',
-                                number: '21'
-                            }
+                            name: 'N_INTEGER',
+                            number: '-21'
                         }
                     }]
                 }]
