@@ -43,6 +43,39 @@ describe('PHP Parser grammar bitwise XOR "^" operator integration', function () 
                     }
                 }]
             }
+        },
+        'calculating bitwise XOR of 21, 10 and 99': {
+            code: 'return 21 ^ 10 ^ 99;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_EXPRESSION',
+                            left: {
+                                name: 'N_INTEGER',
+                                number: '21'
+                            },
+                            right: [{
+                                operator: '^',
+                                operand: {
+                                    name: 'N_INTEGER',
+                                    number: '10'
+                                }
+                            }]
+                        },
+                        right: [{
+                            operator: '^',
+                            operand: {
+                                name: 'N_INTEGER',
+                                number: '99'
+                            }
+                        }]
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

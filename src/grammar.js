@@ -1014,20 +1014,35 @@ module.exports = {
         'N_EXPRESSION_LEVEL_11': {
             captureAs: 'N_EXPRESSION',
             components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_10'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/&(?!&)/)}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_10']}]}],
-            ifNoMatch: {component: 'right', capture: 'left'}
-            // TODO: Use buildBinaryExpression ahead of deprecating N_EXPRESSION for N_BINARY_EXPRESSION w/a single right operand
+            processor: function (node) {
+                if (!node.right) {
+                    return node.left;
+                }
+
+                return buildBinaryExpression(node.left, node.right);
+            }
         },
         'N_EXPRESSION_LEVEL_12': {
             captureAs: 'N_EXPRESSION',
             components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_11'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/\^/)}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_11']}]}],
-            ifNoMatch: {component: 'right', capture: 'left'}
-            // TODO: Use buildBinaryExpression ahead of deprecating N_EXPRESSION for N_BINARY_EXPRESSION w/a single right operand
+            processor: function (node) {
+                if (!node.right) {
+                    return node.left;
+                }
+
+                return buildBinaryExpression(node.left, node.right);
+            }
         },
         'N_EXPRESSION_LEVEL_13': {
             captureAs: 'N_EXPRESSION',
             components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_12'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: (/\|(?!\|)/)}, {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_12']}]}],
-            ifNoMatch: {component: 'right', capture: 'left'}
-            // TODO: Use buildBinaryExpression ahead of deprecating N_EXPRESSION for N_BINARY_EXPRESSION w/a single right operand
+            processor: function (node) {
+                if (!node.right) {
+                    return node.left;
+                }
+
+                return buildBinaryExpression(node.left, node.right);
+            }
         },
         'N_EXPRESSION_LEVEL_14': {
             captureAs: 'N_EXPRESSION',
