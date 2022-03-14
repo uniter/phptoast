@@ -555,7 +555,7 @@ module.exports = {
             components: ['T_BREAK', {name: 'levels', oneOf: ['N_INTEGER', 'N_JUMP_ONE_LEVEL']}, 'N_END_STATEMENT']
         },
         'N_CASE': {
-            components: ['T_CASE', {name: 'expression', what: 'N_EXPRESSION'}, (/:/), {name: 'body', zeroOrMoreOf: 'N_STATEMENT'}]
+            components: ['T_CASE', {name: 'expression', what: 'N_EXPRESSION'}, (/[:;]/), {name: 'body', zeroOrMoreOf: 'N_STATEMENT'}]
         },
         'N_CLASS_STATEMENT': {
             components: [{optionally: {name: 'type', oneOf: ['T_ABSTRACT', 'T_FINAL']}}, 'T_CLASS', {name: 'className', rule: 'T_STRING'}, {optionally: ['T_EXTENDS', {name: 'extend', oneOf: ['N_NAMESPACE', 'T_STRING']}]}, {optionally: ['T_IMPLEMENTS', {name: 'implement', zeroOrMoreOf: [{oneOf: ['N_NAMESPACE', 'T_STRING']}, {what: (/(,|(?=\{))()/), captureIndex: 2}]}]}, (/\{/), {name: 'members', zeroOrMoreOf: {oneOf: ['N_INSTANCE_PROPERTY_DEFINITION', 'N_STATIC_PROPERTY_DEFINITION', 'N_METHOD_DEFINITION', 'N_STATIC_METHOD_DEFINITION', 'N_ABSTRACT_METHOD_DEFINITION', 'N_ABSTRACT_STATIC_METHOD_DEFINITION', 'N_CONSTANT_DEFINITION']}}, (/\}/)],

@@ -132,6 +132,48 @@ describe('PHP Parser grammar switch statement integration', function () {
                 }]
             }
         },
+        'switch with one case with one statement and break, with case terminated by semicolon': {
+            code: 'switch (null) {case 1; $a = 7; break;}',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_SWITCH_STATEMENT',
+                    expression: {
+                        name: 'N_NULL'
+                    },
+                    cases: [{
+                        name: 'N_CASE',
+                        expression: {
+                            name: 'N_INTEGER',
+                            number: '1'
+                        },
+                        body: [{
+                            name: 'N_EXPRESSION_STATEMENT',
+                            expression: {
+                                name: 'N_EXPRESSION',
+                                left: {
+                                    name: 'N_VARIABLE',
+                                    variable: 'a'
+                                },
+                                right: [{
+                                    operator: '=',
+                                    operand: {
+                                        name: 'N_INTEGER',
+                                        number: '7'
+                                    }
+                                }]
+                            }
+                        }, {
+                            name: 'N_BREAK_STATEMENT',
+                            levels: {
+                                name: 'N_INTEGER',
+                                number: '1'
+                            }
+                        }]
+                    }]
+                }]
+            }
+        },
         'switch with one case with one statement and break, and one empty default case': {
             code: 'switch (null) {case 1: $a = 7; break; default:}',
             expectedAST: {
