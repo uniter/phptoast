@@ -1376,11 +1376,11 @@ module.exports = {
                 (/;/),
                 {name: 'statements', zeroOrMoreOf: 'N_NAMESPACE_SCOPED_STATEMENT'},
 
-                // Check for mixed namespace types
+                // Check for mixed namespace types.
                 {optionally: {
                     rule: 'N_BRACED_NAMESPACE_STATEMENT',
-                    modifier: function (capture, parse, fail) {
-                        fail('Cannot mix namespace declaration types', {
+                    modifier: function (capture, parse, abort) {
+                        abort('Cannot mix namespace declaration types', {
                             translationKey: CANNOT_MIX_NAMESPACE_DECLARATION_TYPES
                         });
                     }
@@ -1396,20 +1396,20 @@ module.exports = {
                 {name: 'statements', zeroOrMoreOf: {oneOf: [
                     'N_NAMESPACE_SCOPED_STATEMENT',
 
-                    // Check for nested braced namespaces, which are invalid
-                    {rule: 'T_NAMESPACE', modifier: function (capture, parse, fail) {
-                        fail('Cannot nest namespace declarations', {
+                    // Check for nested braced namespaces, which are invalid.
+                    {rule: 'T_NAMESPACE', modifier: function (capture, parse, abort) {
+                        abort('Cannot nest namespace declarations', {
                             translationKey: CANNOT_NEST_NAMESPACE_DECLARATIONS
                         });
                     }}
                 ]}},
                 (/\}/),
 
-                // Check for mixed namespace types
+                // Check for mixed namespace types.
                 {optionally: {
                     rule: 'N_SEMICOLON_NAMESPACE_STATEMENT',
-                    modifier: function (capture, parse, fail) {
-                        fail('Cannot mix namespace declaration types', {
+                    modifier: function (capture, parse, abort) {
+                        abort('Cannot mix namespace declaration types', {
                             translationKey: CANNOT_MIX_NAMESPACE_DECLARATION_TYPES
                         });
                     }
@@ -1483,30 +1483,30 @@ module.exports = {
                     oneOf: [
                         'N_SEMICOLON_NAMESPACE_STATEMENT',
 
-                        // Braced semicolon statements must not be followed by any other statements
+                        // Braced semicolon statements must not be followed by any other statements.
                         [
                             'N_BRACED_NAMESPACE_STATEMENT',
 
-                            // Check for any normal code after the namespace braces (which would be invalid)
+                            // Check for any normal code after the namespace braces (which would be invalid).
                             {optionally: {
                                 rule: 'N_STATEMENT',
-                                modifier: function (capture, parse, fail) {
-                                    fail('No code may exist outside of namespace braces', {
+                                modifier: function (capture, parse, abort) {
+                                    abort('No code may exist outside of namespace braces', {
                                         translationKey: NO_CODE_OUTSIDE_NAMESPACE_DECLARATION_BRACES
                                     });
                                 }
                             }}
                         ],
 
-                        // Normal statements must not be followed by any namespace declarations
+                        // Normal statements must not be followed by any namespace declarations.
                         [
                             'N_STATEMENT',
 
-                            // Check for any namespace statement after the normal statement (which would be invalid)
+                            // Check for any namespace statement after the normal statement (which would be invalid).
                             {optionally: {
                                 oneOf: ['N_SEMICOLON_NAMESPACE_STATEMENT', 'N_BRACED_NAMESPACE_STATEMENT'],
-                                modifier: function (capture, parse, fail) {
-                                    fail('Namespace declaration must come first', {
+                                modifier: function (capture, parse, abort) {
+                                    abort('Namespace declaration must come first', {
                                         translationKey: NAMESPACE_DECLARATION_MUST_COME_FIRST
                                     });
                                 }
