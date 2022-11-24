@@ -121,7 +121,7 @@ describe('PHP Parser grammar logical Not "! <value>" operator integration', func
         describe(description, function () {
             var code = '<?php ' + scenario.code;
 
-            // Pretty-print the code strings so any non-printable characters are readable
+            // Pretty-print the code strings so any non-printable characters are readable.
             describe('when the code is ' + JSON.stringify(code) + ' ?>', function () {
                 it('should return the expected AST', function () {
                     expect(parser.parse(code)).to.deep.equal(scenario.expectedAST);

@@ -55,7 +55,7 @@ describe('PHP Parser grammar logical And "<value> && <value>" operator integrati
             }
         },
         'assigning word-And of variable values to another variable': {
-            code: '$result = $value1 aNd $value2;', // Test cae-insensitivity
+            code: '$result = $value1 aNd $value2;', // Test case-insensitivity.
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
@@ -139,7 +139,7 @@ describe('PHP Parser grammar logical And "<value> && <value>" operator integrati
             }
         },
         'assigning two chained Ands to another variable': {
-            // "&&" is left-associative, so equivalent to `$result = ($value1 && $value2) && $value3;`
+            // "&&" is left-associative, so equivalent to `$result = ($value1 && $value2) && $value3;`.
             code: '$result = $value1 && $value2 && $value3;',
             expectedAST: {
                 name: 'N_PROGRAM',
@@ -229,7 +229,7 @@ describe('PHP Parser grammar logical And "<value> && <value>" operator integrati
         describe(description, function () {
             var code = '<?php ' + scenario.code;
 
-            // Pretty-print the code strings so any non-printable characters are readable
+            // Pretty-print the code strings so any non-printable characters are readable.
             describe('when the code is ' + JSON.stringify(code) + ' ?>', function () {
                 it('should return the expected AST', function () {
                     expect(parser.parse(code)).to.deep.equal(scenario.expectedAST);
