@@ -376,7 +376,7 @@ module.exports = {
         'T_IS_SMALLER_OR_EQUAL': /<=/,
         'T_LINE': /__LINE__\b/i,
         'T_LIST': /list\b/i,
-        'T_LNUMBER': /-?(?:0x[0-9a-f]+|\d+)/i,
+        'T_LNUMBER': /-?(?:0x[0-9a-f]+|0b[01]+|\d+)/i,
         'T_LOGICAL_AND': /and\b/i,
         'T_LOGICAL_OR': /or\b/i,
         'T_LOGICAL_XOR': /xor\b/i,
@@ -1268,11 +1268,15 @@ module.exports = {
             components: {name: 'number', what: 'T_LNUMBER'},
             processor: function (node) {
                 if (/^0x/i.test(node.number)) {
-                    // Number is in hexadecimal
+                    // Number is in hexadecimal. Note that unlike binary literals as below,
+                    // the prefix does not need to be stripped off.
                     node.number = parseInt(node.number, 16) + '';
+                } else if (/^0b/i.test(node.number)) {
+                    // Number is in binary. Note that "0b" prefix must be stripped off.
+                    node.number = parseInt(node.number.substring(2), 2) + '';
                 } else if (/^0/i.test(node.number)) {
                     // In strict mode, parseInt(...) will parse an octal literal as decimal
-                    // so eg. parseInt('021') will return 21 instead of 17
+                    // so eg. parseInt('021') will return 21 instead of 17.
                     node.number = parseInt(node.number, 8) + '';
                 }
 

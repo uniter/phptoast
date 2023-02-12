@@ -99,6 +99,19 @@ describe('PHP Parser grammar number literal expression integration', function ()
                 }]
             }
         },
+        'return of binary literal': {
+            code: 'return 0b10100111001;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_INTEGER',
+                        number: '1337'
+                    }
+                }]
+            }
+        },
         'return of float literal': {
             code: 'return 1002.7;',
             expectedAST: {
