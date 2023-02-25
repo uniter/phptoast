@@ -318,7 +318,7 @@ module.exports = {
         'T_DIV_EQUAL': /\/=/,
 
         // See http://www.php.net/manual/en/language.types.float.php
-        'T_DNUMBER': /-?(?:\d\.\d+e\d+|\d*\.\d+|\d+e[+-]?\d+)/i,
+        'T_DNUMBER': /[+-]?(?:\d\.\d+e\d+|\d*\.\d+|\d+e[+-]?\d+)/i,
 
         'T_DOC_COMMENT': /\/\*\*([\s\S]*?)\*\//,
         'T_DO': /do\b/i,
@@ -376,7 +376,7 @@ module.exports = {
         'T_IS_SMALLER_OR_EQUAL': /<=/,
         'T_LINE': /__LINE__\b/i,
         'T_LIST': /list\b/i,
-        'T_LNUMBER': /-?(?:0x[0-9a-f]+|0b[01]+|\d+)/i,
+        'T_LNUMBER': /[+-]?(?:0x[0-9a-f]+|0b[01]+|\d+)/i,
         'T_LOGICAL_AND': /and\b/i,
         'T_LOGICAL_OR': /or\b/i,
         'T_LOGICAL_XOR': /xor\b/i,

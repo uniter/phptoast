@@ -48,6 +48,72 @@ describe('PHP Parser grammar arithmetic identity "+<value>" operator integration
                     }
                 }]
             }
+        },
+        'assigning identity of variable value to another variable, with redundant parenthesised identity': {
+            code: '$identity = +(+$value);',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'identity'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_UNARY_EXPRESSION',
+                                operator: '+',
+                                operand: {
+                                    name: 'N_UNARY_EXPRESSION',
+                                    operator: '+',
+                                    operand: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'value'
+                                    },
+                                    prefix: true
+                                },
+                                prefix: true
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
+        'assigning identity of negated variable value to another variable': {
+            code: '$identity = +(-$value);',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'identity'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_UNARY_EXPRESSION',
+                                operator: '+',
+                                operand: {
+                                    name: 'N_UNARY_EXPRESSION',
+                                    operator: '-',
+                                    operand: {
+                                        name: 'N_VARIABLE',
+                                        variable: 'value'
+                                    },
+                                    prefix: true
+                                },
+                                prefix: true
+                            }
+                        }]
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

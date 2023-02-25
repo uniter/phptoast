@@ -34,6 +34,19 @@ describe('PHP Parser grammar number literal expression integration', function ()
                 }]
             }
         },
+        'return of positive integer literal with redundant identity "+" prefix': {
+            code: 'return +21;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_INTEGER',
+                        number: '+21'
+                    }
+                }]
+            }
+        },
         'return of negative integer literal': {
             code: 'return -27;',
             expectedAST: {
@@ -121,6 +134,19 @@ describe('PHP Parser grammar number literal expression integration', function ()
                     expression: {
                         name: 'N_FLOAT',
                         number: 1002.7
+                    }
+                }]
+            }
+        },
+        'return of positive float literal with redundant identity "+" prefix': {
+            code: 'return +123.45;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_RETURN_STATEMENT',
+                    expression: {
+                        name: 'N_FLOAT',
+                        number: 123.45
                     }
                 }]
             }
