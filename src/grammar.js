@@ -567,7 +567,32 @@ module.exports = {
             }
         },
         'N_CLOSURE': {
-            components: [{name: 'static', optionally: 'T_STATIC'}, 'T_FUNCTION', (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), {oneOf: [['T_USE', (/\(/), {name: 'bindings', zeroOrMoreOf: ['N_ARGUMENT_VARIABLE', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/)], {name: 'bindings', zeroOrMoreOf: {what: (/(?!)/)}}]}, {name: 'body', what: 'N_STATEMENT'}],
+            components: [
+                {name: 'static', optionally: 'T_STATIC'},
+                'T_FUNCTION',
+                (/\(/),
+                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                (/\)/),
+                {
+                    optionally: [
+                        (/:/),
+                        {name: 'returnType', rule: 'N_TYPE'}
+                    ]
+                },
+                {oneOf: [
+                    [
+                        'T_USE',
+                        (/\(/),
+                        {
+                            name: 'bindings',
+                            zeroOrMoreOf: ['N_ARGUMENT_VARIABLE', {what: (/(,|(?=\)))()/), captureIndex: 2}]
+                        },
+                        (/\)/)
+                    ],
+                    {name: 'bindings', zeroOrMoreOf: {what: (/(?!)/)}}
+                ]},
+                {name: 'body', what: 'N_STATEMENT'}
+            ],
             processor: function (node) {
                 node.static = !!node.static;
 
@@ -1180,7 +1205,20 @@ module.exports = {
             components: ['T_FOREACH', (/\(/), {name: 'array', rule: 'N_EXPRESSION'}, 'T_AS', {optionally: [{name: 'key', oneOf: ['N_ARRAY_INDEX', 'N_ARGUMENT_VARIABLE']}, 'T_DOUBLE_ARROW']}, {name: 'value', oneOf: ['N_ARRAY_INDEX', 'N_ARGUMENT_VARIABLE']}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
         },
         'N_FUNCTION_STATEMENT': {
-            components: ['T_FUNCTION', {name: 'func', what: 'N_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
+            components: [
+                'T_FUNCTION',
+                {name: 'func', what: 'N_STRING'},
+                (/\(/),
+                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                (/\)/),
+                {
+                    optionally: [
+                        (/:/),
+                        {name: 'returnType', rule: 'N_TYPE'}
+                    ]
+                },
+                {name: 'body', what: 'N_STATEMENT'}
+            ]
         },
         'N_GLOBAL_STATEMENT': {
             components: ['T_GLOBAL', {name: 'variables', oneOrMoreOf: ['N_VARIABLE', (/,|(?=;|[?%]>\n?)/)]}, 'N_END_STATEMENT']
@@ -1359,6 +1397,12 @@ module.exports = {
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),
+                {
+                    optionally: [
+                        (/:/),
+                        {name: 'returnType', rule: 'N_TYPE'}
+                    ]
+                },
                 {name: 'body', what: 'N_STATEMENT'}
             ],
             processor: function (node) {
@@ -1617,6 +1661,12 @@ module.exports = {
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),
+                {
+                    optionally: [
+                        (/:/),
+                        {name: 'returnType', rule: 'N_TYPE'}
+                    ]
+                },
                 {name: 'body', what: 'N_STATEMENT'}
             ],
             processor: function (node) {
@@ -1931,10 +1981,68 @@ module.exports = {
         'N_ITERABLE_TYPE': {
             components: [{allowMerge: false, what: /iterable\b/i}]
         },
+        'N_NULL_TYPE': {
+            components: [{allowMerge: false, what: /null\b/i}]
+        },
         'N_TYPE': {
             components: [
-                {oneOf: ['N_ARRAY_TYPE', 'N_CALLABLE_TYPE', 'N_ITERABLE_TYPE', 'N_CLASS_TYPE']}
+                {oneOf: ['N_UNION_TYPE', 'N_NON_UNION_TYPE']}
             ]
+        },
+        'N_NON_UNION_TYPE': {
+            components: [
+                { name: 'isNullable', optionally: /\?/ },
+                { name: 'type', rule: 'N_SINGLE_TYPE' }
+            ],
+            processor: function (node) {
+                if (!node.isNullable) {
+                    return node.type;
+                }
+
+                // Represent a "?"-prefixed nullable type as its equivalent union "...|null".
+                return {
+                    name: 'N_UNION_TYPE',
+                    types: [
+                        node.type,
+                        { name: 'N_NULL_TYPE' }
+                    ]
+                };
+            }
+        },
+        'N_SCALAR_TYPE': {
+            components: [
+                {name: 'type', what: /(?:bool|float|int|string)\b/i}
+            ]
+        },
+        'N_VOID_TYPE': {
+            components: [{allowMerge: false, what: /void\b/i}]
+        },
+        'N_SINGLE_TYPE': {
+            components: [
+                {oneOf: [
+                    'N_ARRAY_TYPE',
+                    'N_CALLABLE_TYPE',
+                    'N_ITERABLE_TYPE',
+                    'N_NULL_TYPE',
+                    'N_SCALAR_TYPE',
+                    'N_VOID_TYPE',
+                    'N_CLASS_TYPE'
+                ]}
+            ]
+        },
+        'N_UNION_TYPE': {
+            components: [
+                {name: 'firstType', rule: 'N_SINGLE_TYPE'},
+                {name: 'otherTypes', oneOrMoreOf: [/\|/, 'N_SINGLE_TYPE']}
+            ],
+            processor: function (node) {
+                node.types = [node.firstType].concat(node.otherTypes);
+
+                delete node.firstType;
+                delete node.otherTypes;
+
+                return node;
+            }
         },
         'N_UNSET_STATEMENT': {
             components: ['T_UNSET', (/\(/), {name: 'variables', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), 'N_END_STATEMENT']
