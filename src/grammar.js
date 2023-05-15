@@ -638,6 +638,36 @@ module.exports = {
         'N_CONTINUE_STATEMENT': {
             components: ['T_CONTINUE', {name: 'levels', oneOf: ['N_INTEGER', 'N_JUMP_ONE_LEVEL']}, 'N_END_STATEMENT']
         },
+        'N_STRICT_TYPES_DIRECTIVE': {
+            components: [/strict_types/, /=/, {name: 'value', rule: 'N_TERM'}]
+        },
+        'N_DECLARE_DIRECTIVE': {
+            components: {oneOf: ['N_STRICT_TYPES_DIRECTIVE']}
+        },
+        'N_DECLARE_STATEMENT': {
+            components: [
+                'T_DECLARE',
+                /\(/,
+                {
+                    name: 'firstDirective',
+                    rule: 'N_DECLARE_DIRECTIVE'
+                },
+                {
+                    name: 'otherDirectives',
+                    zeroOrMoreOf: [/,/, 'N_DECLARE_DIRECTIVE']
+                },
+                /\)/,
+                'N_END_STATEMENT'
+            ],
+            processor: function (node) {
+                node.directives = [node.firstDirective].concat(node.otherDirectives);
+
+                delete node.firstDirective;
+                delete node.otherDirectives;
+
+                return node;
+            }
+        },
         'N_DEFAULT_CASE': {
             components: ['T_DEFAULT', (/:/), {name: 'body', zeroOrMoreOf: 'N_STATEMENT'}]
         },
@@ -1576,6 +1606,7 @@ module.exports = {
                 'N_BREAK_STATEMENT',
                 'N_CONTINUE_STATEMENT',
                 'N_UNSET_STATEMENT',
+                'N_DECLARE_STATEMENT',
                 'N_EXPRESSION_STATEMENT',
                 'N_FUNCTION_STATEMENT',
                 'N_IF_STATEMENT',
