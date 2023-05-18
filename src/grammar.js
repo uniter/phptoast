@@ -714,7 +714,7 @@ module.exports = {
             }
         },
         'N_EXPRESSION': {
-            components: {oneOf: ['N_EXPRESSION_LEVEL_22']}
+            components: {oneOf: ['N_EXPRESSION_LEVEL_25']}
         },
 
         /*
@@ -1173,7 +1173,7 @@ module.exports = {
                 {name: 'right', oneOrMoreOf: [{name: 'operator', what: (/(?:[-+*\/.%&|^]|<<|>>)?=/)}, {name: 'operand', what: 'N_EXPRESSION'}]}
             ]
         },
-        'N_EXPRESSION_LEVEL_18_A': {
+        'N_EXPRESSION_LEVEL_20': {
              captureAs: 'N_EXPRESSION',
              components: {
                  // Don't allow binary expressions on the left-hand side of assignments
@@ -1183,37 +1183,55 @@ module.exports = {
                  ]
              }
         },
-        'N_EXPRESSION_LEVEL_18_B': {
+        'N_EXPRESSION_LEVEL_21': {
+            captureAs: 'N_YIELD_EXPRESSION',
+            components: {oneOf: [
+                [
+                    'T_YIELD',
+                    {name: 'value', rule: 'N_EXPRESSION_LEVEL_20'}
+                ],
+                {name: 'next', what: 'N_EXPRESSION_LEVEL_20'}
+            ]},
+            processor: function (node, parse, abort, context) {
+                if (!node.value) {
+                    return node.next;
+                }
+
+                // This yield expression means that the function it is inside
+                // is a generator and not a normal function.
+                context.yieldEncountered = true;
+
+                return node;
+            }
+        },
+        'N_EXPRESSION_LEVEL_22': {
             captureAs: 'N_PRINT_EXPRESSION',
             components: {oneOf: [
                 [
                     'T_PRINT',
-                    {name: 'operand', what: 'N_EXPRESSION_LEVEL_18_A'},
+                    {name: 'operand', what: 'N_EXPRESSION_LEVEL_21'},
                 ],
-                {name: 'next', what: 'N_EXPRESSION_LEVEL_18_A'}
+                {name: 'next', what: 'N_EXPRESSION_LEVEL_21'}
             ]},
             ifNoMatch: {component: 'operand', capture: 'next'}
         },
-        'N_EXPRESSION_LEVEL_19': {
+        'N_EXPRESSION_LEVEL_23': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_18_B'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_AND', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_18_B'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_22'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_AND', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_22'}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
             // TODO: Use buildBinaryExpression ahead of deprecating N_EXPRESSION for N_BINARY_EXPRESSION w/a single right operand
         },
-        'N_EXPRESSION_LEVEL_20': {
+        'N_EXPRESSION_LEVEL_24': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_19'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_XOR', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_19'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_23'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_XOR', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_23'}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
             // TODO: Use buildBinaryExpression ahead of deprecating N_EXPRESSION for N_BINARY_EXPRESSION w/a single right operand
         },
-        'N_EXPRESSION_LEVEL_21': {
+        'N_EXPRESSION_LEVEL_25': {
             captureAs: 'N_EXPRESSION',
-            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_20'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_OR', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_20'}]}],
+            components: [{name: 'left', what: 'N_EXPRESSION_LEVEL_24'}, {name: 'right', zeroOrMoreOf: [{name: 'operator', what: 'T_LOGICAL_OR', replace: lowercaseReplacements}, {name: 'operand', what: 'N_EXPRESSION_LEVEL_24'}]}],
             ifNoMatch: {component: 'right', capture: 'left'}
             // TODO: Use buildBinaryExpression ahead of deprecating N_EXPRESSION for N_BINARY_EXPRESSION w/a single right operand
-        },
-        'N_EXPRESSION_LEVEL_22': {
-            components: 'N_EXPRESSION_LEVEL_21'
         },
         'N_LEFT_HAND_SIDE_EXPRESSION': 'N_EXPRESSION_LEVEL_2_A',
         'N_EXPRESSION_STATEMENT': {
@@ -1248,7 +1266,18 @@ module.exports = {
                     ]
                 },
                 {name: 'body', what: 'N_STATEMENT'}
-            ]
+            ],
+            processor: function (node, parse, abort, context) {
+                if (context.yieldEncountered) {
+                    delete context.yieldEncountered;
+
+                    // One or more yield statements encountered inside,
+                    // therefore this is a generator and not a normal function.
+                    node.generator = true;
+                }
+
+                return node;
+            }
         },
         'N_GLOBAL_STATEMENT': {
             components: ['T_GLOBAL', {name: 'variables', oneOrMoreOf: ['N_VARIABLE', (/,|(?=;|[?%]>\n?)/)]}, 'N_END_STATEMENT']
