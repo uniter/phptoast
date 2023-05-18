@@ -1559,6 +1559,8 @@ module.exports = {
                 'N_INLINE_HTML_STATEMENT_AT_START',
                 {
                     oneOf: [
+                        'N_DECLARE_STATEMENT',
+
                         'N_SEMICOLON_NAMESPACE_STATEMENT',
 
                         // Braced semicolon statements must not be followed by any other statements.

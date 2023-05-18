@@ -68,6 +68,26 @@ describe('PHP Parser grammar "declare" statement integration', function () {
                     }]
                 }]
             }
+        },
+        'declaring strict_types as on and a namespace in the same module': {
+            code: '<?php declare(strict_types=1); namespace My\\Stuff;',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_DECLARE_STATEMENT',
+                    directives: [{
+                        name: 'N_STRICT_TYPES_DIRECTIVE',
+                        value: {
+                            name: 'N_INTEGER',
+                            number: '1'
+                        }
+                    }]
+                }, {
+                    name: 'N_NAMESPACE_STATEMENT',
+                    namespace: 'My\\Stuff',
+                    statements: []
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
