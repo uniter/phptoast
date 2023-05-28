@@ -2077,8 +2077,14 @@ module.exports = {
         'N_ITERABLE_TYPE': {
             components: [{allowMerge: false, what: /iterable\b/i}]
         },
+        'N_MIXED_TYPE': {
+            components: [{allowMerge: false, what: /mixed\b/i}]
+        },
         'N_NULL_TYPE': {
             components: [{allowMerge: false, what: /null\b/i}]
+        },
+        'N_OBJECT_TYPE': {
+            components: [{allowMerge: false, what: /object\b/i}]
         },
         'N_TYPE': {
             components: [
@@ -2119,7 +2125,9 @@ module.exports = {
                     'N_ARRAY_TYPE',
                     'N_CALLABLE_TYPE',
                     'N_ITERABLE_TYPE',
+                    'N_MIXED_TYPE',
                     'N_NULL_TYPE',
+                    'N_OBJECT_TYPE',
                     'N_SCALAR_TYPE',
                     'N_VOID_TYPE',
                     'N_CLASS_TYPE'
