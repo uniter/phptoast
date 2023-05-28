@@ -593,8 +593,16 @@ module.exports = {
                 ]},
                 {name: 'body', what: 'N_STATEMENT'}
             ],
-            processor: function (node) {
+            processor: function (node, parse, abort, context) {
                 node.static = !!node.static;
+
+                if (context.yieldEncountered) {
+                    delete context.yieldEncountered;
+
+                    // One or more yield statements encountered inside,
+                    // therefore this is a generator and not a normal closure.
+                    node.generator = true;
+                }
 
                 return node;
             }
@@ -1188,13 +1196,23 @@ module.exports = {
             components: {oneOf: [
                 [
                     'T_YIELD',
+                    {
+                        optionally: [
+                            {name: 'key', rule: 'N_EXPRESSION_LEVEL_20'},
+                            /=>/
+                        ]
+                    },
                     {name: 'value', rule: 'N_EXPRESSION_LEVEL_20'}
                 ],
                 {name: 'next', what: 'N_EXPRESSION_LEVEL_20'}
             ]},
             processor: function (node, parse, abort, context) {
-                if (!node.value) {
+                if (node.next) {
                     return node.next;
+                }
+
+                if (!node.key) {
+                    node.key = null;
                 }
 
                 // This yield expression means that the function it is inside
@@ -1464,9 +1482,17 @@ module.exports = {
                 },
                 {name: 'body', what: 'N_STATEMENT'}
             ],
-            processor: function (node) {
+            processor: function (node, parse, abort, context) {
                 if (!node.visibility) {
                     node.visibility = 'public';
+                }
+
+                if (context.yieldEncountered) {
+                    delete context.yieldEncountered;
+
+                    // One or more yield statements encountered inside,
+                    // therefore this is a generator and not a normal closure.
+                    node.generator = true;
                 }
 
                 return node;
@@ -1731,9 +1757,17 @@ module.exports = {
                 },
                 {name: 'body', what: 'N_STATEMENT'}
             ],
-            processor: function (node) {
+            processor: function (node, parse, abort, context) {
                 if (!node.visibility) {
                     node.visibility = 'public';
+                }
+
+                if (context.yieldEncountered) {
+                    delete context.yieldEncountered;
+
+                    // One or more yield statements encountered inside,
+                    // therefore this is a generator and not a normal closure.
+                    node.generator = true;
                 }
 
                 return node;
