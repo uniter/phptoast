@@ -573,12 +573,6 @@ module.exports = {
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),
-                {
-                    optionally: [
-                        (/:/),
-                        {name: 'returnType', rule: 'N_TYPE'}
-                    ]
-                },
                 {oneOf: [
                     [
                         'T_USE',
@@ -591,6 +585,12 @@ module.exports = {
                     ],
                     {name: 'bindings', zeroOrMoreOf: {what: (/(?!)/)}}
                 ]},
+                {
+                    optionally: [
+                        (/:/),
+                        {name: 'returnType', rule: 'N_TYPE'}
+                    ]
+                },
                 {name: 'body', what: 'N_STATEMENT'}
             ],
             processor: function (node, parse, abort, context) {

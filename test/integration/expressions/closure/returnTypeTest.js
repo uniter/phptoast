@@ -43,6 +43,31 @@ describe('PHP Parser grammar closure expression return type integration', functi
                 }]
             }
         },
+        'empty closure in void context with "use" binding and "array" return type': {
+            code: 'function () use ($myBinding) : array {};',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_CLOSURE',
+                        static: false,
+                        args: [],
+                        bindings: [{
+                            name: 'N_VARIABLE',
+                            variable: 'myBinding'
+                        }],
+                        body: {
+                            name: 'N_COMPOUND_STATEMENT',
+                            statements: []
+                        },
+                        returnType: {
+                            name: 'N_ARRAY_TYPE'
+                        }
+                    }
+                }]
+            }
+        },
         'empty closure in void context with "callable" return type': {
             code: 'function () : callable {};',
             expectedAST: {
