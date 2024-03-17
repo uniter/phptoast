@@ -1,7 +1,7 @@
 PHP-To-AST
 ==========
 
-[![Build Status](https://github.com/uniter/phptoast/workflows/CI/badge.svg)](https://github.com/uniter/phptoast/actions?query=workflow%3ACI)
+[![Build Status](https://github.com/uniter/phptoast/workflows/CI/badge.svg?branch=master)](https://github.com/uniter/phptoast/actions?query=workflow%3ACI)
 
 PHP-to-AST parser.
 
