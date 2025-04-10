@@ -20,7 +20,7 @@
   "main": "index",
   "scripts": {
     "jshint": "jshint .",
-    "mocha": "mocha --recursive test/",
+    "mocha": "mocha -r mocha-bootstrap --recursive test/",
     "test": "npm run jshint && npm run mocha"
   },
   "dependencies": {
@@ -32,8 +32,9 @@
     "chai": "^4.3.7",
     "jshint": "^2.13.6",
     "mocha": "^10.2.0",
+    "mocha-bootstrap": "^1.0.6",
     "nowdoc": "^1.0.1",
-    "sinon": "^15.0.1"
+    "sinon": "^17.0.1"
   },
   "engines": {
     "node": ">=0.6"

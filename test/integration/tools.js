@@ -38,7 +38,7 @@ module.exports = {
                     throw new Error('Expected an Exception to be thrown');
                 });
             } else if (hasOwn.call(scenario, 'expectedAST')) {
-                it('should return the expected result', function () {
+                it('should return the expected AST', function () {
                     var result = parser.parse(scenario.code);
 
                     expect(result).to.deep.equal(scenario.expectedAST);

@@ -255,6 +255,38 @@ describe('PHP Parser grammar closure expression integration', function () {
                     }
                 }]
             }
+        },
+        'empty closure in void context with two parameters that returns by reference': {
+            code: 'function &($a, $b) {};',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_CLOSURE',
+                        static: false,
+                        args: [{
+                            name: 'N_ARGUMENT',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'a'
+                            }
+                        }, {
+                            name: 'N_ARGUMENT',
+                            variable: {
+                                name: 'N_VARIABLE',
+                                variable: 'b'
+                            }
+                        }],
+                        bindings: [],
+                        body: {
+                            name: 'N_COMPOUND_STATEMENT',
+                            statements: []
+                        },
+                        returnByReference: true
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {

@@ -558,7 +558,30 @@ module.exports = {
             components: ['T_CASE', {name: 'expression', what: 'N_EXPRESSION'}, (/[:;]/), {name: 'body', zeroOrMoreOf: 'N_STATEMENT'}]
         },
         'N_CLASS_STATEMENT': {
-            components: [{optionally: {name: 'type', oneOf: ['T_ABSTRACT', 'T_FINAL']}}, 'T_CLASS', {name: 'className', rule: 'T_STRING'}, {optionally: ['T_EXTENDS', {name: 'extend', oneOf: ['N_NAMESPACE', 'T_STRING']}]}, {optionally: ['T_IMPLEMENTS', {name: 'implement', zeroOrMoreOf: [{oneOf: ['N_NAMESPACE', 'T_STRING']}, {what: (/(,|(?=\{))()/), captureIndex: 2}]}]}, (/\{/), {name: 'members', zeroOrMoreOf: {oneOf: ['N_INSTANCE_PROPERTY_DEFINITION', 'N_STATIC_PROPERTY_DEFINITION', 'N_METHOD_DEFINITION', 'N_STATIC_METHOD_DEFINITION', 'N_ABSTRACT_METHOD_DEFINITION', 'N_ABSTRACT_STATIC_METHOD_DEFINITION', 'N_CONSTANT_DEFINITION']}}, (/\}/)],
+            components: [
+                {optionally: {name: 'type', oneOf: ['T_ABSTRACT', 'T_FINAL']}},
+                'T_CLASS',
+                {name: 'className', rule: 'T_STRING'},
+                {optionally: ['T_EXTENDS', {name: 'extend', oneOf: ['N_NAMESPACE', 'T_STRING']}]},
+                {optionally: ['T_IMPLEMENTS', {name: 'implement', zeroOrMoreOf: [{oneOf: ['N_NAMESPACE', 'T_STRING']}, {what: (/(,|(?=\{))()/), captureIndex: 2}]}]},
+                (/\{/),
+                {
+                    name: 'members',
+                    zeroOrMoreOf: {
+                        oneOf: [
+                            'N_INSTANCE_PROPERTY_DEFINITION',
+                            'N_STATIC_PROPERTY_DEFINITION',
+                            'N_METHOD_DEFINITION',
+                            'N_STATIC_METHOD_DEFINITION',
+                            'N_ABSTRACT_METHOD_DEFINITION',
+                            'N_ABSTRACT_STATIC_METHOD_DEFINITION',
+                            'N_CONSTANT_DEFINITION',
+                            'N_USE_TRAIT_STATEMENT'
+                        ]
+                    }
+                },
+                (/\}/)
+            ],
             processor: function (node) {
                 if (node.type) {
                     node.type = node.type.toLowerCase();
@@ -570,6 +593,11 @@ module.exports = {
             components: [
                 {name: 'static', optionally: 'T_STATIC'},
                 'T_FUNCTION',
+                {
+                    optionally: [
+                        {name: 'returnByReference', what: (/&/)}
+                    ]
+                },
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),
@@ -602,6 +630,10 @@ module.exports = {
                     // One or more yield statements encountered inside,
                     // therefore this is a generator and not a normal closure.
                     node.generator = true;
+                }
+
+                if (node.returnByReference) {
+                    node.returnByReference = true;
                 }
 
                 return node;
@@ -1273,6 +1305,11 @@ module.exports = {
         'N_FUNCTION_STATEMENT': {
             components: [
                 'T_FUNCTION',
+                {
+                    optionally: [
+                        {name: 'returnByReference', what: (/&/)}
+                    ]
+                },
                 {name: 'func', what: 'N_STRING'},
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
@@ -1292,6 +1329,10 @@ module.exports = {
                     // One or more yield statements encountered inside,
                     // therefore this is a generator and not a normal function.
                     node.generator = true;
+                }
+
+                if (node.returnByReference) {
+                    node.returnByReference = true;
                 }
 
                 return node;
@@ -1441,7 +1482,16 @@ module.exports = {
             components: ['T_LIST', (/\(/), {name: 'elements', zeroOrMoreOf: {oneOf: [[{oneOf: ['N_VARIABLE', 'N_ARRAY_INDEX']}, {what: (/(,|(?=\)))()/), captureIndex: 2}], 'N_VOID']}}, (/\)/)]
         },
         'N_MAGIC_CONSTANT': {
-            components: {oneOf: ['N_MAGIC_CLASS_CONSTANT', 'N_MAGIC_DIR_CONSTANT', 'N_MAGIC_FILE_CONSTANT', 'N_MAGIC_FUNCTION_CONSTANT', 'N_MAGIC_LINE_CONSTANT', 'N_MAGIC_METHOD_CONSTANT', 'N_MAGIC_NAMESPACE_CONSTANT']}
+            components: {oneOf: [
+                'N_MAGIC_CLASS_CONSTANT',
+                'N_MAGIC_DIR_CONSTANT',
+                'N_MAGIC_FILE_CONSTANT',
+                'N_MAGIC_FUNCTION_CONSTANT',
+                'N_MAGIC_LINE_CONSTANT',
+                'N_MAGIC_METHOD_CONSTANT',
+                'N_MAGIC_NAMESPACE_CONSTANT',
+                'N_MAGIC_TRAIT_CONSTANT'
+            ]}
         },
         'N_MAGIC_CLASS_CONSTANT': {
             components: {what: 'T_CLASS_C', replace: uppercaseReplacements, allowMerge: false}
@@ -1464,12 +1514,20 @@ module.exports = {
         'N_MAGIC_NAMESPACE_CONSTANT': {
             components: {what: 'T_NS_C', replace: uppercaseReplacements, allowMerge: false}
         },
+        'N_MAGIC_TRAIT_CONSTANT': {
+            components: {what: 'T_TRAIT_C', replace: uppercaseReplacements, allowMerge: false}
+        },
         'N_METHOD_DEFINITION': {
             components: [
                 {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
                 {optionally: {name: 'modifier', rule: 'T_FINAL'}},
                 {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
                 'T_FUNCTION',
+                {
+                    optionally: [
+                        {name: 'returnByReference', what: (/&/)}
+                    ]
+                },
                 {name: 'func', what: 'N_STRING'},
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
@@ -1493,6 +1551,10 @@ module.exports = {
                     // One or more yield statements encountered inside,
                     // therefore this is a generator and not a normal closure.
                     node.generator = true;
+                }
+
+                if (node.returnByReference) {
+                    node.returnByReference = true;
                 }
 
                 return node;
@@ -1673,6 +1735,7 @@ module.exports = {
                 'N_DO_WHILE_STATEMENT',
                 'N_CLASS_STATEMENT',
                 'N_INTERFACE_STATEMENT',
+                'N_TRAIT_STATEMENT',
                 'N_SWITCH_STATEMENT',
                 'N_GLOBAL_STATEMENT',
                 'N_CONSTANT_STATEMENT',
@@ -1745,6 +1808,11 @@ module.exports = {
                 {optionally: {name: 'modifier', rule: 'T_FINAL'}},
                 {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
                 'T_FUNCTION',
+                {
+                    optionally: [
+                        {name: 'returnByReference', what: (/&/)}
+                    ]
+                },
                 {name: 'method', what: 'N_STRING'},
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
@@ -1768,6 +1836,10 @@ module.exports = {
                     // One or more yield statements encountered inside,
                     // therefore this is a generator and not a normal closure.
                     node.generator = true;
+                }
+
+                if (node.returnByReference) {
+                    node.returnByReference = true;
                 }
 
                 return node;
@@ -2040,6 +2112,38 @@ module.exports = {
         'N_THROW_STATEMENT': {
             components: ['T_THROW', {name: 'expression', rule: 'N_EXPRESSION'}, 'N_END_STATEMENT']
         },
+        'N_TRAIT_STATEMENT': {
+            components: [
+                'T_TRAIT',
+                {name: 'traitName', rule: 'T_STRING'},
+                {optionally: ['T_EXTENDS', {name: 'extend', oneOf: ['N_NAMESPACE', 'T_STRING']}]},
+                {optionally: [
+                    'T_IMPLEMENTS',
+                    {name: 'implement', zeroOrMoreOf: [
+                        {oneOf: ['N_NAMESPACE', 'T_STRING']},
+                        {what: (/(,|(?=\{))()/), captureIndex: 2}
+                    ]}
+                ]},
+                (/\{/),
+                {name: 'members', zeroOrMoreOf: {oneOf: [
+                    'N_INSTANCE_PROPERTY_DEFINITION',
+                    'N_STATIC_PROPERTY_DEFINITION',
+                    'N_METHOD_DEFINITION',
+                    'N_STATIC_METHOD_DEFINITION',
+                    'N_ABSTRACT_METHOD_DEFINITION',
+                    'N_ABSTRACT_STATIC_METHOD_DEFINITION',
+                    'N_CONSTANT_DEFINITION',
+                    'N_USE_TRAIT_STATEMENT'
+                ]}},
+                (/}/)
+            ],
+            processor: function (node) {
+                if (node.type) {
+                    node.type = node.type.toLowerCase();
+                }
+                return node;
+            }
+        },
         'N_TRY_STATEMENT': {
             components: [
                 'T_TRY',
@@ -2150,6 +2254,31 @@ module.exports = {
         },
         'N_UNSET_STATEMENT': {
             components: ['T_UNSET', (/\(/), {name: 'variables', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), 'N_END_STATEMENT']
+        },
+        'N_USE_TRAIT': {
+            components: {oneOf: ['N_NAMESPACE', 'T_STRING']}
+        },
+        'N_USE_TRAIT_STATEMENT': {
+            components: [
+                'T_USE',
+                {
+                    name: 'firstTrait',
+                    rule: 'N_USE_TRAIT'
+                },
+                {
+                    name: 'otherTraits',
+                    zeroOrMoreOf: [{what: /,()/, captureIndex: 1}, 'N_USE_TRAIT']
+                },
+                'N_END_STATEMENT'
+            ],
+            processor: function (node) {
+                node.traitNames = [node.firstTrait].concat(node.otherTraits);
+
+                delete node.firstTrait;
+                delete node.otherTraits;
+
+                return node;
+            }
         },
         'N_USE_STATEMENT': {
             components: ['T_USE', {name: 'uses', oneOrMoreOf: [{name: 'source', oneOf: ['N_NAMESPACE', 'T_STRING']}, {optionally: ['T_AS', {name: 'alias', what: 'T_STRING'}]}]}, 'N_END_STATEMENT']
