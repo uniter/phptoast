@@ -585,7 +585,21 @@ module.exports = {
             components: ['T_BREAK', {name: 'levels', oneOf: ['N_INTEGER', 'N_JUMP_ONE_LEVEL']}, 'N_END_STATEMENT']
         },
         'N_CASE': {
-            components: ['T_CASE', {name: 'expression', what: 'N_EXPRESSION'}, (/[:;]/), {name: 'body', zeroOrMoreOf: 'N_STATEMENT'}]
+            components: [
+                'T_CASE',
+                {name: 'expression', what: 'N_EXPRESSION'},
+                (/[:;]/),
+                {name: 'body', zeroOrMoreOf: 'N_STATEMENT'}
+            ]
+        },
+        'N_ALT_CASE': {
+            captureAs: 'N_CASE',
+            components: [
+                'T_CASE',
+                {name: 'expression', what: 'N_EXPRESSION'},
+                (/[:;]/),
+                {name: 'body', zeroOrMoreOf: 'N_ALT_STATEMENT_BODY_STATEMENT'}
+            ]
         },
         'N_CLASS_STATEMENT': {
             components: [
@@ -741,17 +755,37 @@ module.exports = {
         'N_DEFAULT_CASE': {
             components: ['T_DEFAULT', (/:/), {name: 'body', zeroOrMoreOf: 'N_STATEMENT'}]
         },
+        'N_ALT_DEFAULT_CASE': {
+            captureAs: 'N_DEFAULT_CASE',
+            components: ['T_DEFAULT', (/:/), {name: 'body', zeroOrMoreOf: 'N_ALT_STATEMENT_BODY_STATEMENT'}]
+        },
         'N_ECHO_STATEMENT': {
             components: ['T_ECHO', {name: 'expressions', oneOrMoreOf: ['N_EXPRESSION', {what: (/,|(?=;|[?%]>\n?)/)}]}, 'N_END_STATEMENT']
+        },
+        'N_EMPTY_INLINE_HTML': {
+            components: [
+                'T_CLOSE_TAG',
+                'T_OPEN_TAG'
+            ],
+            processor: function () {
+                // Match is successful but empty. For example, PHP tags used in the middle
+                // of an alternative switch control structure for code style reasons.
+                return '';
+            }
         },
         'N_EMPTY_STATEMENT': {
             components: (/;/)
         },
+        // FIXME: When semi-colon is omitted, closing PHP tag ends statement,
+        //        but we have N_IGNORE skipping over redundant PHP tags now so it gets to the end of the file
+        //        which is _not_ a valid statement terminator.
         'N_END_STATEMENT': {
             components: {
                 oneOf: [
-                    (/;/), // Standard semi-colon statement terminator
-                    (/(?=[?%]>\n?)/) // Statements may be terminated by a closing PHP tag
+                    (/;/), // Standard semi-colon statement terminator.
+                    // 'N_EMPTY_INLINE_HTML',
+                    (/(?=[?%]>\n?)/), // Statements may be terminated by a closing PHP tag.
+                    // '<EOF>'
                 ]
             }
         },
@@ -1327,10 +1361,62 @@ module.exports = {
             }
         },
         'N_FOR_STATEMENT': {
-            components: ['T_FOR', (/\(/), {name: 'initializer', what: 'N_COMMA_EXPRESSION'}, (/;/), {name: 'condition', what: 'N_COMMA_EXPRESSION'}, (/;/), {name: 'update', what: 'N_COMMA_EXPRESSION'}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
+            components: [
+                'T_FOR',
+                (/\(/),
+                {name: 'initializer', rule: 'N_COMMA_EXPRESSION'},
+                (/;/),
+                {name: 'condition', rule: 'N_COMMA_EXPRESSION'},
+                (/;/),
+                {name: 'update', rule: 'N_COMMA_EXPRESSION'},
+                (/\)/),
+                {name: 'body', rule: 'N_STATEMENT'}
+            ]
+        },
+        'N_ALT_FOR_STATEMENT': {
+            captureAs: 'N_FOR_STATEMENT',
+            components: [
+                'T_FOR',
+                (/\(/),
+                {name: 'initializer', rule: 'N_COMMA_EXPRESSION'},
+                (/;/),
+                {name: 'condition', rule: 'N_COMMA_EXPRESSION'},
+                (/;/),
+                {name: 'update', rule: 'N_COMMA_EXPRESSION'},
+                (/\)/),
+                (/:/),
+                {name: 'body', rule: 'N_ALT_STATEMENT_BODY'},
+                'T_ENDFOR',
+                'N_END_STATEMENT'
+            ]
         },
         'N_FOREACH_STATEMENT': {
-            components: ['T_FOREACH', (/\(/), {name: 'array', rule: 'N_EXPRESSION'}, 'T_AS', {optionally: [{name: 'key', oneOf: ['N_ARRAY_INDEX', 'N_ARGUMENT_VARIABLE']}, 'T_DOUBLE_ARROW']}, {name: 'value', oneOf: ['N_ARRAY_INDEX', 'N_ARGUMENT_VARIABLE']}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
+            components: [
+                'T_FOREACH',
+                (/\(/),
+                {name: 'array', rule: 'N_EXPRESSION'},
+                'T_AS',
+                {optionally: [{name: 'key', oneOf: ['N_ARRAY_INDEX', 'N_ARGUMENT_VARIABLE']}, 'T_DOUBLE_ARROW']},
+                {name: 'value', oneOf: ['N_ARRAY_INDEX', 'N_ARGUMENT_VARIABLE']},
+                (/\)/),
+                {name: 'body', what: 'N_STATEMENT'}
+            ]
+        },
+        'N_ALT_FOREACH_STATEMENT': {
+            captureAs: 'N_FOREACH_STATEMENT',
+            components: [
+                'T_FOREACH',
+                (/\(/),
+                {name: 'array', rule: 'N_EXPRESSION'},
+                'T_AS',
+                {optionally: [{name: 'key', oneOf: ['N_ARRAY_INDEX', 'N_ARGUMENT_VARIABLE']}, 'T_DOUBLE_ARROW']},
+                {name: 'value', oneOf: ['N_ARRAY_INDEX', 'N_ARGUMENT_VARIABLE']},
+                (/\)/),
+                (/:/),
+                {name: 'body', rule: 'N_ALT_STATEMENT_BODY'},
+                'T_ENDFOREACH',
+                'N_END_STATEMENT'
+            ]
         },
         'N_FUNCTION_STATEMENT': {
             components: [
@@ -1417,10 +1503,98 @@ module.exports = {
             components: {name: 'string', what: (/(?:[^\\$]|\\[\s\S]|\$(?=\$))+/), ignoreWhitespace: false, replace: stringEscapeReplacements}
         },
         'N_IF_STATEMENT': {
-            components: ['T_IF', (/\(/), {name: 'condition', what: 'N_EXPRESSION'}, (/\)/), {name: 'consequentStatement', what: 'N_STATEMENT'}, {optionally: [(/else(\b|(?=if\b))/), {name: 'alternateStatement', what: 'N_STATEMENT'}]}]
+            components: [
+                'T_IF',
+                (/\(/),
+                {name: 'condition', rule: 'N_EXPRESSION'},
+                (/\)/),
+                {name: 'consequentStatement', rule: 'N_STATEMENT'},
+                {optionally: [(/else(\b|(?=if\b))/), {name: 'alternateStatement', rule: 'N_STATEMENT'}]}
+            ]
+        },
+        'N_ALT_IF_STATEMENT': {
+            captureAs: 'N_IF_STATEMENT',
+            components: [
+                'T_IF',
+                (/\(/),
+                {name: 'condition', rule: 'N_EXPRESSION'},
+                (/\)/),
+                (/:/),
+                {name: 'consequentStatement', rule: 'N_ALT_STATEMENT_BODY'},
+                {name: 'conditionalAlternateStatements', zeroOrMoreOf: [
+                    'T_ELSEIF',
+                    (/\(/),
+                    {name: 'alternateCondition', rule: 'N_EXPRESSION'},
+                    (/\)/),
+                    (/:/),
+                    {name: 'alternateStatement', rule: 'N_ALT_STATEMENT_BODY'}
+                ]},
+                {optionally: [
+                    'T_ELSE',
+                    (/:/),
+                    {name: 'alternateStatement', rule: 'N_ALT_STATEMENT_BODY'}
+                ]},
+                'T_ENDIF',
+                'N_END_STATEMENT'
+            ],
+            processor: function (node) {
+                var currentNode,
+                    i,
+                    nestedIf,
+                    result = {
+                        name: 'N_IF_STATEMENT',
+                        condition: node.condition,
+                        consequentStatement: node.consequentStatement
+                    };
+
+                if (node.bounds) {
+                    result.bounds = node.bounds;
+                }
+
+                // Turn the elseif list into a tree structure.
+                if (node.conditionalAlternateStatements.length > 0) {
+                    currentNode = result;
+
+                    for (i = 0; i < node.conditionalAlternateStatements.length; i++) {
+                        nestedIf = {
+                            name: 'N_IF_STATEMENT',
+                            condition: node.conditionalAlternateStatements[i].alternateCondition,
+                            consequentStatement: node.conditionalAlternateStatements[i].alternateStatement
+                        };
+
+                        if (node.bounds) {
+                            nestedIf.bounds = {
+                                start: node.conditionalAlternateStatements[i].bounds.start,
+                                end: node.bounds.end
+                            };
+                        }
+
+                        currentNode.alternateStatement = nestedIf;
+                        currentNode = nestedIf;
+                    }
+
+                    // Add the final else if it exists.
+                    if (node.alternateStatement) {
+                        currentNode.alternateStatement = node.alternateStatement;
+                    }
+                } else if (node.alternateStatement) {
+                    // Just a simple if-else without elseif.
+                    result.alternateStatement = node.alternateStatement;
+                }
+
+                return result;
+            }
         },
         'N_IGNORE': {
-            components: {oneOrMoreOf: {oneOf: ['T_WHITESPACE', 'T_COMMENT', 'T_DOC_COMMENT']}}
+            components: {
+                oneOrMoreOf: {
+                    oneOf: [
+                        'T_WHITESPACE',
+                        'T_COMMENT',
+                        'T_DOC_COMMENT'
+                    ]
+                }
+            }
         },
         'N_INCLUDE_EXPRESSION': {
             components: ['T_INCLUDE', {name: 'path', what: 'N_EXPRESSION'}]
@@ -1442,7 +1616,10 @@ module.exports = {
                     {name: 'html', what: /()/},
                     'T_OPEN_TAG'
                 ]
-            ]
+            ],
+            processor: function (node) {
+                return node.html === '' ? '' : node;
+            }
         },
         'N_INSTANCE_MEMBER': {
             components: {oneOf: ['N_STRING', 'N_VARIABLE', [(/\{/), 'N_EXPRESSION', (/\}/)]]}
@@ -1745,6 +1922,57 @@ module.exports = {
             ]}
         },
         'N_STATEMENT': 'N_NAMESPACE_SCOPED_STATEMENT',
+        // End statements of alternative control structures would be parsed as barewords,
+        // so we need to handle them specially here.
+        'N_ALT_STATEMENT_BODY': {
+            components: {
+                name: 'statements',
+                zeroOrMoreOf: 'N_ALT_STATEMENT_BODY_STATEMENT'
+            },
+            processor: function (node) {
+                return node.statements.length === 1 ?
+                    // Alternative control structure section only contains a single statement,
+                    // no need to wrap it in a compound statement.
+                    node.statements[0] :
+                    // Alternative control structure section contains multiple statements,
+                    // wrap them in a compound statement.
+                    {
+                        name: 'N_COMPOUND_STATEMENT',
+                        statements: node.statements
+                    };
+            }
+        },
+        // End statements of alternative control structures would be parsed as barewords,
+        // so we need to handle them specially here.
+        'N_ALT_STATEMENT_BODY_STATEMENT': {
+            components: [
+                // {optionally: 'N_EMPTY_INLINE_HTML'},
+                {oneOf: [
+                    {
+                        // Mark end statements of alternative control structures.
+                        oneOf: [
+                            'T_ENDFOREACH',
+                            'T_ENDFOR',
+                            'T_ENDIF',
+                            'T_ENDSWITCH',
+                            'T_ENDWHILE',
+                            ['T_ELSE', (/:/)]
+                        ],
+                        modifier: function () {
+                            // TODO: Try just "return '';" and removing the processor below.
+                            return {'name': 'N_ALT_END_STATEMENT'};
+                        }
+                    },
+                    'N_STATEMENT'
+                ]},
+                // {optionally: 'N_EMPTY_INLINE_HTML'}
+            ],
+            processor: function (node) {
+                // Skip end statements of alternative control structures,
+                // so that can be matched by the alternative control structure rule.
+                return node.name === 'N_ALT_END_STATEMENT' ? null : node;
+            }
+        },
         'N_NAMESPACE_SCOPED_STATEMENT': {
             components: {oneOf: [
                 'N_COMPOUND_STATEMENT',
@@ -1774,7 +2002,12 @@ module.exports = {
                 'N_GOTO_STATEMENT',
                 'N_USE_STATEMENT',
                 'N_THROW_STATEMENT',
-                'N_TRY_STATEMENT'
+                'N_TRY_STATEMENT',
+                'N_ALT_FOR_STATEMENT',
+                'N_ALT_FOREACH_STATEMENT',
+                'N_ALT_IF_STATEMENT',
+                'N_ALT_SWITCH_STATEMENT',
+                'N_ALT_WHILE_STATEMENT'
             ]}
         },
         'N_REQUIRE_EXPRESSION': {
@@ -2106,7 +2339,28 @@ module.exports = {
             }
         },
         'N_SWITCH_STATEMENT': {
-            components: ['T_SWITCH', (/\(/), {name: 'expression', what: 'N_EXPRESSION'}, (/\)/), (/\{/), {name: 'cases', zeroOrMoreOf: {oneOf: ['N_CASE', 'N_DEFAULT_CASE']}}, (/\}/)]
+            components: [
+                'T_SWITCH',
+                (/\(/),
+                {name: 'expression', what: 'N_EXPRESSION'},
+                (/\)/),
+                (/\{/),
+                {name: 'cases', zeroOrMoreOf: {oneOf: ['N_CASE', 'N_DEFAULT_CASE']}},
+                (/\}/)
+            ]
+        },
+        'N_ALT_SWITCH_STATEMENT': {
+            captureAs: 'N_SWITCH_STATEMENT',
+            components: [
+                'T_SWITCH',
+                (/\(/),
+                {name: 'expression', what: 'N_EXPRESSION'},
+                (/\)/),
+                (/:/),
+                {name: 'cases', zeroOrMoreOf: {oneOf: ['N_ALT_CASE', 'N_ALT_DEFAULT_CASE', 'N_EMPTY_INLINE_HTML']}},
+                'T_ENDSWITCH',
+                'N_END_STATEMENT'
+            ]
         },
         'N_TERM': {
             components: {oneOf: [
@@ -2338,7 +2592,26 @@ module.exports = {
             allowMerge: false
         },
         'N_WHILE_STATEMENT': {
-            components: ['T_WHILE', (/\(/), {name: 'condition', what: 'N_EXPRESSION'}, (/\)/), {name: 'body', what: 'N_STATEMENT'}]
+            components: [
+                'T_WHILE',
+                (/\(/),
+                {name: 'condition', what: 'N_EXPRESSION'},
+                (/\)/),
+                {name: 'body', what: 'N_STATEMENT'}
+            ]
+        },
+        'N_ALT_WHILE_STATEMENT': {
+            captureAs: 'N_WHILE_STATEMENT',
+            components: [
+                'T_WHILE',
+                (/\(/),
+                {name: 'condition', what: 'N_EXPRESSION'},
+                (/\)/),
+                (/:/),
+                {name: 'body', rule: 'N_ALT_STATEMENT_BODY'},
+                'T_ENDWHILE',
+                'N_END_STATEMENT'
+            ]
         }
     },
     start: 'N_PROGRAM'
