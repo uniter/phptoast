@@ -449,15 +449,30 @@ module.exports = {
                 {optionally: {name: 'modifier', rule: 'T_FINAL'}},
                 {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
                 'T_FUNCTION',
+                {
+                    optionally: [
+                        {name: 'returnByReference', what: (/&/)}
+                    ]
+                },
                 {name: 'func', what: 'N_STRING'},
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),
+                {
+                    optionally: [
+                        (/:/),
+                        {name: 'returnType', rule: 'N_TYPE'}
+                    ]
+                },
                 'N_END_STATEMENT'
             ],
             processor: function (node) {
                 if (!node.visibility) {
                     node.visibility = 'public';
+                }
+
+                if (node.returnByReference) {
+                    node.returnByReference = true;
                 }
 
                 return node;
@@ -477,15 +492,30 @@ module.exports = {
                 {optionally: {name: 'modifier', rule: 'T_FINAL'}},
                 {optionally: {name: 'visibility', rule: 'N_VISIBILITY'}},
                 'T_FUNCTION',
+                {
+                    optionally: [
+                        {name: 'returnByReference', what: (/&/)}
+                    ]
+                },
                 {name: 'method', what: 'N_STRING'},
                 (/\(/),
                 {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
                 (/\)/),
+                {
+                    optionally: [
+                        (/:/),
+                        {name: 'returnType', rule: 'N_TYPE'}
+                    ]
+                },
                 'N_END_STATEMENT'
             ],
             processor: function (node) {
                 if (!node.visibility) {
                     node.visibility = 'public';
+                }
+
+                if (node.returnByReference) {
+                    node.returnByReference = true;
                 }
 
                 return node;
