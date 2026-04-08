@@ -523,11 +523,23 @@ module.exports = {
         },
         'N_ARGUMENT': {
             components: {oneOf: [
+                'N_VARIADIC_ARGUMENT',
                 [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}],
                 [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}],
                 [{name: 'type', rule: 'N_TYPE'}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}],
                 [{name: 'type', rule: 'N_TYPE'}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}]
             ]}
+        },
+        'N_VARIADIC_ARGUMENT': {
+            captureAs: 'N_ARGUMENT',
+            components: {oneOf: [
+                [(/\.\.\./), {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}],
+                [{name: 'type', rule: 'N_TYPE'}, (/\.\.\./), {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}]
+            ]},
+            processor: function (node) {
+                node.variadic = true;
+                return node;
+            }
         },
         'N_ARGUMENT_VARIABLE': {
             components: {
