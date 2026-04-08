@@ -456,7 +456,7 @@ module.exports = {
                 },
                 {name: 'func', what: 'N_STRING'},
                 (/\(/),
-                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', 'N_PARENTHESISED_LIST_DELIMITER']},
                 (/\)/),
                 {
                     optionally: [
@@ -499,7 +499,7 @@ module.exports = {
                 },
                 {name: 'method', what: 'N_STRING'},
                 (/\(/),
-                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', 'N_PARENTHESISED_LIST_DELIMITER']},
                 (/\)/),
                 {
                     optionally: [
@@ -566,7 +566,7 @@ module.exports = {
         },
         'N_LONG_ARRAY_LITERAL': {
             captureAs: 'N_ARRAY_LITERAL',
-            components: ['T_ARRAY', (/\(/), {name: 'elements', zeroOrMoreOf: [{oneOf: ['N_KEY_VALUE_PAIR', 'N_EXPRESSION']}, {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/)]
+            components: ['T_ARRAY', (/\(/), {name: 'elements', zeroOrMoreOf: [{oneOf: ['N_KEY_VALUE_PAIR', 'N_EXPRESSION']}, 'N_PARENTHESISED_LIST_DELIMITER']}, (/\)/)]
         },
         'N_SHORT_ARRAY_LITERAL': {
             captureAs: 'N_ARRAY_LITERAL',
@@ -655,7 +655,7 @@ module.exports = {
                     ]
                 },
                 (/\(/),
-                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', 'N_PARENTHESISED_LIST_DELIMITER']},
                 (/\)/),
                 {oneOf: [
                     [
@@ -663,7 +663,7 @@ module.exports = {
                         (/\(/),
                         {
                             name: 'bindings',
-                            zeroOrMoreOf: ['N_ARGUMENT_VARIABLE', {what: (/(,|(?=\)))()/), captureIndex: 2}]
+                            zeroOrMoreOf: ['N_ARGUMENT_VARIABLE', 'N_PARENTHESISED_LIST_DELIMITER']
                         },
                         (/\)/)
                     ],
@@ -1438,9 +1438,9 @@ module.exports = {
                         {name: 'returnByReference', what: (/&/)}
                     ]
                 },
-                {name: 'func', what: 'N_STRING'},
+                {name: 'func', rule: 'N_STRING'},
                 (/\(/),
-                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', 'N_PARENTHESISED_LIST_DELIMITER']},
                 (/\)/),
                 {
                     optionally: [
@@ -1661,7 +1661,21 @@ module.exports = {
             }
         },
         'N_INTERFACE_METHOD_DEFINITION': {
-            components: [{name: 'visibility', oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}, 'T_FUNCTION', {name: 'func', what: 'N_STRING'}, (/\(/), {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), 'N_END_STATEMENT']
+            components: [
+                {name: 'visibility', oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']},
+                'T_FUNCTION',
+                {name: 'func', what: 'N_STRING'},
+                (/\(/),
+                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', 'N_PARENTHESISED_LIST_DELIMITER']},
+                (/\)/),
+                {
+                    optionally: [
+                        (/:/),
+                        {name: 'returnType', rule: 'N_TYPE'}
+                    ]
+                },
+                'N_END_STATEMENT'
+            ]
         },
         'N_INTERFACE_STATEMENT': {
             components: [
@@ -1684,7 +1698,7 @@ module.exports = {
             ]
         },
         'N_ISSET': {
-            components: ['T_ISSET', (/\(/), {name: 'variables', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/)]
+            components: ['T_ISSET', (/\(/), {name: 'variables', zeroOrMoreOf: ['N_EXPRESSION', 'N_PARENTHESISED_LIST_DELIMITER']}, (/\)/)]
         },
         'N_JUMP_ONE_LEVEL': {
             captureAs: 'N_INTEGER',
@@ -1698,7 +1712,11 @@ module.exports = {
             components: [{name: 'label', what: [(/(?!default\b)/i), 'N_STRING']}, (/:/)]
         },
         'N_LIST': {
-            components: ['T_LIST', (/\(/), {name: 'elements', zeroOrMoreOf: {oneOf: [[{oneOf: ['N_VARIABLE', 'N_ARRAY_INDEX']}, {what: (/(,|(?=\)))()/), captureIndex: 2}], 'N_VOID']}}, (/\)/)]
+            components: ['T_LIST', (/\(/), {name: 'elements', zeroOrMoreOf: {oneOf: [[{oneOf: ['N_VARIABLE', 'N_ARRAY_INDEX']}, 'N_PARENTHESISED_LIST_DELIMITER'], 'N_VOID']}}, (/\)/)]
+        },
+        'N_PARENTHESISED_LIST_DELIMITER': {
+            what: (/(,|(?=\)))()/),
+            captureIndex: 2
         },
         'N_MAGIC_CONSTANT': {
             components: {oneOf: [
@@ -1749,7 +1767,7 @@ module.exports = {
                 },
                 {name: 'func', what: 'N_STRING'},
                 (/\(/),
-                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', 'N_PARENTHESISED_LIST_DELIMITER']},
                 (/\)/),
                 {
                     optionally: [
@@ -2065,8 +2083,14 @@ module.exports = {
                 'T_FUNCTION',
                 {name: 'method', what: 'N_STRING'},
                 (/\(/),
-                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', 'N_PARENTHESISED_LIST_DELIMITER']},
                 (/\)/),
+                {
+                    optionally: [
+                        (/:/),
+                        {name: 'returnType', rule: 'N_TYPE'}
+                    ]
+                },
                 'N_END_STATEMENT'
             ]
         },
@@ -2090,7 +2114,7 @@ module.exports = {
                 },
                 {name: 'method', what: 'N_STRING'},
                 (/\(/),
-                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                {name: 'args', zeroOrMoreOf: ['N_ARGUMENT', 'N_PARENTHESISED_LIST_DELIMITER']},
                 (/\)/),
                 {
                     optionally: [
@@ -2269,7 +2293,7 @@ module.exports = {
                                     'T_DOUBLE_COLON',
                                     {name: 'method', oneOf: ['N_STRING', 'N_VARIABLE', 'N_VARIABLE_EXPRESSION', 'N_MEMBER_EXPRESSION']},
                                     (/\(/),
-                                    {name: 'args', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
+                                    {name: 'args', zeroOrMoreOf: ['N_EXPRESSION', 'N_PARENTHESISED_LIST_DELIMITER']},
                                     (/\)/)
                                 ]
                             },
@@ -2549,7 +2573,7 @@ module.exports = {
             }
         },
         'N_UNSET_STATEMENT': {
-            components: ['T_UNSET', (/\(/), {name: 'variables', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]}, (/\)/), 'N_END_STATEMENT']
+            components: ['T_UNSET', (/\(/), {name: 'variables', zeroOrMoreOf: ['N_EXPRESSION', 'N_PARENTHESISED_LIST_DELIMITER']}, (/\)/), 'N_END_STATEMENT']
         },
         'N_USE_TRAIT': {
             components: {oneOf: ['N_NAMESPACE', 'T_STRING']}
