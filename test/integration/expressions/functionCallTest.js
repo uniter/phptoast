@@ -21,7 +21,7 @@ describe('PHP Parser grammar function call expression integration', function () 
     });
 
     _.each({
-        'simple function call test': {
+        'simple function call': {
             code: 'now();',
             expectedAST: {
                 name: 'N_PROGRAM',

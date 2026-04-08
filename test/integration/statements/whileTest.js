@@ -13,7 +13,7 @@ var _ = require('microdash'),
     expect = require('chai').expect,
     tools = require('../../tools');
 
-describe('PHP Parser grammar while statement integration', function () {
+describe('PHP Parser grammar while loop statement integration', function () {
     var parser;
 
     beforeEach(function () {
