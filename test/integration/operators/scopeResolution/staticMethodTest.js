@@ -11,7 +11,9 @@
 
 var _ = require('microdash'),
     expect = require('chai').expect,
-    tools = require('../../../tools');
+    phpCommon = require('phpcommon'),
+    tools = require('../../../tools'),
+    PHPFatalError = phpCommon.PHPFatalError;
 
 describe('PHP Parser grammar scope resolution operator "::" static method integration', function () {
     var parser;
@@ -45,6 +47,64 @@ describe('PHP Parser grammar scope resolution operator "::" static method integr
                 }]
             }
         },
+        'calling static method with one named argument': {
+            code: 'MyClass::myMethod(myParam: "my value");',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_STATIC_METHOD_CALL',
+                        className: {
+                            name: 'N_STRING',
+                            string: 'MyClass'
+                        },
+                        method: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
+                        args: [],
+                        namedArgs: {
+                            'myParam': {
+                                name: 'N_STRING_LITERAL',
+                                string: 'my value'
+                            }
+                        }
+                    }
+                }]
+            }
+        },
+        'calling static method with multiple named arguments': {
+            code: 'MyClass::myMethod(first: "one", second: "two");',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_STATIC_METHOD_CALL',
+                        className: {
+                            name: 'N_STRING',
+                            string: 'MyClass'
+                        },
+                        method: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
+                        args: [],
+                        namedArgs: {
+                            'first': {
+                                name: 'N_STRING_LITERAL',
+                                string: 'one'
+                            },
+                            'second': {
+                                name: 'N_STRING_LITERAL',
+                                string: 'two'
+                            }
+                        }
+                    }
+                }]
+            }
+        },
         'calling statically referenced static method of statically referenced class with namespace prefix': {
             code: '\\My\\Awesome\\Stuff::myMethod(6);',
             expectedAST: {
@@ -69,6 +129,36 @@ describe('PHP Parser grammar scope resolution operator "::" static method integr
                 }]
             }
         },
+        'calling static method with one positional and one named argument': {
+            code: '\\My\\Awesome\\Stuff::myMethod(21, myParam: "my value");',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_STATIC_METHOD_CALL',
+                        className: {
+                            name: 'N_STRING',
+                            string: '\\My\\Awesome\\Stuff'
+                        },
+                        method: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
+                        args: [{
+                            name: 'N_INTEGER',
+                            number: '21'
+                        }],
+                        namedArgs: {
+                            'myParam': {
+                                name: 'N_STRING_LITERAL',
+                                string: 'my value'
+                            }
+                        }
+                    }
+                }]
+            }
+        },
         'calling statically referenced static method of dynamically referenced class stored in variable': {
             code: '$myClassName::myMethod(5);',
             expectedAST: {
@@ -89,6 +179,33 @@ describe('PHP Parser grammar scope resolution operator "::" static method integr
                             name: 'N_INTEGER',
                             number: '5'
                         }]
+                    }
+                }]
+            }
+        },
+        'calling static method of dynamically referenced class with named arguments': {
+            code: '$myClassName::myMethod(myParam: "my value");',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_STATIC_METHOD_CALL',
+                        className: {
+                            name: 'N_VARIABLE',
+                            variable: 'myClassName'
+                        },
+                        method: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
+                        args: [],
+                        namedArgs: {
+                            'myParam': {
+                                name: 'N_STRING_LITERAL',
+                                string: 'my value'
+                            }
+                        }
                     }
                 }]
             }
@@ -272,6 +389,70 @@ describe('PHP Parser grammar scope resolution operator "::" static method integr
                     }
                 }]
             }
+        },
+        'calling dynamically referenced static method with named arguments': {
+            code: 'MyClass::{"myMethod"}(myParam: "my value");',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_STATIC_METHOD_CALL',
+                        className: {
+                            name: 'N_STRING',
+                            string: 'MyClass'
+                        },
+                        method: {
+                            name: 'N_STRING_LITERAL',
+                            string: 'myMethod'
+                        },
+                        args: [],
+                        namedArgs: {
+                            'myParam': {
+                                name: 'N_STRING_LITERAL',
+                                string: 'my value'
+                            }
+                        }
+                    }
+                }]
+            }
+        },
+        'calling static method with complex expression as named argument': {
+            code: 'MyClass::myMethod(myParam: 10 + 5);',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_STATIC_METHOD_CALL',
+                        className: {
+                            name: 'N_STRING',
+                            string: 'MyClass'
+                        },
+                        method: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
+                        args: [],
+                        namedArgs: {
+                            'myParam': {
+                                name: 'N_EXPRESSION',
+                                left: {
+                                    name: 'N_INTEGER',
+                                    number: '10'
+                                },
+                                right: [{
+                                    operator: '+',
+                                    operand: {
+                                        name: 'N_INTEGER',
+                                        number: '5'
+                                    }
+                                }]
+                            }
+                        }
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
@@ -284,5 +465,22 @@ describe('PHP Parser grammar scope resolution operator "::" static method integr
                 });
             });
         });
+    });
+
+    it('should raise a fatal error when a positional argument is provided after a named argument', function () {
+        var caughtError;
+        parser.getState().setPath('/path/to/my_module.php');
+
+        try {
+            parser.parse('<?php \n\nMyClass::myMethod(firstArg: "one", "two");');
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).to.be.an.instanceOf(PHPFatalError);
+        expect(caughtError.getMessage()).to.equal('Cannot use positional argument after named argument');
+        expect(caughtError.getFilePath()).to.equal('/path/to/my_module.php');
+        expect(caughtError.getLevel()).to.equal('Fatal error');
+        expect(caughtError.getLineNumber()).to.equal(3);
     });
 });

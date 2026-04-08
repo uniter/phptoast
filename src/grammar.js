@@ -16,6 +16,7 @@
 var _ = require('microdash'),
     CANNOT_MIX_NAMESPACE_DECLARATION_TYPES = 'core.cannot_mix_namespace_declaration_types',
     CANNOT_NEST_NAMESPACE_DECLARATIONS = 'core.cannot_nest_namespace_declarations',
+    CANNOT_USE_POSITIONAL_ARGUMENT_AFTER_NAMED_ARGUMENT = 'core.cannot_use_positional_argument_after_named_argument',
     NAMESPACE_DECLARATION_MUST_COME_FIRST = 'core.namespace_declaration_must_come_first',
     NO_CODE_OUTSIDE_NAMESPACE_DECLARATION_BRACES = 'core.no_code_outside_namespace_declaration_braces',
     lowercaseReplacements = [{
@@ -171,6 +172,10 @@ var _ = require('microdash'),
                     method: member.method_call.method,
                     args: member.method_call.args
                 };
+
+                if (member.method_call.namedArgs) {
+                    result.namedArgs = member.method_call.namedArgs;
+                }
             } else if (member.object_property) {
                 result = {
                     name: 'N_OBJECT_PROPERTY',
@@ -184,6 +189,10 @@ var _ = require('microdash'),
                     method: member.static_method_call.method,
                     args: member.static_method_call.args
                 };
+
+                if (member.static_method_call.namedArgs) {
+                    result.namedArgs = member.static_method_call.namedArgs;
+                }
             } else if (member.static_property) {
                 result = {
                     name: 'N_STATIC_PROPERTY',
@@ -202,6 +211,10 @@ var _ = require('microdash'),
                     func: result,
                     args: member.callable.args
                 };
+
+                if (member.callable.namedArgs) {
+                    result.namedArgs = member.callable.namedArgs;
+                }
             }
 
             if (member.bounds) {
@@ -613,6 +626,67 @@ module.exports = {
                 {name: 'body', zeroOrMoreOf: 'N_ALT_STATEMENT_BODY_STATEMENT'}
             ]
         },
+        'N_CALL': {
+            components: [
+                (/\(/),
+                {
+                    name: 'args',
+                    zeroOrMoreOf: [
+                        'N_EXPRESSION',
+                        'N_PARENTHESISED_LIST_DELIMITER'
+                    ]
+                },
+                {
+                    optionally: {
+                        name: 'namedArgs',
+                        oneOrMoreOf: [
+                            {
+                                what: [
+                                    {name: 'name', what: 'T_STRING'},
+                                    (/:/),
+                                    {name: 'value', what: 'N_EXPRESSION'},
+                                    'N_PARENTHESISED_LIST_DELIMITER'
+                                ]
+                            }
+                        ],
+                        modifier: function (capture) {
+                            var namedArgs = {};
+
+                            if (capture.length === 0) {
+                                return '';
+                            }
+
+                            _.each(capture, function (argCapture) {
+                                namedArgs[argCapture.name] = argCapture.value;
+                            });
+
+                            return namedArgs;
+                        }
+                    }
+                },
+                {
+                    zeroOrMoreOf: [
+                        'N_EXPRESSION',
+                        'N_PARENTHESISED_LIST_DELIMITER'
+                    ],
+                    modifier: function (capture, parse, abort) {
+                        if (capture.length === 0) {
+                            return capture;
+                        }
+
+                        abort('Cannot use positional argument after named argument', {
+                            translationKey: CANNOT_USE_POSITIONAL_ARGUMENT_AFTER_NAMED_ARGUMENT,
+                        });
+                    }
+                },
+                (/\)/)
+            ],
+            processor: function (node) {
+                delete node.name;
+
+                return node;
+            }
+        },
         'N_CLASS_STATEMENT': {
             components: [
                 {optionally: {name: 'type', oneOf: ['T_ABSTRACT', 'T_FINAL']}},
@@ -911,11 +985,7 @@ module.exports = {
                 [
                     'T_NEW',
                     {name: 'className', rule: 'N_NEW_EXPRESSION_DYNAMIC_CLASS'},
-                    {optionally: [
-                        (/\(/),
-                        {name: 'args', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
-                        (/\)/)
-                    ]}
+                    {optionally: 'N_CALL'}
                 ],
                 {name: 'next', what: 'N_EXPRESSION_LEVEL_0'}
             ]},
@@ -965,15 +1035,13 @@ module.exports = {
                                     ]
                                 ]
                             },
-                            // Method call
+                            // Instance method call.
                             {
                                 name: 'method_call',
                                 what: [
                                     'T_OBJECT_OPERATOR',
                                     {name: 'method', what: 'N_INSTANCE_MEMBER'},
-                                    (/\(/),
-                                    {name: 'args', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
-                                    (/\)/)
+                                    'N_CALL'
                                 ]
                             },
                             // Object property
@@ -985,15 +1053,13 @@ module.exports = {
                                     (/(?!\()/)
                                 ]
                             },
-                            // Static method call
+                            // Static method call.
                             {
                                 name: 'static_method_call',
                                 what: [
                                     'T_DOUBLE_COLON',
                                     {name: 'method', oneOf: ['N_STRING', 'N_VARIABLE', 'N_VARIABLE_EXPRESSION', 'N_MEMBER_EXPRESSION']},
-                                    (/\(/),
-                                    {name: 'args', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
-                                    (/\)/)
+                                    'N_CALL'
                                 ]
                             },
                             // Static object property
@@ -1012,14 +1078,10 @@ module.exports = {
                                     {name: 'constant', what: ['T_STRING', (/(?!\()/)]}
                                 ]
                             },
-                            // Call to callable stored in array index or static property
+                            // Call to callable bareword or stored in variable, array index or static property.
                             {
                                 name: 'callable',
-                                what: [
-                                    (/\(/),
-                                    {name: 'args', zeroOrMoreOf: ['N_EXPRESSION', {what: (/(,|(?=\)))()/), captureIndex: 2}]},
-                                    (/\)/)
-                                ]
+                                rule: 'N_CALL'
                             }
                         ]
                     }
@@ -1448,7 +1510,7 @@ module.exports = {
                         {name: 'returnType', rule: 'N_TYPE'}
                     ]
                 },
-                {name: 'body', what: 'N_STATEMENT'}
+                {name: 'body', rule: 'N_STATEMENT'}
             ],
             processor: function (node, parse, abort, context) {
                 if (context.yieldEncountered) {

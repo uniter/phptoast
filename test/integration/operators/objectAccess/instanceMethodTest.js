@@ -11,7 +11,9 @@
 
 var _ = require('microdash'),
     expect = require('chai').expect,
-    tools = require('../../../tools');
+    phpCommon = require('phpcommon'),
+    tools = require('../../../tools'),
+    PHPFatalError = phpCommon.PHPFatalError;
 
 describe('PHP Parser grammar object access operator "->" instance method call integration', function () {
     var parser;
@@ -62,6 +64,36 @@ describe('PHP Parser grammar object access operator "->" instance method call in
                             name: 'N_STRING_LITERAL',
                             string: 'not some PHP code'
                         }]
+                    }
+                }]
+            }
+        },
+        'call to instance method with one positional and one named argument': {
+            code: '$obj->myMethod(21, myParam: "test");',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_METHOD_CALL',
+                        object: {
+                            name: 'N_VARIABLE',
+                            variable: 'obj'
+                        },
+                        method: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
+                        args: [{
+                            name: 'N_INTEGER',
+                            number: '21'
+                        }],
+                        namedArgs: {
+                            'myParam': {
+                                name: 'N_STRING_LITERAL',
+                                string: 'test'
+                            }
+                        }
                     }
                 }]
             }
@@ -201,6 +233,77 @@ describe('PHP Parser grammar object access operator "->" instance method call in
                     }
                 }]
             }
+        },
+        'call to method of property with named argument': {
+            code: '$obj->prop->doSomething(myParam: "my arg");',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_METHOD_CALL',
+                        object: {
+                            name: 'N_OBJECT_PROPERTY',
+                            object: {
+                                name: 'N_VARIABLE',
+                                variable: 'obj'
+                            },
+                            property: {
+                                name: 'N_STRING',
+                                string: 'prop'
+                            }
+                        },
+                        method: {
+                            name: 'N_STRING',
+                            string: 'doSomething'
+                        },
+                        args: [],
+                        namedArgs: {
+                            'myParam': {
+                                name: 'N_STRING_LITERAL',
+                                string: 'my arg'
+                            }
+                        }
+                    }
+                }]
+            }
+        },
+        'call to method with complex expression as named argument': {
+            code: '$obj->myMethod(myParam: 10 + 5);',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_METHOD_CALL',
+                        object: {
+                            name: 'N_VARIABLE',
+                            variable: 'obj'
+                        },
+                        method: {
+                            name: 'N_STRING',
+                            string: 'myMethod'
+                        },
+                        args: [],
+                        namedArgs: {
+                            'myParam': {
+                                name: 'N_EXPRESSION',
+                                left: {
+                                    name: 'N_INTEGER',
+                                    number: '10'
+                                },
+                                right: [{
+                                    operator: '+',
+                                    operand: {
+                                        name: 'N_INTEGER',
+                                        number: '5'
+                                    }
+                                }]
+                            }
+                        }
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
@@ -213,5 +316,22 @@ describe('PHP Parser grammar object access operator "->" instance method call in
                 });
             });
         });
+    });
+
+    it('should raise a fatal error when a positional argument is provided after a named argument', function () {
+        var caughtError;
+        parser.getState().setPath('/path/to/my_module.php');
+
+        try {
+            parser.parse('<?php \n\n$obj->doSomething(firstArg: "one", "two");');
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).to.be.an.instanceOf(PHPFatalError);
+        expect(caughtError.getMessage()).to.equal('Cannot use positional argument after named argument');
+        expect(caughtError.getFilePath()).to.equal('/path/to/my_module.php');
+        expect(caughtError.getLevel()).to.equal('Fatal error');
+        expect(caughtError.getLineNumber()).to.equal(3);
     });
 });

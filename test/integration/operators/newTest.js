@@ -11,7 +11,9 @@
 
 var _ = require('microdash'),
     expect = require('chai').expect,
-    tools = require('../../tools');
+    phpCommon = require('phpcommon'),
+    tools = require('../../tools'),
+    PHPFatalError = phpCommon.PHPFatalError;
 
 describe('PHP Parser grammar new operator integration', function () {
     var parser;
@@ -69,6 +71,138 @@ describe('PHP Parser grammar new operator integration', function () {
                                     string: 'Worker'
                                 },
                                 args: []
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
+        'creating instance of class with name specified statically and one positional argument': {
+            code: '$object = new Worker(21);',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'object'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_NEW_EXPRESSION',
+                                className: {
+                                    name: 'N_STRING',
+                                    string: 'Worker'
+                                },
+                                args: [{
+                                    name: 'N_INTEGER',
+                                    number: '21'
+                                }]
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
+        'creating instance of class with name specified statically and two positional arguments': {
+            code: '$object = new Worker(21, 42);',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'object'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_NEW_EXPRESSION',
+                                className: {
+                                    name: 'N_STRING',
+                                    string: 'Worker'
+                                },
+                                args: [{
+                                    name: 'N_INTEGER',
+                                    number: '21'
+                                }, {
+                                    name: 'N_INTEGER',
+                                    number: '42'
+                                }]
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
+        'creating instance of class with name specified statically and one named argument': {
+            code: '$object = new Worker(myParam: 21);',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'object'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_NEW_EXPRESSION',
+                                className: {
+                                    name: 'N_STRING',
+                                    string: 'Worker'
+                                },
+                                args: [],
+                                namedArgs: {
+                                    myParam: {
+                                        name: 'N_INTEGER',
+                                        number: '21'
+                                    }
+                                }
+                            }
+                        }]
+                    }
+                }]
+            }
+        },
+        'creating instance of class with name specified statically, one positional and one named argument': {
+            code: '$object = new Worker(21, myParam: 21);',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_EXPRESSION',
+                        left: {
+                            name: 'N_VARIABLE',
+                            variable: 'object'
+                        },
+                        right: [{
+                            operator: '=',
+                            operand: {
+                                name: 'N_NEW_EXPRESSION',
+                                className: {
+                                    name: 'N_STRING',
+                                    string: 'Worker'
+                                },
+                                args: [{
+                                    name: 'N_INTEGER',
+                                    number: '21'
+                                }],
+                                namedArgs: {
+                                    myParam: {
+                                        name: 'N_INTEGER',
+                                        number: '21'
+                                    }
+                                }
                             }
                         }]
                     }
@@ -410,5 +544,22 @@ describe('PHP Parser grammar new operator integration', function () {
                 });
             });
         });
+    });
+
+    it('should raise a fatal error when a positional argument is provided after a named argument', function () {
+        var caughtError;
+        parser.getState().setPath('/path/to/my_module.php');
+
+        try {
+            parser.parse('<?php \n\n\n$myVar = new MyClass(firstArg: "one", "two");');
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).to.be.an.instanceOf(PHPFatalError);
+        expect(caughtError.getMessage()).to.equal('Cannot use positional argument after named argument');
+        expect(caughtError.getFilePath()).to.equal('/path/to/my_module.php');
+        expect(caughtError.getLevel()).to.equal('Fatal error');
+        expect(caughtError.getLineNumber()).to.equal(4);
     });
 });

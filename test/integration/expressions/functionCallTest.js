@@ -11,7 +11,9 @@
 
 var _ = require('microdash'),
     expect = require('chai').expect,
-    tools = require('../../tools');
+    phpCommon = require('phpcommon'),
+    tools = require('../../tools'),
+    PHPFatalError = phpCommon.PHPFatalError;
 
 describe('PHP Parser grammar function call expression integration', function () {
     var parser;
@@ -117,6 +119,86 @@ describe('PHP Parser grammar function call expression integration', function () 
                     }
                 }]
             }
+        },
+        'function call with one named argument only': {
+            code: 'now(myArg: "one");',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_FUNCTION_CALL',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'now'
+                        },
+                        args: [],
+                        namedArgs: {
+                            'myArg': {
+                                name: 'N_STRING_LITERAL',
+                                string: 'one'
+                            }
+                        }
+                    }
+                }]
+            }
+        },
+        'function call with two named arguments only': {
+            code: 'now(firstArg: "one", secondArg: "two");',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_FUNCTION_CALL',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'now'
+                        },
+                        args: [],
+                        namedArgs: {
+                            'firstArg': {
+                                name: 'N_STRING_LITERAL',
+                                string: 'one'
+                            },
+                            'secondArg': {
+                                name: 'N_STRING_LITERAL',
+                                string: 'two'
+                            }
+                        }
+                    }
+                }]
+            }
+        },
+        'function call with one positional and two named arguments': {
+            code: 'now("one", secondArg: "two", thirdArg: "three");',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_EXPRESSION_STATEMENT',
+                    expression: {
+                        name: 'N_FUNCTION_CALL',
+                        func: {
+                            name: 'N_STRING',
+                            string: 'now'
+                        },
+                        args: [{
+                            name: 'N_STRING_LITERAL',
+                            string: 'one'
+                        }],
+                        namedArgs: {
+                            'secondArg': {
+                                name: 'N_STRING_LITERAL',
+                                string: 'two'
+                            },
+                            'thirdArg': {
+                                name: 'N_STRING_LITERAL',
+                                string: 'three'
+                            }
+                        }
+                    }
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
@@ -129,5 +211,22 @@ describe('PHP Parser grammar function call expression integration', function () 
                 });
             });
         });
+    });
+
+    it('should raise a fatal error when a positional argument is provided after a named argument', function () {
+        var caughtError;
+        parser.getState().setPath('/path/to/my_module.php');
+
+        try {
+            parser.parse('<?php \n\nnow(firstArg: "one", "two");');
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).to.be.an.instanceOf(PHPFatalError);
+        expect(caughtError.getMessage()).to.equal('Cannot use positional argument after named argument');
+        expect(caughtError.getFilePath()).to.equal('/path/to/my_module.php');
+        expect(caughtError.getLevel()).to.equal('Fatal error');
+        expect(caughtError.getLineNumber()).to.equal(3);
     });
 });
