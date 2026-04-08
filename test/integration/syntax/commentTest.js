@@ -22,7 +22,7 @@ describe('PHP Parser grammar comment syntax integration', function () {
 
     _.each({
         'line-comment at beginning of module': {
-            code: '// My comment\nreturn "done";',
+            code: '<?php // My comment\nreturn "done";',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
@@ -35,7 +35,7 @@ describe('PHP Parser grammar comment syntax integration', function () {
             }
         },
         'line-comment at end of module': {
-            code: 'return "done";\n// My comment',
+            code: '<?php return "done";\n// My comment',
             expectedAST: {
                 name: 'N_PROGRAM',
                 statements: [{
@@ -46,10 +46,41 @@ describe('PHP Parser grammar comment syntax integration', function () {
                     }
                 }]
             }
+        },
+        // Line-comments cannot contain PHP closing tags.
+        'line-comment terminated by PHP closing tag': {
+            code: '<?php echo "first ";\n// My comment ?>second',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_ECHO_STATEMENT',
+                    expressions: [{
+                        name: 'N_STRING_LITERAL',
+                        string: 'first '
+                    }]
+                }, {
+                    name: 'N_INLINE_HTML_STATEMENT',
+                    html: 'second'
+                }]
+            }
+        },
+        // Block-comments can contain PHP closing tags.
+        'block-comment terminated by PHP closing tag': {
+            code: '<?php echo "first ";\n/* My comment ?>second */',
+            expectedAST: {
+                name: 'N_PROGRAM',
+                statements: [{
+                    name: 'N_ECHO_STATEMENT',
+                    expressions: [{
+                        name: 'N_STRING_LITERAL',
+                        string: 'first '
+                    }]
+                }]
+            }
         }
     }, function (scenario, description) {
         describe(description, function () {
-            var code = '<?php ' + scenario.code;
+            var code = scenario.code;
 
             // Pretty-print the code strings so any non-printable characters are readable
             describe('when the code is ' + JSON.stringify(code) + ' ?>', function () {
