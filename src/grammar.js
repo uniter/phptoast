@@ -425,6 +425,7 @@ module.exports = {
         'T_PRIVATE': /private\b/i,
         'T_PUBLIC': /public\b/i,
         'T_PROTECTED': /protected\b/i,
+        'T_READONLY': /readonly\b/i,
         'T_REQUIRE': /require\b/i,
         'T_REQUIRE_ONCE': /require_once\b/i,
         'T_RETURN': /return\b/i,
@@ -537,11 +538,29 @@ module.exports = {
         'N_ARGUMENT': {
             components: {oneOf: [
                 'N_VARIADIC_ARGUMENT',
+                // Constructor property promotion: visibility [readonly] [type] $var [= default].
+                [{name: 'visibility', rule: 'N_VISIBILITY'}, {optionally: {name: 'readonly', what: 'T_READONLY'}}, {name: 'type', rule: 'N_TYPE'}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}],
+                [{name: 'visibility', rule: 'N_VISIBILITY'}, {optionally: {name: 'readonly', what: 'T_READONLY'}}, {name: 'type', rule: 'N_TYPE'}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}],
+                [{name: 'visibility', rule: 'N_VISIBILITY'}, {optionally: {name: 'readonly', what: 'T_READONLY'}}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}],
+                [{name: 'visibility', rule: 'N_VISIBILITY'}, {optionally: {name: 'readonly', what: 'T_READONLY'}}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}],
+                // Constructor property promotion: readonly visibility [type] $var [= default].
+                [{name: 'readonly', what: 'T_READONLY'}, {name: 'visibility', rule: 'N_VISIBILITY'}, {name: 'type', rule: 'N_TYPE'}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}],
+                [{name: 'readonly', what: 'T_READONLY'}, {name: 'visibility', rule: 'N_VISIBILITY'}, {name: 'type', rule: 'N_TYPE'}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}],
+                [{name: 'readonly', what: 'T_READONLY'}, {name: 'visibility', rule: 'N_VISIBILITY'}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}],
+                [{name: 'readonly', what: 'T_READONLY'}, {name: 'visibility', rule: 'N_VISIBILITY'}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}],
+                // Regular parameters.
                 [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}],
                 [{name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}],
                 [{name: 'type', rule: 'N_TYPE'}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}, (/=/), {name: 'value', rule: 'N_EXPRESSION'}],
                 [{name: 'type', rule: 'N_TYPE'}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}]
-            ]}
+            ]},
+            processor: function (node) {
+                if (node.readonly) {
+                    node.readonly = true;
+                }
+
+                return node;
+            }
         },
         'N_VARIADIC_ARGUMENT': {
             captureAs: 'N_ARGUMENT',
@@ -699,8 +718,8 @@ module.exports = {
                     name: 'members',
                     zeroOrMoreOf: {
                         oneOf: [
-                            'N_INSTANCE_PROPERTY_DEFINITION',
                             'N_STATIC_PROPERTY_DEFINITION',
+                            'N_INSTANCE_PROPERTY_DEFINITION',
                             'N_METHOD_DEFINITION',
                             'N_STATIC_METHOD_DEFINITION',
                             'N_ABSTRACT_METHOD_DEFINITION',
@@ -1699,7 +1718,23 @@ module.exports = {
             components: {oneOf: ['N_STRING', 'N_VARIABLE', [(/\{/), 'N_EXPRESSION', (/\}/)]]}
         },
         'N_INSTANCE_PROPERTY_DEFINITION': {
-            components: [{name: 'visibility', oneOf: ['T_PUBLIC', 'T_PRIVATE', 'T_PROTECTED']}, {name: 'variable', what: 'N_VARIABLE'}, {optionally: [(/=/), {name: 'value', rule: 'N_EXPRESSION'}]}, 'N_END_STATEMENT']
+            components: [
+                {oneOf: [
+                    [{name: 'visibility', rule: 'N_VISIBILITY'}, {optionally: {name: 'readonly', what: 'T_READONLY'}}],
+                    [{name: 'readonly', rule: 'T_READONLY'}, {name: 'visibility', rule: 'N_VISIBILITY'}]
+                ]},
+                {optionally: {name: 'type', rule: 'N_TYPE'}},
+                {name: 'variable', what: 'N_VARIABLE'},
+                {optionally: [(/=/), {name: 'value', rule: 'N_EXPRESSION'}]},
+                'N_END_STATEMENT'
+            ],
+            processor: function (node) {
+                if (node.readonly) {
+                    node.readonly = true;
+                }
+
+                return node;
+            }
         },
         'N_INTEGER': {
             components: {name: 'number', what: 'T_LNUMBER'},
@@ -1749,8 +1784,8 @@ module.exports = {
                     'N_INTERFACE_METHOD_DEFINITION',
                     'N_STATIC_INTERFACE_METHOD_DEFINITION',
                     'N_CONSTANT_DEFINITION',
-                    'N_INSTANCE_PROPERTY_DEFINITION',
                     'N_STATIC_PROPERTY_DEFINITION',
+                    'N_INSTANCE_PROPERTY_DEFINITION',
                     'N_METHOD_DEFINITION',
                     'N_STATIC_METHOD_DEFINITION',
                     'N_ABSTRACT_METHOD_DEFINITION',
@@ -2223,7 +2258,10 @@ module.exports = {
                     ['T_STATIC', {name: 'visibility', rule: 'N_VISIBILITY'}],
                     'T_STATIC'
                 ]},
-                {name: 'variable', what: 'N_VARIABLE'}, {optionally: [(/=/), {name: 'value', rule: 'N_EXPRESSION'}]}, 'N_END_STATEMENT'
+                {optionally: {name: 'type', rule: 'N_TYPE'}},
+                {name: 'variable', what: 'N_VARIABLE'},
+                {optionally: [(/=/), {name: 'value', rule: 'N_EXPRESSION'}]},
+                'N_END_STATEMENT'
             ]
         },
         'N_STRING': {
@@ -2508,8 +2546,8 @@ module.exports = {
                 ]},
                 (/\{/),
                 {name: 'members', zeroOrMoreOf: {oneOf: [
-                    'N_INSTANCE_PROPERTY_DEFINITION',
                     'N_STATIC_PROPERTY_DEFINITION',
+                    'N_INSTANCE_PROPERTY_DEFINITION',
                     'N_METHOD_DEFINITION',
                     'N_STATIC_METHOD_DEFINITION',
                     'N_ABSTRACT_METHOD_DEFINITION',
