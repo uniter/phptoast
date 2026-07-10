@@ -481,15 +481,17 @@ module.exports = {
                 'N_END_STATEMENT'
             ],
             processor: function (node) {
-                if (!node.visibility) {
-                    node.visibility = 'public';
+                var result = Object.assign({}, node);
+
+                if (!result.visibility) {
+                    result.visibility = 'public';
                 }
 
-                if (node.returnByReference) {
-                    node.returnByReference = true;
+                if (result.returnByReference) {
+                    result.returnByReference = true;
                 }
 
-                return node;
+                return result;
             }
         },
         'N_ABSTRACT_STATIC_METHOD_DEFINITION': {
@@ -524,15 +526,17 @@ module.exports = {
                 'N_END_STATEMENT'
             ],
             processor: function (node) {
-                if (!node.visibility) {
-                    node.visibility = 'public';
+                var result = Object.assign({}, node);
+
+                if (!result.visibility) {
+                    result.visibility = 'public';
                 }
 
-                if (node.returnByReference) {
-                    node.returnByReference = true;
+                if (result.returnByReference) {
+                    result.returnByReference = true;
                 }
 
-                return node;
+                return result;
             }
         },
         'N_ARGUMENT': {
@@ -555,11 +559,9 @@ module.exports = {
                 [{name: 'type', rule: 'N_TYPE'}, {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}]
             ]},
             processor: function (node) {
-                if (node.readonly) {
-                    node.readonly = true;
-                }
-
-                return node;
+                return node.readonly ?
+                    Object.assign({}, node, { readonly: true }) :
+                    node;
             }
         },
         'N_VARIADIC_ARGUMENT': {
@@ -569,8 +571,7 @@ module.exports = {
                 [{name: 'type', rule: 'N_TYPE'}, (/\.\.\./), {name: 'variable', rule: 'N_ARGUMENT_VARIABLE'}]
             ]},
             processor: function (node) {
-                node.variadic = true;
-                return node;
+                return Object.assign({}, node, { variadic: true });
             }
         },
         'N_ARGUMENT_VARIABLE': {
@@ -610,19 +611,18 @@ module.exports = {
                 {name: 'string', what: 'N_STRING_LITERAL'}
             ],
             processor: function (node) {
-                node.name = 'N_BINARY_LITERAL';
-                // Extract the nested string from N_STRING_LITERAL
-                node.string = node.string.string;
-                return node;
+                return Object.assign({}, node, {
+                    name: 'N_BINARY_LITERAL',
+                    // Extract the nested string from N_STRING_LITERAL.
+                    string: node.string.string
+                });
             }
         },
         'N_BOOLEAN': {
             components: {name: 'bool', what: (/true|false/i)},
             processor: function (node) {
-                // Cast to a native boolean, accommodating the fact that the keywords are case-insensitive
-                node.bool = node.bool.toLowerCase() === 'true';
-
-                return node;
+                // Cast to a native boolean, accommodating the fact that the keywords are case-insensitive.
+                return Object.assign({}, node, { bool: node.bool.toLowerCase() === 'true' });
             }
         },
         'N_BREAK_STATEMENT': {
@@ -701,9 +701,11 @@ module.exports = {
                 (/\)/)
             ],
             processor: function (node) {
-                delete node.name;
+                var result = Object.assign({}, node);
 
-                return node;
+                delete result.name;
+
+                return result;
             }
         },
         'N_CLASS_STATEMENT': {
@@ -732,10 +734,9 @@ module.exports = {
                 (/\}/)
             ],
             processor: function (node) {
-                if (node.type) {
-                    node.type = node.type.toLowerCase();
-                }
-                return node;
+                return node.type ?
+                    Object.assign({}, node, { type: node.type.toLowerCase() }) :
+                    node;
             }
         },
         'N_CLOSURE': {
@@ -771,21 +772,21 @@ module.exports = {
                 {name: 'body', what: 'N_STATEMENT'}
             ],
             processor: function (node, parse, abort, context) {
-                node.static = !!node.static;
+                var result = Object.assign({}, node, { static: Boolean(node.static) });
 
                 if (context.yieldEncountered) {
                     delete context.yieldEncountered;
 
                     // One or more yield statements encountered inside,
                     // therefore this is a generator and not a normal closure.
-                    node.generator = true;
+                    result.generator = true;
                 }
 
                 if (node.returnByReference) {
-                    node.returnByReference = true;
+                    result.returnByReference = true;
                 }
 
-                return node;
+                return result;
             }
         },
         'N_COMMA_EXPRESSION': {
@@ -849,12 +850,14 @@ module.exports = {
                 'N_END_STATEMENT'
             ],
             processor: function (node) {
-                node.directives = [node.firstDirective].concat(node.otherDirectives);
+                var result = Object.assign({}, node, {
+                    directives: [node.firstDirective].concat(node.otherDirectives)
+                });
 
-                delete node.firstDirective;
-                delete node.otherDirectives;
+                delete result.firstDirective;
+                delete result.otherDirectives;
 
-                return node;
+                return result;
             }
         },
         'N_DEFAULT_CASE': {
@@ -1011,7 +1014,7 @@ module.exports = {
             ifNoMatch: {component: 'className', capture: 'next'},
             processor: function (node) {
                 if (node.className && !node.args) {
-                    node.args = [];
+                    return Object.assign({}, node, { args: [] });
                 }
 
                 return node;
@@ -1198,23 +1201,23 @@ module.exports = {
                 {name: 'operand', oneOf: ['N_ASSIGNMENT_EXPRESSION', 'N_EXPRESSION_LEVEL_4']}
             ],
             processor: function (node) {
-                var count;
+                var count,
+                    result;
 
                 if (node.operators.length === 0) {
                     return node.operand;
                 }
 
                 count = node.operators.length;
-                delete node.operators;
+                result = Object.assign({}, node, { operator: '!', prefix: true });
 
-                node.operator = '!';
-                node.prefix = true;
+                delete result.operators;
 
-                return buildUnaryTree(node, count, function (result) {
+                return buildUnaryTree(result, count, function (operandNode) {
                     return {
                         name: 'N_UNARY_EXPRESSION',
                         operator: '!',
-                        operand: result,
+                        operand: operandNode,
                         prefix: true
                     };
                 });
@@ -1400,13 +1403,13 @@ module.exports = {
                     return node.next;
                 }
 
-                if (!node.key) {
-                    node.key = null;
-                }
-
                 // This yield expression means that the function it is inside
                 // is a generator and not a normal function.
                 context.yieldEncountered = true;
+
+                if (!node.key) {
+                    return Object.assign({}, node, { key: null });
+                }
 
                 return node;
             }
@@ -1447,10 +1450,8 @@ module.exports = {
         'N_FLOAT': {
             components: {name: 'number', what: 'T_DNUMBER'},
             processor: function (node) {
-                // Coerce the matched numeric string to a native JS number
-                node.number = Number(node.number);
-
-                return node;
+                // Coerce the matched numeric string to a native JS number.
+                return Object.assign({}, node, { number: Number(node.number) });
             }
         },
         'N_FOR_STATEMENT': {
@@ -1532,19 +1533,21 @@ module.exports = {
                 {name: 'body', rule: 'N_STATEMENT'}
             ],
             processor: function (node, parse, abort, context) {
+                var result = Object.assign({}, node);
+
                 if (context.yieldEncountered) {
                     delete context.yieldEncountered;
 
                     // One or more yield statements encountered inside,
                     // therefore this is a generator and not a normal function.
-                    node.generator = true;
+                    result.generator = true;
                 }
 
                 if (node.returnByReference) {
-                    node.returnByReference = true;
+                    result.returnByReference = true;
                 }
 
-                return node;
+                return result;
             }
         },
         'N_GLOBAL_STATEMENT': {
@@ -1729,27 +1732,31 @@ module.exports = {
                 'N_END_STATEMENT'
             ],
             processor: function (node) {
-                if (node.readonly) {
-                    node.readonly = true;
-                }
-
-                return node;
+                return node.readonly ?
+                    Object.assign({}, node, { readonly: true }) :
+                    node;
             }
         },
         'N_INTEGER': {
             components: {name: 'number', what: 'T_LNUMBER'},
             processor: function (node) {
-                if (/^0x/i.test(node.number)) {
+                var number = node.number;
+
+                if (/^0x/i.test(number)) {
                     // Number is in hexadecimal. Note that unlike binary literals as below,
                     // the prefix does not need to be stripped off.
-                    node.number = parseInt(node.number, 16) + '';
-                } else if (/^0b/i.test(node.number)) {
-                    // Number is in binary. Note that "0b" prefix must be stripped off.
-                    node.number = parseInt(node.number.substring(2), 2) + '';
-                } else if (/^0/i.test(node.number)) {
-                    // In strict mode, parseInt(...) will parse an octal literal as decimal
-                    // so eg. parseInt('021') will return 21 instead of 17.
-                    node.number = parseInt(node.number, 8) + '';
+                    return Object.assign({}, node, { number: parseInt(number, 16) + '' });
+                }
+
+                if (/^0b/i.test(number)) {
+                    // Number is in binary. Note that the "0b" prefix must be stripped off.
+                    return Object.assign({}, node, { number: parseInt(number.substring(2), 2) + '' });
+                }
+
+                if (/^0/i.test(number)) {
+                    // In strict mode, parseInt(...) with no radix will parse an octal literal as decimal
+                    // so e.g. parseInt('021') will return 21 instead of 17.
+                    return Object.assign({}, node, { number: parseInt(number, 8) + '' });
                 }
 
                 // TODO: Always parse number property as a native number
@@ -1875,8 +1882,10 @@ module.exports = {
                 {name: 'body', what: 'N_STATEMENT'}
             ],
             processor: function (node, parse, abort, context) {
-                if (!node.visibility) {
-                    node.visibility = 'public';
+                var result = Object.assign({}, node);
+
+                if (!result.visibility) {
+                    result.visibility = 'public';
                 }
 
                 if (context.yieldEncountered) {
@@ -1884,14 +1893,14 @@ module.exports = {
 
                     // One or more yield statements encountered inside,
                     // therefore this is a generator and not a normal closure.
-                    node.generator = true;
+                    result.generator = true;
                 }
 
-                if (node.returnByReference) {
-                    node.returnByReference = true;
+                if (result.returnByReference) {
+                    result.returnByReference = true;
                 }
 
-                return node;
+                return result;
             }
         },
         'N_NAMESPACE': {
@@ -1991,7 +2000,11 @@ module.exports = {
             components: ['T_RETURN', {name: 'expression', optionally: 'N_EXPRESSION'}, 'N_END_STATEMENT'],
             processor: function (node) {
                 if (node.expression === '') {
-                    delete node.expression;
+                    var result = Object.assign({}, node);
+
+                    delete result.expression;
+
+                    return result;
                 }
 
                 return node;
@@ -2222,8 +2235,10 @@ module.exports = {
                 {name: 'body', what: 'N_STATEMENT'}
             ],
             processor: function (node, parse, abort, context) {
-                if (!node.visibility) {
-                    node.visibility = 'public';
+                var result = Object.assign({}, node);
+
+                if (!result.visibility) {
+                    result.visibility = 'public';
                 }
 
                 if (context.yieldEncountered) {
@@ -2231,14 +2246,14 @@ module.exports = {
 
                     // One or more yield statements encountered inside,
                     // therefore this is a generator and not a normal closure.
-                    node.generator = true;
+                    result.generator = true;
                 }
 
-                if (node.returnByReference) {
-                    node.returnByReference = true;
+                if (result.returnByReference) {
+                    result.returnByReference = true;
                 }
 
-                return node;
+                return result;
             }
         },
         'N_STATIC_VARIABLE': {
@@ -2418,41 +2433,51 @@ module.exports = {
                 }
             ],
             processor: function (node) {
-                var isVariableVariable = false,
+                var expression,
+                    isVariableVariable = false,
                     result;
 
                 if (!node || !node.expression) {
                     return node;
                 }
 
-                if (node.expression.name === 'N_VARIABLE') {
+                expression = node.expression;
+
+                if (expression.name === 'N_VARIABLE') {
                     // A variable was used inside the braces (eg. "${$myVar->prop}") -
                     // will resolve to the value of the variable whose name is contained in ->prop
                     isVariableVariable = true;
-                } else if (node.expression.name === 'N_STRING_SIMPLE_INTERPOLATED_BRACED_BARE_VARIABLE') {
+                } else if (expression.name === 'N_STRING_SIMPLE_INTERPOLATED_BRACED_BARE_VARIABLE') {
                     // A bare string was used inside the braces referencing a variable (eg. "${myVar->prop}") -
-                    // will resolve to the value of ->prop
-                    node.expression.name = 'N_VARIABLE';
-
-                    if (node.expression.bounds) {
-                        // Account for the leading dollar
-                        node.expression.bounds.start.offset--;
-                        node.expression.bounds.start.column--;
+                    // will resolve to the value of ->prop.
+                    if (expression.bounds) {
+                        expression = Object.assign({}, expression, {
+                            name: 'N_VARIABLE',
+                            bounds: Object.assign({}, expression.bounds, {
+                                // Account for the leading dollar.
+                                start: Object.assign({}, expression.bounds.start, {
+                                    offset: expression.bounds.start.offset - 1,
+                                    column: expression.bounds.start.column - 1
+                                })
+                            })
+                        });
+                    } else {
+                        expression = Object.assign({}, expression, { name: 'N_VARIABLE' });
                     }
-                } else if (node.expression.name === 'N_STRING_SIMPLE_INTERPOLATED_BRACED_CLASS_NAME') {
-                    // A bare string was used inside the braces referencing a class (eg. "${MyClass::MY_CONST}") -
-                    // will resolve to the value of the variable whose name is contained in ::MY_CONST
+                } else if (expression.name === 'N_STRING_SIMPLE_INTERPOLATED_BRACED_CLASS_NAME') {
+                    // A bare string was used inside the braces referencing a class (e.g. `${MyClass::MY_CONST}`) -
+                    // will resolve to the value of the variable whose name is contained in `::MY_CONST`.
                     isVariableVariable = true;
-                    node.expression.name = 'N_STRING';
+                    expression = Object.assign({}, expression, { name: 'N_STRING' });
                 } else {
                     throw new Error(
                         'N_STRING_SIMPLE_INTERPOLATED_DEREFERENCE :: Unexpected node type "' +
-                        node.expression.name +
+                        expression.name +
                         '"'
                     );
                 }
 
-                result = buildMemberExpressionTree(node.expression, node.member);
+                result = buildMemberExpressionTree(expression, node.member);
 
                 if (isVariableVariable) {
                     result = {
@@ -2559,8 +2584,9 @@ module.exports = {
             ],
             processor: function (node) {
                 if (node.type) {
-                    node.type = node.type.toLowerCase();
+                    return Object.assign({}, node, { type: node.type.toLowerCase() });
                 }
+
                 return node;
             }
         },
@@ -2583,7 +2609,7 @@ module.exports = {
             ],
             processor: function (node) {
                 if (!node.finalizer) {
-                    node.finalizer = null;
+                    return Object.assign({}, node, { finalizer: null });
                 }
 
                 return node;
@@ -2664,12 +2690,14 @@ module.exports = {
                 {name: 'otherTypes', oneOrMoreOf: [/\|/, 'N_SINGLE_TYPE']}
             ],
             processor: function (node) {
-                node.types = [node.firstType].concat(node.otherTypes);
+                var result = Object.assign({}, node, {
+                    types: [node.firstType].concat(node.otherTypes)
+                });
 
-                delete node.firstType;
-                delete node.otherTypes;
+                delete result.firstType;
+                delete result.otherTypes;
 
-                return node;
+                return result;
             }
         },
         'N_UNSET_STATEMENT': {
@@ -2692,12 +2720,14 @@ module.exports = {
                 'N_END_STATEMENT'
             ],
             processor: function (node) {
-                node.traitNames = [node.firstTrait].concat(node.otherTraits);
+                var result = Object.assign({}, node, {
+                    traitNames: [node.firstTrait].concat(node.otherTraits)
+                });
 
-                delete node.firstTrait;
-                delete node.otherTraits;
+                delete result.firstTrait;
+                delete result.otherTraits;
 
-                return node;
+                return result;
             }
         },
         'N_USE_STATEMENT': {
